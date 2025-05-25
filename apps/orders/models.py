@@ -5,6 +5,16 @@ from django.db import models
 from apps.products.models import Product
 
 
+class Order(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    total_price = models.DecimalField(max_digits=8, decimal_places=2)
+    is_first_order = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Order #{self.id} for {self.user.username}"
+
+
 class Cart(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

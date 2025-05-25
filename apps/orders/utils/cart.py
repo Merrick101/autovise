@@ -1,7 +1,34 @@
 # orders/utils/cart.py
 
-from orders.models import Cart, CartItem
+from apps.orders.models import Cart, CartItem
 from apps.products.models import Product
+
+
+def add_to_cart(request, product_id, quantity=1):
+    product = Product.objects.get(id=product_id)
+
+    if request.user.is_authenticated:
+        cart = get_or_create_cart(request.user)
+        item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+        if not created:
+            item.quantity += quantity
+        else:
+            item.quantity = quantity
+        item.save()
+    else:
+        cart = request.session.get('cart', {})
+        product_code = product.product_code
+        if product_code in cart:
+            cart[product_code]['quantity'] += quantity
+        else:
+            cart[product_code] = {
+                'product_id': product.id,
+                'name': product.name,
+                'quantity': quantity,
+                'price': float(product.price),
+                'image_type': product.image_type,
+            }
+        save_cart(request, cart)
 
 
 def get_or_create_cart(user):
