@@ -1,11 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cart</title>
-</head>
-<body>
-  
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Your Cart</h2>
+
+  {% if cart_items %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Subtotal</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in cart_items %}
+        <tr>
+          <td>
+            {{ item.product.name }}<br>
+            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" width="60">
+          </td>
+          <td>
+            <form action="{% url 'orders:update_quantity' item.product.id %}" method="post" class="d-inline">
+              {% csrf_token %}
+              <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control d-inline w-auto">
+              <button type="submit" class="btn btn-sm btn-secondary">Update</button>
+            </form>
+          </td>
+          <td>£{{ item.product.price }}</td>
+          <td>£{{ item.subtotal }}</td>
+          <td>
+            <form action="{% url 'orders:remove_item' item.product.id %}" method="post" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="cart-actions mt-3">
+      <form action="{% url 'orders:clear_cart' %}" method="post" onsubmit="return confirm('Are you sure you want to clear the cart?')">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Clear Cart</button>
+      </form>
+    </div>
+
+    <h3 class="mt-4">Total: £{{ cart_total }}</h3>
+
+    {% if discount %}
+      <p class="text-success">You saved £{{ discount }}</p>
+    {% endif %}
+
+  {% else %}
+    <p>Your cart is empty.</p>
+  {% endif %}
+{% endblock %}

@@ -20,3 +20,13 @@ def get_active_cart(request):
     else:
         cart = request.session.get('cart', {})
         return cart, 'session'
+
+
+def save_cart(request, cart_data):
+    request.session['cart'] = cart_data
+    request.session.modified = True
+
+
+def clear_session_cart(request):
+    request.session['cart'] = {}
+    request.session.modified = True
