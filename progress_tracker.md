@@ -8,6 +8,7 @@
 - Task 2 – Add to Cart Functionality ✔️
 - Task 3 – Cart Page with Summary ✔️
 - Task 4 – Discount Application ✔️
+- Task 5 - Shipping & Delivery Rules ✔️
 
 ---
 
@@ -30,4 +31,17 @@ Completed automatic discount handling for first-time users and bundle items.
 - Discount messaging is accessible and ARIA-compliant
 
 Ready for integration into checkout flow in EPIC 05 Task 6.
+
+---
+
+**Task 5 Complete:**
+
+Implemented delivery logic based on business rules:
+- Free delivery applied if cart total ≥ £40 or user is a first-time buyer
+- Default £4.99 delivery fee added when no free conditions are met
+- Estimated delivery date calculated as 2 days from the current date
+
+All logic is handled within the cart summary helper, making it reusable for checkout and confirmation views. Delivery status, fee, and estimated date are clearly shown in the cart view.
+
+---
 
