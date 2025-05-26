@@ -1,3 +1,9 @@
+# config/settings.py
+
+from dotenv import load_dotenv
+load_dotenv()
+
+
 from decouple import config
 from pathlib import Path
 
@@ -84,7 +90,22 @@ MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaw
 # Stripe Credentials
 STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY")
 STRIPE_PUBLISHABLE_KEY = config("STRIPE_PUBLISHABLE_KEY")
-STRIPE_WEBHOOK_SECRET= config("STRIPE_WEBHOOK_SECRET")
+STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET")
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}
 
 
 # Database

@@ -20,23 +20,23 @@ def stripe_webhook_view(request):
     webhook_secret = settings.STRIPE_WEBHOOK_SECRET
 
     try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, webhook_secret
-        )
+        event = stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
     except ValueError as e:
-        logger.error(f"Invalid payload: {e}")
+        logger.warning(f"Invalid payload: {e}")
         return HttpResponseBadRequest()
     except stripe.error.SignatureVerificationError as e:
-        logger.error(f"Invalid signature: {e}")
+        logger.warning(f"Invalid signature: {e}")
         return HttpResponseBadRequest()
 
-    # Handle the completed checkout
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
-        logger.info(f"Checkout completed: {session['id']}")
+        logger.info(f"✅ Webhook: checkout.session.completed | Session ID: {session['id']}")
 
-        # Placeholder: implement this function
         from apps.orders.utils.order import create_order_from_stripe_session
-        create_order_from_stripe_session(session)
+        try:
+            create_order_from_stripe_session(session)
+        except Exception as e:
+            logger.error(f"Order creation failed for session {session['id']}: {e}")
+            return HttpResponse(status=500)
 
     return HttpResponse(status=200)

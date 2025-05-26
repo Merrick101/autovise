@@ -1,5 +1,8 @@
+# config/urls.py
+
 from django.contrib import admin
 from django.urls import path, include
+from apps.orders.views.webhook import stripe_webhook_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -10,4 +13,5 @@ urlpatterns = [
     path('users/', include('apps.users.urls')),
     path('', include('apps.pages.urls')),
     path('assets/', include('apps.assets.urls')),
+    path('webhooks/stripe/', stripe_webhook_view, name='stripe_webhook'),
 ]
