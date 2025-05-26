@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
-  <h2>Payment cancelled</h2>
-  <p>You have not been charged. You can return to your cart and try again.</p>
+  <div class="container mt-5">
+    <h2>⚠️ Payment Cancelled</h2>
+    <p>Your payment was not completed.</p>
+
+    <p>You have not been charged. You can return to your cart and try again at any time.</p>
+
+    <a href="{% url 'orders:cart' %}" class="btn btn-warning mt-3">Return to Cart</a>
+  </div>
 {% endblock %}
