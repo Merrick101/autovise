@@ -2,7 +2,6 @@
 
 from apps.orders.models import Cart, CartItem
 from apps.products.models import Product
-from apps.orders.views import get_or_create_cart, is_first_time_user
 from datetime import date, timedelta
 
 
