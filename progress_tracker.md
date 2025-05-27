@@ -58,3 +58,13 @@ Successfully implemented secure payment processing using Stripe Checkout, integr
 
 ---
 
+**Task 7 Complete:**
+
+Implemented post-payment confirmation flow to display order details, contact links, and send an optional receipt via email after successful Stripe checkout.
+- Created checkout_success_view to display order summary by session ID
+- Designed user-friendly success template with order info and support links
+- Added plaintext email confirmation template using Django’s console backend
+- Sent confirmation email upon webhook-triggered order creation
+
+---
+
