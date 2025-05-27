@@ -1,17 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Product List</title>
-</head>
-<body>
+<!-- templates/products/product_list.html -->
 
-<form action="{% url 'orders:add_to_cart' product.id %}" method="post">
-  {% csrf_token %}
-  <input type="hidden" name="quantity" value="1">
-  <button type="submit" class="btn btn-primary">Add to Cart</button>
-</form>
+{% extends "base.html" %}
+{% block content %}
+<h2>Autovise Product Catalog</h2>
 
-</body>
-</html>
+<div class="row">
+  {% for product in products %}
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">{{ product.name }}</h5>
+          <p class="card-text">£{{ product.price }}</p>
+          <form action="{% url 'orders:add_to_cart' product.id %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="quantity" value="1">
+            <button type="submit" class="btn btn-primary">Add to Cart</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

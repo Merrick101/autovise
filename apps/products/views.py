@@ -1,5 +1,9 @@
-from django.http import HttpResponse
+# apps/products/views.py
+
+from django.shortcuts import render
+from .models import Product
 
 
-def index(request):
-    return HttpResponse("Products app is connected!")
+def product_list_view(request):
+    products = Product.objects.all()
+    return render(request, 'products/product_list.html', {'products': products})

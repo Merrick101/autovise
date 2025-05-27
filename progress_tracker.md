@@ -68,3 +68,14 @@ Implemented post-payment confirmation flow to display order details, contact lin
 
 ---
 
+**Task 11 Complete:**
+
+Configured Django admin for efficient management and testing of products, carts, and orders. Admin panel now supports filtering, inline editing, and visibility into all key data models.
+- Registered Product, Cart, CartItem, Order, and OrderItem models
+- Customized admin list views with filters, search, and date hierarchy
+- Added inline OrderItem editing within Order admin
+- Prepared admin with test data to support checkout and webhook testing
+
+---
+
+**Task 12 Complete:**
