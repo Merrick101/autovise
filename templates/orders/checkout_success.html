@@ -3,10 +3,22 @@
 {% extends "base.html" %}
 {% block content %}
   <div class="container mt-5">
-    <h2>🎉 Payment Successful</h2>
-    <p>Thank you for your purchase!</p>
+    <h2>🎉 Order Confirmed</h2>
+    {% if order %}
+      <p>Thank you for your purchase, {{ order.user.username }}!</p>
 
-    <p>Your order is being processed. You’ll receive a confirmation shortly.</p>
+      <h4>Order Summary:</h4>
+      <ul>
+        {% for item in order.items.all %}
+          <li>{{ item.quantity }} × {{ item.product.name }} – £{{ item.subtotal|floatformat:2 }}</li>
+        {% endfor %}
+      </ul>
+      <p><strong>Total:</strong> £{{ order.total_price }}</p>
+    {% else %}
+      <p>Your order has been received. (No details available)</p>
+    {% endif %}
+
+    <p>If you have any questions, please <a href="{{ contact_page_url }}">contact support</a> or email us at <a href="mailto:{{ support_email }}">{{ support_email }}</a>.</p>
 
     <a href="{% url 'products:product_list' %}" class="btn btn-primary mt-3">Continue Shopping</a>
   </div>

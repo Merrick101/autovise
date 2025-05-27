@@ -45,3 +45,16 @@ All logic is handled within the cart summary helper, making it reusable for chec
 
 ---
 
+**Task 6 Complete:**
+
+Successfully implemented secure payment processing using Stripe Checkout, integrated with Django via a verified webhook that creates Order and OrderItem records post-payment.
+- Created dynamic Stripe Checkout Sessions with product line_items
+- Passed user_id and product_ids as session metadata for webhook access
+- Added /checkout/success/ and /checkout/cancel/ routes for user feedback
+- Implemented stripe_webhook_view with signature verification and logging
+- Created OrderItem model and create_order_from_stripe_session() function
+- Tested local webhook delivery with stripe listen and trigger checkout.session.completed
+- Verified cart clearance and secure order creation logic
+
+---
+
