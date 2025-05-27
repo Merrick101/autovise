@@ -1,4 +1,4 @@
-# orders/models.py
+# apps/orders/models.py
 
 from django.conf import settings
 from django.db import models
@@ -13,6 +13,19 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order #{self.id} for {self.user.username}"
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+    quantity = models.PositiveIntegerField(default=1)
+    unit_price = models.DecimalField(max_digits=8, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.quantity} × {self.product.name} @ £{self.unit_price}"
+
+    def subtotal(self):
+        return self.quantity * self.unit_price
 
 
 class Cart(models.Model):
