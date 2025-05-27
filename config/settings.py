@@ -1,11 +1,9 @@
 # config/settings.py
 
-from dotenv import load_dotenv
-load_dotenv()
-
-
 from decouple import config
 from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -106,6 +104,10 @@ LOGGING = {
         'level': 'INFO',
     },
 }
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'no-reply@autovise.co.uk'
 
 
 # Database

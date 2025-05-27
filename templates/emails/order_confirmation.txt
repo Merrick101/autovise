@@ -1,0 +1,19 @@
+Hi {{ user.username }},
+
+Thank you for your order!
+
+Order ID: {{ order.id }}
+Date: {{ order.created_at|date:"F j, Y, g:i a" }}
+
+Order Summary:
+{% for item in order.items.all %}
+- {{ item.quantity }} × {{ item.product.name }} — £{{ item.subtotal|floatformat:2 }}
+{% endfor %}
+
+Total: £{{ order.total_price }}
+
+We’ll keep you updated when it’s ready for delivery.
+If you have any questions, reply to this email or contact us at support@autovise.co.uk.
+
+Thanks again,
+The Autovise Team

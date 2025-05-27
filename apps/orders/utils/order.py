@@ -3,11 +3,12 @@
 from django.contrib.auth import get_user_model
 from apps.orders.models import Order, OrderItem, Cart
 from apps.products.models import Product
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 
 
 def create_order_from_stripe_session(session):
     user_id = session.get('metadata', {}).get('user_id')
-    line_items = session.get('display_items') or []
 
     # Attempt to find user (optional, supports guest checkout)
     User = get_user_model()
@@ -37,7 +38,7 @@ def create_order_from_stripe_session(session):
             OrderItem.objects.create(
                 order=order,
                 product=product,
-                quantity=1  # You can extend this later with exact quantities
+                quantity=1  # Assuming quantity is 1 for simplicity
             )
         except Product.DoesNotExist:
             continue
@@ -45,3 +46,17 @@ def create_order_from_stripe_session(session):
     # Optional: clean up user cart
     if user:
         Cart.objects.filter(user=user).delete()
+    # Optional: send confirmation email
+    if user and user.email:
+        subject = f"Your Autovise Order #{order.id} Confirmation"
+        message = render_to_string("emails/order_confirmation.txt", {
+            "user": user,
+            "order": order,
+        })
+        send_mail(
+            subject,
+            message,
+            "no-reply@autovise.co.uk",  # From email
+            [user.email],
+            fail_silently=True,
+        )
