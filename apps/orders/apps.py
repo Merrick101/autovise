@@ -1,3 +1,5 @@
+# apps/orders/apps.py
+
 from django.apps import AppConfig
 
 
@@ -7,4 +9,4 @@ class OrdersConfig(AppConfig):
 
 
 def ready(self):
-    import apps.orders.signals
+    import apps.orders.signals  # noqa: F401

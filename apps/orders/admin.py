@@ -1,7 +1,23 @@
 # apps/orders/admin.py
 
 from django.contrib import admin
+from django.utils.timezone import now
+from datetime import timedelta
 from apps.orders.models import Order, OrderItem, Cart, CartItem
+
+
+class AbandonedCartFilter(admin.SimpleListFilter):
+    title = 'abandoned carts'
+    parameter_name = 'abandoned'
+
+    def lookups(self, request, model_admin):
+        return [('yes', 'Abandoned (30+ min)')]
+
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            cutoff = now() - timedelta(minutes=30)
+            return queryset.filter(updated_at__lt=cutoff, is_active=True)
+        return queryset
 
 
 class OrderItemInline(admin.TabularInline):
@@ -33,7 +49,7 @@ class OrderItemAdmin(admin.ModelAdmin):
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
     list_display = ['user', 'created_at', 'updated_at', 'is_active']
-    list_filter = ['is_active']
+    list_filter = ['is_active', AbandonedCartFilter]  # ✅ Added custom filter
     search_fields = ['user__username']
 
 
