@@ -123,3 +123,12 @@ Key Actions:
 **Task 9 - (Optional) Cart Analytics or Admin Monitoring:**
 
 Key Actions:
+- Cart model registered in admin with user, created_at, updated_at, and is_active fields
+- Added custom admin filter for abandoned carts (inactive for 30+ minutes)
+- Signal-based logging implemented for Cart and CartItem creation/updates
+- Session-to-DB cart merge events logged on user login
+- Documented cart storage behavior, expiration rules, and analytics potential in README
+- Future enhancements (e.g., recovery emails, cron cleanup) noted but out of scope for this phase
+
+---
+

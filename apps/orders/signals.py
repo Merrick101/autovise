@@ -4,7 +4,7 @@ import logging
 from django.contrib.auth.signals import user_logged_in
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils.timezone import now
+from django.utils.timezone import now  # noqa: F401
 from orders.models import Cart, CartItem
 from orders.utils.cart import get_or_create_cart
 
