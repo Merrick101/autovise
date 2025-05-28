@@ -1,8 +1,15 @@
-# orders/utils/cart.py
+# apps/orders/utils/cart.py
 
 from apps.orders.models import Cart, CartItem
 from apps.products.models import Product
 from datetime import date, timedelta
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def is_first_time_user(user):
+    return not user.orders.exists()
 
 
 def add_to_cart(request, product_id, quantity=1):
@@ -11,10 +18,7 @@ def add_to_cart(request, product_id, quantity=1):
     if request.user.is_authenticated:
         cart = get_or_create_cart(request.user)
         item, created = CartItem.objects.get_or_create(cart=cart, product=product)
-        if not created:
-            item.quantity += quantity
-        else:
-            item.quantity = quantity
+        item.quantity = item.quantity + quantity if not created else quantity
         item.save()
     else:
         cart = request.session.get('cart', {})
@@ -33,21 +37,11 @@ def add_to_cart(request, product_id, quantity=1):
 
 
 def get_or_create_cart(user):
-    """Returns the active cart for a user or creates one if it doesn't exist."""
-    cart, created = Cart.objects.get_or_create(user=user, is_active=True)
-    return cart
+    return Cart.objects.get_or_create(user=user, is_active=True)[0]
 
 
 def get_active_cart(request):
-    """
-    Returns a tuple: (cart object, 'db') for authenticated users,
-    or (session cart dict, 'session') for guests.
-    """
-    if request.user.is_authenticated:
-        return get_or_create_cart(request.user), 'db'
-    else:
-        cart = request.session.get('cart', {})
-        return cart, 'session'
+    return (get_or_create_cart(request.user), 'db') if request.user.is_authenticated else (request.session.get('cart', {}), 'session')
 
 
 def save_cart(request, cart_data):
@@ -68,7 +62,7 @@ def calculate_cart_summary(request, cart_data, cart_type):
     first_time_discount = False
 
     def is_bundle(product):
-        return hasattr(product, 'is_bundle') or product.type.name.lower() == "bundle"
+        return product.type and product.type.name.lower() == "bundle"
 
     if cart_type == 'db':
         for item in cart_data.items.select_related('product'):
@@ -80,11 +74,16 @@ def calculate_cart_summary(request, cart_data, cart_type):
                 'product': product,
                 'quantity': item.quantity,
                 'subtotal': subtotal,
+                'tier': product.tier,
+                'is_bundle': True if is_bundle(product) else False,
             })
             total += subtotal
     else:
         for _, item in cart_data.items():
-            product = Product.objects.get(id=item['product_id'])
+            try:
+                product = Product.objects.get(id=item['product_id'])
+            except Product.DoesNotExist:
+                continue
             subtotal = item['quantity'] * product.price
             if is_bundle(product):
                 bundle_discount_total += subtotal * 0.10
@@ -92,6 +91,8 @@ def calculate_cart_summary(request, cart_data, cart_type):
                 'product': product,
                 'quantity': item['quantity'],
                 'subtotal': subtotal,
+                'tier': product.tier,
+                'is_bundle': is_bundle(product),
             })
             total += subtotal
 
@@ -103,7 +104,6 @@ def calculate_cart_summary(request, cart_data, cart_type):
         cart_discount_total = total * 0.10
         total -= cart_discount_total
 
-    # Delivery logic
     delivery_fee = 4.99
     free_delivery = first_time_discount or total_before_discount >= 40
     if free_delivery:
@@ -111,6 +111,14 @@ def calculate_cart_summary(request, cart_data, cart_type):
 
     grand_total = total + delivery_fee
     estimated_delivery = date.today() + timedelta(days=2)
+
+    logger.debug(
+        f"[CART] Items: {len(items)} | "
+        f"Subtotal: {total_before_discount:.2f} | "
+        f"Bundle Discount: {bundle_discount_total:.2f} | "
+        f"First-Time Discount: {cart_discount_total:.2f} | "
+        f"Final: {total:.2f} | Delivery: {delivery_fee:.2f} | Grand: {grand_total:.2f}"
+    )
 
     return {
         'cart_items': items,
