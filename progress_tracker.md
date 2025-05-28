@@ -9,19 +9,18 @@
 3. Cart Page with Summary ✔️
 4. Discount Application ✔️
 5. Shipping & Delivery Rules ✔️
-6. Stripe Integration for Checkout
-7. Order Confirmation & Thank You Page
-8. Checkout Testing
-9. Apply Tier & Bundle Rules in Backend
-10. (Optional) Cart Analytics or Admin Monitoring
-11. Admin Panel Setup
-12. Basic Frontend for Checkout Flow
+6. Stripe Integration for Checkout ✔️
+7. Order Confirmation & Thank You Page ✔️
+8. Apply Tier & Bundle Rules in Backend ✔️
+9. (Optional) Cart Analytics or Admin Monitoring
+10. Admin Panel Setup ✔️
+11. Basic Frontend for Checkout Flow ✔️
 
 ---
 
 ### Completion Notes
 
-**Task 3 Complete:** 
+**Task 3 - Cart Page with Summary:** 
 
 Key Actions:
 - Cart page implemented with full interactivity, pricing logic, and accessible controls.
@@ -29,7 +28,7 @@ Key Actions:
 
 ---
 
-**Task 4 Complete:**
+**Task 4 - Discount Application:**
 
 Completed automatic discount handling for first-time users and bundle items.
 
@@ -44,7 +43,7 @@ Ready for integration into checkout flow in EPIC 05 Task 6.
 
 ---
 
-**Task 5 Complete:**
+**Task 5 - Shipping & Delivery Rules:**
 
 Implemented delivery logic based on business rules:
 
@@ -57,7 +56,7 @@ All logic is handled within the cart summary helper, making it reusable for chec
 
 ---
 
-**Task 6 Complete:**
+**Task 6 - Stripe Integration for Checkout:**
 
 Successfully implemented secure payment processing using Stripe Checkout, integrated with Django via a verified webhook that creates Order and OrderItem records post-payment.
 
@@ -72,7 +71,7 @@ Key Actions:
 
 ---
 
-**Task 7 Complete:**
+**Task 7 - Order Confirmation & Thank You Page:**
 
 Implemented post-payment confirmation flow to display order details, contact links, and send an optional receipt via email after successful Stripe checkout.
 
@@ -84,7 +83,7 @@ Key Actions:
 
 ---
 
-**Task 11 Complete:**
+**Task 10 - Admin Panel Setup:**
 
 Configured Django admin for efficient management and testing of products, carts, and orders. Admin panel now supports filtering, inline editing, and visibility into all key data models.
 
@@ -96,7 +95,7 @@ Key Actions:
 
 ---
 
-**Task 12 Complete:**
+**Task 11 - Basic Frontend for Checkout Flow:**
 
 Implemented a minimal frontend interface to support manual testing of the cart and Stripe checkout flow. Product listings and cart functionality are now testable through basic templates and views.
 
@@ -107,3 +106,20 @@ Key Actions:
 - Connected cart and checkout logic with clean template integration
 
 ---
+
+**Task 8 - Apply Tier & Bundle Rules in Backend:**
+
+Key Actions:
+- Implemented 10% automatic discount for predefined bundle products using product.type.name == "bundle"
+- Added tier and bundle flags (tier, is_bundle) to cart item data for display and analytics
+- Applied 10% first-time user discount for authenticated users (single-use logic)
+- Delivery fee logic added with conditional free shipping for first-time buyers or totals ≥ £40
+- Final cart summary includes subtotal, discounts, delivery, and grand total
+- Logging added for cart calculations to support debugging and admin review
+- Manual multi-item bundle detection is out of scope for this phase (deferred)
+
+---
+
+**Task 9 - (Optional) Cart Analytics or Admin Monitoring:**
+
+Key Actions:
