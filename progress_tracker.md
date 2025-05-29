@@ -141,7 +141,7 @@ Key Actions:
 3. Custom User Model & Profile Extension ✔️
 4. Profile Page (Logged-In Users) ✔️
 5. Authentication Tests
-6. Discount Logic Hook
+6. Discount Logic Hook ✔️
 7. Optional Enhancements
 
 ---
@@ -197,5 +197,26 @@ Key Actions:
 ---
 
 **Task 5 - Authentication Tests:**
+
+Key Actions:
+
+---
+
+**Task 6 - Discount Logic Hook:**
+
+Integrated the is_first_time_buyer flag from the UserProfile model into the cart and checkout flow. Applied a secure 10% discount logic for authenticated first-time buyers, applied after bundle discounts and before delivery. Profile flag is reset only after successful order creation to avoid race conditions. Added logging for discount application and profile update.
+
+Key Actions:
+- Linked profile logic into calculate_cart_summary()
+- Discount displayed in the final cart summary context
+- Profile flag reset in create_order_from_stripe_session only after order saved
+- Server-side validation only (no client-side spoofing risk)
+- Logged discount application and user state change
+
+Optional enhancements (e.g., usage timestamp, profile banner) can be added later if time permits.
+
+---
+
+**Task 7 - Optional Enhancements:**
 
 Key Actions:
