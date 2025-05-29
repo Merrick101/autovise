@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     # Apps
     'apps.products',
     'apps.orders',
-    'apps.users',
+    'apps.users.apps.UsersConfig',
     'apps.pages',
     'apps.assets',
     # External Libraries

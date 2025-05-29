@@ -137,8 +137,8 @@ Key Actions:
 ### Tasks
 
 1. Install & Configure Django Allauth ✔️
-2. Signup, Login, Logout Flow
-3. Custom User Model & Profile Extension
+2. Signup, Login, Logout Flow ✔️
+3. Custom User Model & Profile Extension ✔️
 4. Profile Page (Logged-In Users)
 5. Authentication Tests
 6. Discount Logic Hook
@@ -173,3 +173,17 @@ Key Actions:
 
 ---
 
+**Task 3 - Custom User Model & Profile Extension:**
+
+Key Actions:
+- Created `UserProfile` model with a OneToOne relationship to Django’s `User`
+- Added key fields: `is_first_time_buyer`, `address`, `phone_number`, and `preferences`
+- Implemented `post_save` signal to automatically create a profile on user registration
+- Registered signal via `UsersConfig.ready()` and confirmed proper app config usage
+- Applied migrations successfully with all new fields in place
+
+---
+
+**Task 4 - Profile Page (Logged-In Users):**
+
+Key Actions:
