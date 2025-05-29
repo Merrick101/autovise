@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def is_first_time_user(user):
-    return not user.orders.exists()
+    return hasattr(user, 'profile') and user.profile.is_first_time_buyer
 
 
 def add_to_cart(request, product_id, quantity=1):

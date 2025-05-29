@@ -5,6 +5,9 @@ from apps.orders.models import Order, OrderItem, Cart
 from apps.products.models import Product
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def create_order_from_stripe_session(session):
@@ -46,6 +49,11 @@ def create_order_from_stripe_session(session):
     # Optional: clean up user cart
     if user:
         Cart.objects.filter(user=user).delete()
+        profile = getattr(user, 'profile', None)
+        if profile and profile.is_first_time_buyer:
+            profile.is_first_time_buyer = False
+            profile.save()
+            logger.info(f"[PROFILE] First-time buyer flag reset for user {user}.")
     # Optional: send confirmation email
     if user and user.email:
         subject = f"Your Autovise Order #{order.id} Confirmation"

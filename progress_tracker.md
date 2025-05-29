@@ -139,7 +139,7 @@ Key Actions:
 1. Install & Configure Django Allauth ✔️
 2. Signup, Login, Logout Flow ✔️
 3. Custom User Model & Profile Extension ✔️
-4. Profile Page (Logged-In Users)
+4. Profile Page (Logged-In Users) ✔️
 5. Authentication Tests
 6. Discount Logic Hook
 7. Optional Enhancements
@@ -185,5 +185,17 @@ Key Actions:
 ---
 
 **Task 4 - Profile Page (Logged-In Users):**
+
+Key Actions:
+- Created UserForm and UserProfileForm for updating core and extended user data
+- Implemented profile_view with @login_required to ensure secure access
+- Added display logic for is_first_time_buyer flag in the template
+- Built responsive profile.html with Bootstrap styling and error feedback
+- Registered URL path /users/profile/ to handle profile access and edits
+- Confirmed successful form handling, validation, and data persistence
+
+---
+
+**Task 5 - Authentication Tests:**
 
 Key Actions:
