@@ -6,7 +6,8 @@ from apps.orders.views.webhook import stripe_webhook_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
+    # Allauth URLs
+    path('accounts/', include('allauth.urls')),
     # Placeholder routes for each core app
     path('products/', include('apps.products.urls')),
     path('orders/', include('apps.orders.urls')),
