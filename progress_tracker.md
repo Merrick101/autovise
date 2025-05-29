@@ -164,3 +164,12 @@ Key Actions:
 **Task 2 - Signup, Login, Logout Flow:**
 
 Key Actions:
+- Custom Allauth templates created for signup, login, and logout views
+- All forms styled using Bootstrap 5 and integrated into base layout
+- Form fields structured with accessible labels and ARIA attributes
+- Success and error messages displayed via Bootstrap alerts with screen reader support
+- Placeholder logic added for “first-time buyer” flag (to be linked to profile in Task 3)
+- Authentication flow now visually consistent with Autovise branding and UX
+
+---
+
