@@ -132,3 +132,35 @@ Key Actions:
 
 ---
 
+## EPIC 06: User Accounts & Authentication
+
+### Tasks
+
+1. Install & Configure Django Allauth ✔️
+2. Signup, Login, Logout Flow
+3. Custom User Model & Profile Extension
+4. Profile Page (Logged-In Users)
+5. Authentication Tests
+6. Discount Logic Hook
+7. Optional Enhancements
+
+---
+
+### Completion Notes
+
+**Task 1 - Install & Configure Django Allauth:**
+
+Key Actions:
+- Installed and integrated django-allauth into the project
+- Registered required apps and authentication backends in settings.py
+- Updated deprecated ACCOUNT_* settings to modern ACCOUNT_LOGIN_METHODS and ACCOUNT_SIGNUP_FIELDS
+- Configured redirect URLs for login and logout flows
+- Included allauth URLs in the main urls.py
+- Verified working /accounts/login/ and /accounts/signup/ views
+- Custom template overrides to be handled in Task 2
+
+---
+
+**Task 2 - Signup, Login, Logout Flow:**
+
+Key Actions:
