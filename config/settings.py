@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    # Social Login
+    'allauth.socialaccount.providers.google',
     # Apps
     'apps.products',
     'apps.orders',
@@ -160,6 +162,10 @@ DEFAULT_FROM_EMAIL = 'no-reply@autovise.co.uk'
 ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_RATE_LIMITS = {
+    "login_failed": "5/m",  # 5 failed login attempts per minute
+}
+
 
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
