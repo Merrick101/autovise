@@ -7,5 +7,5 @@ app_name = 'products'
 
 urlpatterns = [
     path('', product_list_view, name='product_list'),
-    path('bundles/', bundle_list_view, name='bundles'),
+    path('bundles/', bundle_list_view, name='bundle_list'),
 ]
