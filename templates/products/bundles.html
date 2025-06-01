@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Bundles | Autovise{% endblock %}
+
+{% block content %}
+  <h1 class="mb-4">Bundle Offers</h1>
+  <div class="row">
+    {% for bundle in bundles %}
+      <div class="col-12 col-sm-6 col-lg-4 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ bundle.name }}</h5>
+            <p class="card-text">{{ bundle.description }}</p>
+            <p class="card-text fw-bold">£{{ bundle.price }}</p>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p>No bundles available at this time.</p>
+    {% endfor %}
+  </div>
+{% endblock %}
