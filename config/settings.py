@@ -21,6 +21,7 @@ DEBUG = config('DEBUG', cast=bool)
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # Application definition
 
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     'apps.assets',
     # External Libraries
     'storages',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -65,7 +67,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -76,6 +78,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
@@ -168,6 +171,7 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_RATE_LIMITS = {
     "login_failed": "5/m",  # 5 failed login attempts per minute
 }
+ACCOUNT_LOGOUT_ON_GET = True
 
 
 LOGIN_REDIRECT_URL = '/'
