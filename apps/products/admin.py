@@ -4,18 +4,32 @@ from django.contrib import admin
 from .models import Product, Category, ProductType, Tag, Bundle, ProductBundle
 
 
+# Inline for managing bundle-product relationships within the Bundle admin
+class ProductBundleInline(admin.TabularInline):
+    model = ProductBundle
+    extra = 1
+    autocomplete_fields = ['product']
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'product_code', 'price', 'tier', 'image_type']
+    list_display = [
+        'name', 'variant', 'product_code', 'price', 'tier',
+        'image_type', 'category', 'type', 'stock'
+    ]
     list_filter = ['tier', 'type', 'category']
-    search_fields = ['name', 'product_code']
+    search_fields = ['name', 'variant', 'product_code', 'sku']
     ordering = ['name']
+    autocomplete_fields = ['category', 'type']
+    filter_horizontal = ['tags']  # Easier tag assignment
+    readonly_fields = ['slug', 'created_at', 'updated_at']
 
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name']
     search_fields = ['name']
+    prepopulated_fields = {'slug': ('name',)}
 
 
 @admin.register(ProductType)
@@ -32,8 +46,14 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Bundle)
 class BundleAdmin(admin.ModelAdmin):
-    list_display = ['name', 'price']
+    list_display = ['name', 'price', 'discount_percentage', 'product_count']
     search_fields = ['name']
+    inlines = [ProductBundleInline]
+    readonly_fields = ['created_at', 'updated_at']
+
+    def product_count(self, obj):
+        return obj.products.count()
+    product_count.short_description = 'Number of Products'
 
 
 @admin.register(ProductBundle)
