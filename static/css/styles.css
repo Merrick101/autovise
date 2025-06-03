@@ -16,3 +16,24 @@
   outline: 2px solid #0067bc;
   outline-offset: 2px;
 }
+
+/* Product List Styles */
+
+.card {
+  transition: all 0.2s ease-in-out;
+}
+
+.card-body {
+  min-height: 160px;
+}
+
+.card-img-top {
+  aspect-ratio: 1 / 1; /* or 4/3, 3/2 */
+  object-fit: cover;
+}
+
+.product-title {
+  font-size: clamp(1rem, 2.5vw, 1.35rem);
+  font-weight: 600;
+  line-height: 1.2;
+}
