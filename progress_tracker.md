@@ -244,3 +244,19 @@ Key Actions:
 
 ---
 
+**Task 2 – Implement Mobile-First Navigation:**
+
+Implemented a fully responsive, accessible Bootstrap 5 navbar featuring a sticky top layout, logo, search bar, cart link, and profile dropdown. Navigation structure adapts across breakpoints with a hamburger toggle for mobile and horizontal menu layout for both mobile and desktop. Search input is always visible and adjusts width based on viewport. All focusable elements are keyboard-accessible and styled using :focus-visible for accessibility compliance.
+
+Key Actions:
+- Structured responsive layout using navbar-expand-lg, container-fluid, d-flex, and Bootstrap utility classes
+- Integrated hamburger toggler with aria-expanded, aria-controls, and aria-label for accessibility
+- Search bar made mobile-first (w-100) and adaptive to desktop width (w-lg-50)
+- Replaced Login/Logout links with a Profile dropdown (conditionally rendered by auth state)
+- Applied :focus-visible outline styling to .nav-link, .form-control, and .dropdown-item
+- Verified tab order and screen-reader compatibility using semantic HTML and Bootstrap defaults
+
+Optional enhancements (e.g., profile avatar, dynamic categories in dropdown) may be added later if time permits.
+
+---
+

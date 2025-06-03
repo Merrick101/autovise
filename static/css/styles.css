@@ -1,3 +1,5 @@
+/* Navbar Styles */
+
 .logo-text {
   font-family: 'Goldman', sans-serif;
   font-size: 2rem;
@@ -6,4 +8,11 @@
   transform: skewX(-12deg);
   letter-spacing: 0.05em;
   margin: 0;
+}
+
+.nav-link:focus-visible,
+.form-control:focus-visible,
+.dropdown-item:focus-visible {
+  outline: 2px solid #0067bc;
+  outline-offset: 2px;
 }
