@@ -220,3 +220,27 @@ Optional enhancements (e.g., usage timestamp, profile banner) can be added later
 **Task 7 - Optional Enhancements:**
 
 Key Actions:
+
+---
+
+## EPIC 09: Responsive Front-End UI
+
+### Tasks
+
+---
+
+### Completion Notes
+
+**Task 1 – Responsive Grid Layout:**
+
+Key Actions:
+- Implemented a fully responsive Bootstrap 5 grid using container, row, and col-* classes. Verified layout behavior across all key breakpoints:
+  - Mobile (<768px)
+  - Tablet (768px–1024px)
+  - Desktop (>1024px)
+- Product cards stack and resize correctly at each breakpoint
+- Layout tested with Chrome DevTools on iPhone SE, iPad Mini, Galaxy S20, and 1440px desktop
+- No layout overflow, horizontal scrolling, or clipping issues detected
+
+---
+
