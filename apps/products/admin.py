@@ -36,14 +36,35 @@ class ProductBundleInline(admin.TabularInline):
 class ProductAdmin(admin.ModelAdmin):
     list_display = [
         'name', 'variant', 'product_code', 'price', 'tier',
-        'image_type', 'category', 'type', 'stock'
+        'image_type', 'category', 'type', 'stock', 'image_tag'
     ]
-    list_filter = ['tier', 'type', 'category', StockLevelFilter]
+    list_filter = ['tier', 'type', 'category']
     search_fields = ['name', 'variant', 'product_code', 'sku']
     ordering = ['name']
     autocomplete_fields = ['category', 'type']
-    filter_horizontal = ['tags']  # Easier tag assignment
+    filter_horizontal = ['tags']
     readonly_fields = ['slug', 'created_at', 'updated_at', 'image_tag']
+
+    fieldsets = (
+        ("Basic Info", {
+            'fields': ('name', 'variant', 'slug', 'description'),
+        }),
+        ("Classification", {
+            'fields': ('tier', 'category', 'type', 'tags'),
+            'classes': ['collapse'],
+        }),
+        ("Pricing & Inventory", {
+            'fields': ('price', 'stock', 'sku', 'product_code'),
+        }),
+        ("Media", {
+            'fields': ('image', 'image_tag', 'image_type'),
+            'classes': ['collapse'],
+        }),
+        ("Timestamps", {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ['collapse'],
+        }),
+    )
 
 
 @admin.register(Category)
@@ -71,6 +92,19 @@ class BundleAdmin(admin.ModelAdmin):
     search_fields = ['name']
     inlines = [ProductBundleInline]
     readonly_fields = ['created_at', 'updated_at']
+
+    fieldsets = (
+        ("Basic Info", {
+            'fields': ('name', 'description'),
+        }),
+        ("Pricing", {
+            'fields': ('price', 'discount_percentage'),
+        }),
+        ("Timestamps", {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ['collapse'],
+        }),
+    )
 
     def product_count(self, obj):
         return obj.products.count()
