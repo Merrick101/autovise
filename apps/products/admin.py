@@ -2,6 +2,7 @@
 
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
+from decimal import Decimal
 from .forms import BundleAdminForm
 from .models import Product, Category, ProductType, Tag, Bundle, ProductBundle
 
@@ -98,7 +99,7 @@ class BundleAdmin(admin.ModelAdmin):
     list_display = ['name', 'price', 'discount_percentage', 'product_count']
     search_fields = ['name']
     inlines = [ProductBundleInline]
-    readonly_fields = ['created_at', 'updated_at']
+    readonly_fields = ['created_at', 'updated_at', 'calculated_price']
 
     fieldsets = (
         ("Basic Info", {
@@ -106,6 +107,10 @@ class BundleAdmin(admin.ModelAdmin):
         }),
         ("Pricing", {
             'fields': ('price', 'discount_percentage'),
+        }),
+        ("Preview", {
+            'fields': ('calculated_price',),
+            'classes': ['collapse'],
         }),
         ("Timestamps", {
             'fields': ('created_at', 'updated_at'),
@@ -116,6 +121,14 @@ class BundleAdmin(admin.ModelAdmin):
     def product_count(self, obj):
         return obj.products.count()
     product_count.short_description = 'Number of Products'
+
+    def calculated_price(self, obj):
+        if obj.pk:
+            total = sum(p.price for p in obj.products.all())
+            return round(total * Decimal('0.90'), 2)  # 10% discount
+        return "N/A"
+
+    calculated_price.short_description = "Auto Price (10% Off)"
 
 
 @admin.register(ProductBundle)
