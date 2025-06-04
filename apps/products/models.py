@@ -77,10 +77,17 @@ class Tag(models.Model):
 
 
 class Bundle(models.Model):
+    BUNDLE_TYPE_CHOICES = [
+        ('Standard', 'Standard'),
+        ('Pro', 'Pro'),
+        ('Special', 'Special'),
+    ]
+
     name = models.CharField(max_length=100)
     description = RichTextField(blank=True)
     discount_percentage = models.DecimalField(max_digits=5, decimal_places=2)
     price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
+    bundle_type = models.CharField(max_length=20, choices=BUNDLE_TYPE_CHOICES, default='Standard')
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
