@@ -3,6 +3,7 @@
 from django.db import models
 from django.utils.text import slugify
 from django.utils import timezone
+from django.utils.html import mark_safe
 
 
 class Product(models.Model):
@@ -43,6 +44,13 @@ class Product(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.variant})"
+
+    def image_tag(self):
+        if self.image:
+            return mark_safe(f'<img src="{self.image.url}" width="60" height="60" style="object-fit: cover; border-radius: 4px;" />')
+        return "No Image"
+
+    image_tag.short_description = "Image"
 
 
 class Category(models.Model):

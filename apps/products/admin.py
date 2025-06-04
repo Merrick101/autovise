@@ -42,7 +42,7 @@ class ProductAdmin(admin.ModelAdmin):
     ordering = ['name']
     autocomplete_fields = ['category', 'type']
     filter_horizontal = ['tags']  # Easier tag assignment
-    readonly_fields = ['slug', 'created_at', 'updated_at']
+    readonly_fields = ['slug', 'created_at', 'updated_at', 'image_tag']
 
 
 @admin.register(Category)
