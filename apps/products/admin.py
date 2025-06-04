@@ -1,6 +1,7 @@
 # apps/products/admin.py
 
-from django.contrib import admin, SimpleListFilter
+from django.contrib import admin
+from django.contrib.admin import SimpleListFilter
 from .models import Product, Category, ProductType, Tag, Bundle, ProductBundle
 
 

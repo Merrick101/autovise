@@ -4,6 +4,7 @@ from django.db import models
 from django.utils.text import slugify
 from django.utils import timezone
 from django.utils.html import mark_safe
+from ckeditor.fields import RichTextField
 
 
 class Product(models.Model):
@@ -14,7 +15,7 @@ class Product(models.Model):
 
     name = models.CharField(max_length=100)
     variant = models.CharField(max_length=100)
-    description = models.TextField()
+    description = RichTextField()
     slug = models.SlugField(unique=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
@@ -77,7 +78,7 @@ class Tag(models.Model):
 
 class Bundle(models.Model):
     name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
+    description = RichTextField(blank=True)
     discount_percentage = models.DecimalField(max_digits=5, decimal_places=2)
     price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     created_at = models.DateTimeField(default=timezone.now)
