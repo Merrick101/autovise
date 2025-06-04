@@ -331,3 +331,21 @@ Key Outcomes:
 
 ---
 
+**Task 5 – Bundle Management Tools:**
+
+Enhanced the Django Admin to support robust creation, validation, and editing of product bundles. Implemented pricing logic, bundle type assignment, and UI improvements to streamline the admin workflow for managing cross-category bundles.
+
+Key Actions:
+- Registered Bundle with inline editing via ProductBundleInline for adding products directly within the bundle form
+- Enforced minimum 3-product requirement using custom BundleAdminForm with clean validation error handling
+- Implemented auto-discount logic: 10% off total product prices when no discount_percentage is provided
+- Allowed manual override of discount_percentage while showing a calculated preview in a collapsible "Preview" section
+- Added bundle_type field to support Standard, Pro, and Special bundles, with list filter and admin visibility
+- Organized BundleAdmin with grouped fieldsets and clear list displays including product count
+
+Key Outcomes:
+- Admins can confidently create and manage bundles with pricing control, rule validation, and visual clarity.
+- Cross-category product relationships and flexible bundle typing are now supported, improving catalog configurability and consistency.
+
+---
+
