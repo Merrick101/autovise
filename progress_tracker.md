@@ -285,3 +285,36 @@ Outcome:
 
 ---
 
+**Task 2 - Admin Roles & Permissions Setup:**
+
+Configured role-based access control within Django Admin, clearly separating superuser and staff responsibilities. Implemented group-based permissions for catalog management while restricting order access to superusers only.
+
+Key Actions:
+- Created a dedicated Catalog Editors group with permissions for Product, Category, Bundle, Tag, and ProductType
+- Assigned staff users to the group using the Django Admin interface
+- Verified staff can manage catalog data but cannot access Orders
+- Implemented OrderAdmin permission overrides to enforce superuser-only access
+- Confirmed admin visibility and field access reflects assigned role
+Outcome:
+- Staff users can manage product and bundle data, but not orders
+- Superusers retain full access to all admin features
+- Permissions are enforced securely and tested across user roles
+- Admin dashboard visibility aligns with assigned permissions
+
+---
+
+**Task 3 – Register Core Models in Django Admin:**
+
+Registered all core product models in the Django Admin, including Product, Category, ProductType, Tag, Bundle, and ProductBundle. Enhanced admin usability through filters, ordering, and custom list displays.
+
+Key Actions:
+- Registered all relevant models with @admin.register decorators
+- Configured list_display, list_filter, and search_fields for improved visibility
+- Enabled autocomplete_fields and filter_horizontal where helpful
+- Customized ProductAdmin and BundleAdmin for efficient editing and catalog review
+- Excluded Brand and ImageType models as they were deemed unnecessary for this project scope
+Outcome:
+- Admin interface is now fully usable for catalog review, filtering, and search, streamlining product management.
+
+---
+
