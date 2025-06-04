@@ -2,6 +2,7 @@
 
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
+from .forms import BundleAdminForm
 from .models import Product, Category, ProductType, Tag, Bundle, ProductBundle
 
 
@@ -36,9 +37,10 @@ class ProductBundleInline(admin.TabularInline):
 class ProductAdmin(admin.ModelAdmin):
     list_display = [
         'name', 'variant', 'product_code', 'price', 'tier',
-        'image_type', 'category', 'type', 'stock', 'image_tag'
+        'image_type', 'category', 'type', 'stock', 'image_tag',
+        'bundle_count', 'created_at', 'updated_at'
     ]
-    list_filter = ['tier', 'type', 'category']
+    list_filter = ['tier', 'type', 'category', StockLevelFilter]
     search_fields = ['name', 'variant', 'product_code', 'sku']
     ordering = ['name']
     autocomplete_fields = ['category', 'type']
@@ -66,6 +68,10 @@ class ProductAdmin(admin.ModelAdmin):
         }),
     )
 
+    def bundle_count(self, obj):
+        return obj.bundles.count()
+    bundle_count.short_description = "Used in Bundles"
+
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -88,6 +94,7 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Bundle)
 class BundleAdmin(admin.ModelAdmin):
+    form = BundleAdminForm
     list_display = ['name', 'price', 'discount_percentage', 'product_count']
     search_fields = ['name']
     inlines = [ProductBundleInline]
