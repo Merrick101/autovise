@@ -371,3 +371,34 @@ Key Outcomes:
 **Task 7 - Optional Styling & UX Improvements:**
 
 Key Actions:
+- Enhanced the Django admin interface for improved usability and navigation using optional styling tools
+- Installed and configured django-jazzmin with the flatly theme for a cleaner, responsive admin UI
+- Enabled horizontal tab layout for Product and Bundle models using changeform_format and fieldset classes
+- Reviewed and refined collapsible fieldsets to reduce visual clutter in long forms
+- Implemented TabularInline for managing related models (ProductBundle in BundleAdmin)
+- Added contextual help_text and inline titles for better admin readability and guidance
+
+Key Outcomes:
+- Admin interface is more user-friendly and visually polished
+- Optional themes improve navigation and layout organization
+- Long forms and inlines are logically grouped and simplified for faster management
+
+---
+
+**Task 8 - Admin Testing & Validation:**
+
+Status: 
+- Deferred
+
+Reason: 
+- Postponed until after initial database population and catalog setup. Full admin validation will occur during EPIC 17 (Testing) and EPIC 22 (Final Integration).
+
+---
+
+**Task 9 – Admin Dashboard Overview:** 
+
+Status:
+- Deferred  
+
+Reason:
+- Optional enhancement. Can be revisited during EPIC 22 (Final Polish) if time permits. Current admin layout is functional and visually modern using django-jazzmin.
