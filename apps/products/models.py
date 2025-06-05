@@ -35,6 +35,10 @@ class Product(models.Model):
     tags = models.ManyToManyField('Tag', blank=True)
     bundles = models.ManyToManyField('Bundle', through='ProductBundle', related_name='products')
 
+    featured = models.BooleanField(default=False, help_text="Mark as a featured item.")
+    image_ready = models.BooleanField(default=False, help_text="Image has been generated and approved.")
+    is_draft = models.BooleanField(default=False, help_text="Hide product from public view (draft mode).")
+
     class Meta:
         verbose_name = "Product"
         verbose_name_plural = "Products"

@@ -39,9 +39,9 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = [
         'name', 'variant', 'product_code', 'price', 'tier',
         'image_type', 'category', 'subcategory', 'type', 'stock', 'image_tag',
-        'bundle_count', 'created_at', 'updated_at'
+        'bundle_count', 'created_at', 'updated_at', 'featured', 'image_ready', 'is_draft'
     ]
-    list_filter = ['tier', 'type', 'category', 'subcategory', StockLevelFilter]
+    list_filter = ['tier', 'type', 'category', 'subcategory', 'featured', 'image_ready', 'is_draft', StockLevelFilter]
     search_fields = ['name', 'variant', 'product_code', 'sku']
     ordering = ['name']
     autocomplete_fields = ['category', 'subcategory', 'type']
@@ -61,6 +61,10 @@ class ProductAdmin(admin.ModelAdmin):
         }),
         ("Media", {
             'fields': ('image', 'image_tag', 'image_type'),
+            'classes': ['collapse'],
+        }),
+        ("Status Flags", {
+            'fields': ('featured', 'image_ready', 'is_draft'),
             'classes': ['collapse'],
         }),
         ("Timestamps", {
