@@ -51,25 +51,27 @@ class ProductAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Basic Info", {
             'fields': ('name', 'variant', 'slug', 'description'),
+            'classes': ['tab-general'],
         }),
         ("Classification", {
             'fields': ('tier', 'category', 'type', 'tags'),
-            'classes': ['collapse'],
+            'classes': ['tab-general', 'collapse'],
         }),
         ("Pricing & Inventory", {
             'fields': ('price', 'stock', 'sku', 'product_code'),
+            'classes': ['tab-inventory'],
         }),
         ("Media", {
             'fields': ('image', 'image_tag', 'image_type'),
-            'classes': ['collapse'],
+            'classes': ['tab-media', 'collapse'],
         }),
         ("Status Flags", {
             'fields': ('featured', 'image_ready', 'is_draft'),
-            'classes': ['collapse'],
+            'classes': ['tab-status', 'collapse'],
         }),
         ("Timestamps", {
             'fields': ('created_at', 'updated_at'),
-            'classes': ['collapse'],
+            'classes': ['tab-status', 'collapse'],
         }),
     )
 
@@ -118,17 +120,19 @@ class BundleAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Basic Info", {
             'fields': ('name', 'description'),
+            'classes': ['tab-general'],
         }),
         ("Pricing", {
             'fields': ('price', 'discount_percentage'),
+            'classes': ['tab-pricing'],
         }),
         ("Preview", {
             'fields': ('calculated_price',),
-            'classes': ['collapse'],
+            'classes': ['tab-pricing', 'collapse'],
         }),
         ("Timestamps", {
             'fields': ('created_at', 'updated_at'),
-            'classes': ['collapse'],
+            'classes': ['tab-meta', 'collapse'],
         }),
     )
 

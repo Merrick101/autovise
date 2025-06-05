@@ -87,7 +87,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 JAZZMIN_SETTINGS = {
-    # Branding
     "site_title": "Autovise Admin",
     "site_header": "Autovise Admin Panel",
     "site_brand": "Autovise",
@@ -95,7 +94,6 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": "Welcome to the Autovise Admin Dashboard",
     "copyright": "Autovise Ltd",
 
-    # Navigation
     "show_sidebar": True,
     "navigation_expanded": True,
     "hide_apps": [],
@@ -103,12 +101,10 @@ JAZZMIN_SETTINGS = {
 
     "order_with_respect_to": ["products", "orders", "users"],
 
-    # Top menu
     "topmenu_links": [
         {"name": "Dashboard", "url": "admin:index", "permissions": ["auth.view_user"]},
     ],
 
-    # Model Icons (Font Awesome)
     "icons": {
         "products.Product": "fas fa-box-open",
         "products.Bundle": "fas fa-cubes",
@@ -120,18 +116,15 @@ JAZZMIN_SETTINGS = {
         "users.UserProfile": "fas fa-user-circle",
     },
 
-    # Changeform layout
     "changeform_format": "horizontal_tabs",
     "changeform_format_overrides": {
         "products.product": "horizontal_tabs",
-        "products.bundle": "collapsible",
+        "products.bundle": "horizontal_tabs",
     },
 
-    # Related modal dialogs (optional)
     "related_modal_active": True,
-
-    # Theme (optional: light/dark/custom)
     "theme": "flatly",
+    "show_bookmarks": True,
 }
 
 
