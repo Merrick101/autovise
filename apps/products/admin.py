@@ -30,6 +30,8 @@ class StockLevelFilter(SimpleListFilter):
 # Inline for managing bundle-product relationships within the Bundle admin
 class ProductBundleInline(admin.TabularInline):
     model = ProductBundle
+    verbose_name = "Included Product"
+    verbose_name_plural = "Included Products"
     extra = 1
     autocomplete_fields = ['product']
 

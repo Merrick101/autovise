@@ -115,8 +115,16 @@ class Bundle(models.Model):
 
 
 class ProductBundle(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        help_text="Select a product to include in this bundle."
+    )
     bundle = models.ForeignKey(Bundle, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = "Bundle Product Link"
+        verbose_name_plural = "Included Products"
 
     def __str__(self):
         return f"{self.product.name} in {self.bundle.name}"
