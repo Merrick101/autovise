@@ -23,6 +23,7 @@ class Product(models.Model):
     type = models.ForeignKey('ProductType', on_delete=models.CASCADE, related_name='products')
     tier = models.CharField(max_length=20, choices=TIER_CHOICES)
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products')
+    subcategory = models.ForeignKey('Subcategory', on_delete=models.CASCADE, related_name='products', null=True, blank=True)
 
     price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     image = models.ImageField(upload_to='product_images/')
@@ -60,6 +61,20 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Subcategory(models.Model):
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
+
+    class Meta:
+        verbose_name = "Subcategory"
+        verbose_name_plural = "Subcategories"
+        ordering = ['name']
+
+    def __str__(self):
+        return f"{self.name} ({self.category.name})"
 
 
 class ProductType(models.Model):

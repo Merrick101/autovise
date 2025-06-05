@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from decimal import Decimal
 from .forms import BundleAdminForm
-from .models import Product, Category, ProductType, Tag, Bundle, ProductBundle
+from .models import Product, Category, ProductType, Tag, Bundle, ProductBundle, Subcategory
 
 
 class StockLevelFilter(SimpleListFilter):
@@ -38,13 +38,13 @@ class ProductBundleInline(admin.TabularInline):
 class ProductAdmin(admin.ModelAdmin):
     list_display = [
         'name', 'variant', 'product_code', 'price', 'tier',
-        'image_type', 'category', 'type', 'stock', 'image_tag',
+        'image_type', 'category', 'subcategory', 'type', 'stock', 'image_tag',
         'bundle_count', 'created_at', 'updated_at'
     ]
-    list_filter = ['tier', 'type', 'category', StockLevelFilter]
+    list_filter = ['tier', 'type', 'category', 'subcategory', StockLevelFilter]
     search_fields = ['name', 'variant', 'product_code', 'sku']
     ordering = ['name']
-    autocomplete_fields = ['category', 'type']
+    autocomplete_fields = ['category', 'subcategory', 'type']
     filter_horizontal = ['tags']
     readonly_fields = ['slug', 'created_at', 'updated_at', 'image_tag']
 
@@ -79,12 +79,22 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name']
     search_fields = ['name']
     prepopulated_fields = {'slug': ('name',)}
+    ordering = ['name']
+
+
+@admin.register(Subcategory)
+class SubcategoryAdmin(admin.ModelAdmin):
+    list_display = ['name', 'category']
+    search_fields = ['name']
+    prepopulated_fields = {'slug': ('name',)}
+    ordering = ['name']
 
 
 @admin.register(ProductType)
 class ProductTypeAdmin(admin.ModelAdmin):
     list_display = ['name']
     search_fields = ['name']
+    ordering = ['name']
 
 
 @admin.register(Tag)
