@@ -349,3 +349,25 @@ Key Outcomes:
 
 ---
 
+**Task 6 – Category & Subgroup Organization:**
+
+Expanded the Django admin interface to support structured product categorization, enhanced filtering, and product status flag management. This improves visibility and control over catalog data for large inventories.
+
+Key Actions:
+- Registered and enabled CRUD access for Subcategory alongside Category and ProductType
+- Added subcategory field to Product model with full admin integration
+- Introduced product-level Boolean flags: featured, image_ready, and is_draft
+- Displayed these flags in ProductAdmin.list_display and added them to list_filter
+- Grouped the new flags into a collapsible Status Flags fieldset for visual clarity
+- Verified all tag-based fields use filter_horizontal and remain editable
+
+Key Outcomes:
+- Admins can manage product categorization and subgroup structure
+- Product flags and tags are visible, editable, and filterable
+- Status filters (e.g., Featured, Draft, Image Ready) improve admin efficiency for large catalogs
+
+---
+
+**Task 7 - Optional Styling & UX Improvements:**
+
+Key Actions:

@@ -27,6 +27,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 INSTALLED_APPS = [
     # Core
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -83,6 +84,55 @@ TEMPLATES = [
 
 
 WSGI_APPLICATION = 'config.wsgi.application'
+
+
+JAZZMIN_SETTINGS = {
+    # Branding
+    "site_title": "Autovise Admin",
+    "site_header": "Autovise Admin Panel",
+    "site_brand": "Autovise",
+    "site_logo": None,
+    "welcome_sign": "Welcome to the Autovise Admin Dashboard",
+    "copyright": "Autovise Ltd",
+
+    # Navigation
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "hide_apps": [],
+    "hide_models": [],
+
+    "order_with_respect_to": ["products", "orders", "users"],
+
+    # Top menu
+    "topmenu_links": [
+        {"name": "Dashboard", "url": "admin:index", "permissions": ["auth.view_user"]},
+    ],
+
+    # Model Icons (Font Awesome)
+    "icons": {
+        "products.Product": "fas fa-box-open",
+        "products.Bundle": "fas fa-cubes",
+        "products.Category": "fas fa-list",
+        "products.Subcategory": "fas fa-layer-group",
+        "products.ProductType": "fas fa-tags",
+        "products.Tag": "fas fa-tag",
+        "orders.Order": "fas fa-receipt",
+        "users.UserProfile": "fas fa-user-circle",
+    },
+
+    # Changeform layout
+    "changeform_format": "horizontal_tabs",
+    "changeform_format_overrides": {
+        "products.product": "horizontal_tabs",
+        "products.bundle": "collapsible",
+    },
+
+    # Related modal dialogs (optional)
+    "related_modal_active": True,
+
+    # Theme (optional: light/dark/custom)
+    "theme": "flatly",
+}
 
 
 # Stripe Credentials
