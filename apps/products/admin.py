@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.utils.html import format_html
 from django.core.exceptions import ValidationError
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from .forms import BundleAdminForm
 from .models import Product, Category, ProductType, Tag, Bundle, ProductBundle, Subcategory
 
@@ -150,8 +150,11 @@ class BundleAdmin(admin.ModelAdmin):
     product_count.short_description = 'Number of Products'
 
     def formatted_price(self, obj):
-        return format_html("£{:.2f}", obj.price)
-    formatted_price.short_description = "Price"
+        try:
+            price = Decimal(obj.price)
+            return format_html("£{0:.2f}", price)
+        except (TypeError, InvalidOperation, ValueError):
+            return "-"
 
     def calculated_price(self, obj):
         if obj.pk:

@@ -423,7 +423,7 @@ Key Actions:
 - Enabled slug generation with fallback to prevent collisions
 - Deferred optional bundle grouping field to future enhancement list
 
-Key Actions:
+Key Outcomes:
 - Bundle model is fully defined with discount logic and ManyToMany linkage
 - Admin panel supports preview and editing
 - Model is visible, tested, and filterable by bundle type
@@ -434,6 +434,26 @@ Add a category or tag field to the Bundle model to support logical grouping of b
 
 - Rationale:
 Deferred for now due to the small number of bundles planned. Current filtering by bundle_type (Standard, Pro, Special) is sufficient. This enhancement can be revisited if bundle volume grows or if storefront filtering by bundle theme becomes necessary.
+
+---
+
+**Task 2 – Implement Bundle Validation Logic**
+
+Status: Completed  
+
+Key Actions:
+- Enforced core bundle business rules through validation:
+  - Minimum 3 products per bundle
+  - Pro-tier bundles must include at least one Pro product
+  - Duplicate product entries blocked using set logic
+- Implemented discount fallback via BundleAdminForm
+- Moved all relationship-based validation to BundleAdmin.save_model for accurate enforcement after inline commits
+- Added admin-facing note confirming support for cross-category bundle contents
+
+Key Outcomes:
+- Bundle logic is enforced consistently in the admin
+- Invalid configurations cannot be saved
+- Validation is scoped correctly between form and admin layers
 
 ---
 
