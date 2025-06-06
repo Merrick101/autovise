@@ -3,6 +3,7 @@
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.utils.html import format_html
+from django.core.exceptions import ValidationError
 from decimal import Decimal
 from .forms import BundleAdminForm
 from .models import Product, Category, ProductType, Tag, Bundle, ProductBundle, Subcategory
@@ -119,7 +120,7 @@ class BundleAdmin(admin.ModelAdmin):
     search_fields = ['name', 'slug']
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ProductBundleInline]
-    readonly_fields = ['created_at', 'updated_at', 'calculated_price']
+    readonly_fields = ['created_at', 'updated_at', 'calculated_price', 'bundle_info_note']
 
     fieldsets = (
         ("Basic Info", {
@@ -138,6 +139,10 @@ class BundleAdmin(admin.ModelAdmin):
             'fields': ('created_at', 'updated_at'),
             'classes': ['tab-meta', 'collapse'],
         }),
+        ("Info", {
+            'fields': ('bundle_info_note',),
+            'classes': ['tab-meta', 'collapse'],
+        }),
     )
 
     def product_count(self, obj):
@@ -146,7 +151,6 @@ class BundleAdmin(admin.ModelAdmin):
 
     def formatted_price(self, obj):
         return format_html("£{:.2f}", obj.price)
-
     formatted_price.short_description = "Price"
 
     def calculated_price(self, obj):
@@ -154,8 +158,27 @@ class BundleAdmin(admin.ModelAdmin):
             total = sum(p.price for p in obj.products.all())
             return round(total * Decimal('0.90'), 2)  # 10% discount
         return "N/A"
-
     calculated_price.short_description = "Auto Price (10% Off)"
+
+    def bundle_info_note(self, obj):
+        return "Note: Bundles may include products from any category."
+    bundle_info_note.short_description = "Info"
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+
+        product_set = obj.products.all()
+
+        if len(product_set) < 3:
+            raise ValidationError("A bundle must include at least 3 products.")
+
+        if obj.bundle_type == "Pro":
+            has_pro_item = any(p.tier == "Pro" for p in product_set)
+            if not has_pro_item:
+                raise ValidationError("Pro-tier bundles must include at least one Pro product.")
+
+        if len(product_set) != len(set(product_set)):
+            raise ValidationError("A bundle cannot contain duplicate products.")
 
 
 @admin.register(ProductBundle)

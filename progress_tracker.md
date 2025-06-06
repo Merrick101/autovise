@@ -402,3 +402,38 @@ Status:
 
 Reason:
 - Optional enhancement. Can be revisited during EPIC 22 (Final Polish) if time permits. Current admin layout is functional and visually modern using django-jazzmin.
+
+---
+
+## EPIC 08 
+
+### Tasks
+
+---
+
+### Completion Notes
+
+**Task 1 – Define Bundle Model Structure**
+
+
+Key Actions:
+- Implemented full Bundle model with all required fields including name, slug, description, discount percentage, price, and bundle type
+- Added ManyToMany relationship to Product via custom through model `ProductBundle`
+- Configured admin panel with inline product editing, auto-calculated discount preview, and product count display
+- Enabled slug generation with fallback to prevent collisions
+- Deferred optional bundle grouping field to future enhancement list
+
+Key Actions:
+- Bundle model is fully defined with discount logic and ManyToMany linkage
+- Admin panel supports preview and editing
+- Model is visible, tested, and filterable by bundle type
+
+Future Enhancement: Bundle Grouping Field
+- Description:
+Add a category or tag field to the Bundle model to support logical grouping of bundles for admin filtering or storefront organization.
+
+- Rationale:
+Deferred for now due to the small number of bundles planned. Current filtering by bundle_type (Standard, Pro, Special) is sufficient. This enhancement can be revisited if bundle volume grows or if storefront filtering by bundle theme becomes necessary.
+
+---
+
