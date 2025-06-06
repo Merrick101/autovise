@@ -24,8 +24,13 @@ class Product(models.Model):
     type = models.ForeignKey('ProductType', on_delete=models.CASCADE, related_name='products')
     tier = models.CharField(max_length=20, choices=TIER_CHOICES)
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products')
-    subcategory = models.ForeignKey('Subcategory', on_delete=models.CASCADE, related_name='products', null=True, blank=True)
-
+    subcategory = models.ForeignKey(
+        'Subcategory',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='products'
+    )
     price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     image = models.ImageField(
         upload_to='product_images/',
