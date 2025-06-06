@@ -2,6 +2,7 @@
 
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
+from django.utils.html import format_html
 from decimal import Decimal
 from .forms import BundleAdminForm
 from .models import Product, Category, ProductType, Tag, Bundle, ProductBundle, Subcategory
@@ -114,8 +115,9 @@ class TagAdmin(admin.ModelAdmin):
 @admin.register(Bundle)
 class BundleAdmin(admin.ModelAdmin):
     form = BundleAdminForm
-    list_display = ['name', 'price', 'discount_percentage', 'product_count']
-    search_fields = ['name']
+    list_display = ['name', 'slug', 'formatted_price', 'discount_percentage', 'product_count']
+    search_fields = ['name', 'slug']
+    prepopulated_fields = {'slug': ('name',)}
     inlines = [ProductBundleInline]
     readonly_fields = ['created_at', 'updated_at', 'calculated_price']
 
@@ -141,6 +143,11 @@ class BundleAdmin(admin.ModelAdmin):
     def product_count(self, obj):
         return obj.products.count()
     product_count.short_description = 'Number of Products'
+
+    def formatted_price(self, obj):
+        return format_html("£{:.2f}", obj.price)
+
+    formatted_price.short_description = "Price"
 
     def calculated_price(self, obj):
         if obj.pk:

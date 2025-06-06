@@ -3,6 +3,7 @@
 from django.db import models
 from django.utils.text import slugify
 from django.utils import timezone
+from django.utils.timezone import now
 from django.utils.html import mark_safe
 from ckeditor.fields import RichTextField
 
@@ -104,11 +105,19 @@ class Bundle(models.Model):
 
     name = models.CharField(max_length=100)
     description = RichTextField(blank=True)
+    slug = models.SlugField(unique=True, blank=True)
     discount_percentage = models.DecimalField(max_digits=5, decimal_places=2)
     price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     bundle_type = models.CharField(max_length=20, choices=BUNDLE_TYPE_CHOICES, default='Standard')
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.name)
+            timestamp = now().strftime('%Y%m%d%H%M%S')
+            self.slug = f"{base_slug}-{timestamp}"
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
