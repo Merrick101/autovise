@@ -27,7 +27,12 @@ class Product(models.Model):
     subcategory = models.ForeignKey('Subcategory', on_delete=models.CASCADE, related_name='products', null=True, blank=True)
 
     price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
-    image = models.ImageField(upload_to='product_images/')
+    image = models.ImageField(
+        upload_to='product_images/',
+        blank=True,
+        null=True,
+        help_text="Upload the product image (optional)."
+    )
     stock = models.PositiveIntegerField()
     sku = models.CharField(max_length=50, unique=True)
     product_code = models.CharField(max_length=50, unique=True, default='TEMP_CODE')
