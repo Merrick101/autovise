@@ -58,7 +58,7 @@ class ProductAdmin(admin.ModelAdmin):
             'classes': ['tab-general'],
         }),
         ("Classification", {
-            'fields': ('tier', 'category', 'type', 'tags'),
+            'fields': ('tier', 'category', 'subcategory', 'type', 'tags'),
             'classes': ['tab-general', 'collapse'],
         }),
         ("Pricing & Inventory", {
