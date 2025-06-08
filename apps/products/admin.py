@@ -5,7 +5,7 @@ from django.contrib.admin import SimpleListFilter
 from django.utils.html import format_html
 from django.core.exceptions import ValidationError
 from decimal import Decimal, InvalidOperation
-from .forms import BundleAdminForm
+from .forms import BundleAdminForm, ProductAdminForm
 from .models import Product, Category, ProductType, Tag, Bundle, ProductBundle, Subcategory
 
 
@@ -40,6 +40,7 @@ class ProductBundleInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    form = ProductAdminForm
     list_display = [
         'name', 'variant', 'product_code', 'price', 'tier',
         'image_type', 'category', 'subcategory', 'type', 'stock', 'image_tag',
@@ -66,7 +67,7 @@ class ProductAdmin(admin.ModelAdmin):
             'classes': ['tab-inventory'],
         }),
         ("Media", {
-            'fields': ('image', 'image_tag', 'image_type'),
+            'fields': ('image', 'image_tag', 'image_path', 'image_type'),
             'classes': ['tab-media', 'collapse'],
         }),
         ("Status Flags", {
