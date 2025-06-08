@@ -40,3 +40,8 @@ def save_product(request, product_id):
 
     # Redirect back to the same page or product detail
     return redirect(request.META.get('HTTP_REFERER', 'products:product_list'))
+
+
+@login_required
+def dashboard(request):
+    return render(request, 'users/dashboard.html')

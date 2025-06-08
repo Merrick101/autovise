@@ -5,7 +5,7 @@ from apps.orders.views.cart_views import (
     add_to_cart_view, cart_view, update_quantity, remove_item, clear_cart
 )
 from apps.orders.views.checkout import checkout_view
-from apps.orders.views.general import checkout_success_view
+from apps.orders.views.general import checkout_success_view, order_history_view
 
 app_name = 'orders'
 
@@ -17,4 +17,5 @@ urlpatterns = [
     path('cart/clear/', clear_cart, name='clear_cart'),
     path('checkout/', checkout_view, name='checkout'),
     path('checkout/success/', checkout_success_view, name='checkout_success'),
+    path('order-history/', order_history_view, name='order_history'),
 ]
