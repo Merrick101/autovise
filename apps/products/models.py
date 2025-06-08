@@ -33,9 +33,10 @@ class Product(models.Model):
     )
     price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     image = models.ImageField(
-        upload_to='product_images/',
+        upload_to='products/',
         blank=True,
         null=True,
+        max_length=255,
         help_text="Upload the product image (optional)."
     )
     stock = models.PositiveIntegerField()
