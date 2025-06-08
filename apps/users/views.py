@@ -1,7 +1,9 @@
 # apps/users/views.py
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from apps.products.models import Product
+from .models import UserProfile
 from .forms import UserForm, UserProfileForm
 
 
@@ -24,3 +26,17 @@ def profile_view(request):
         'first_time_discount': request.user.profile.is_first_time_buyer
     }
     return render(request, 'users/profile.html', context)
+
+
+@login_required
+def save_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+    if product in profile.saved_products.all():
+        profile.saved_products.remove(product)
+    else:
+        profile.saved_products.add(product)
+
+    # Redirect back to the same page or product detail
+    return redirect(request.META.get('HTTP_REFERER', 'products:product_list'))

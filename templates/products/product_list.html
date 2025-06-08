@@ -10,6 +10,10 @@
   {% for product in products %}
     <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
       <div class="card h-100 shadow-sm">
+        
+        {% if product.tier == "Pro" %}
+        <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Pro</span>
+        {% endif %}
 
         {% if product.image %}
           <img src="{{ product.image.url }}" class="card-img-top img-fluid" alt="{{ product.name }}">
@@ -21,12 +25,30 @@
           <div>
             <h5 class="card-title product-title">{{ product.name }}</h5>
             <p class="card-text fw-semibold">£{{ product.price }}</p>
+            <p class="card-text small text-muted">{{ product.description|striptags|truncatewords:12 }}</p>
           </div>
-          <form action="{% url 'orders:add_to_cart' product.id %}" method="post" class="mt-auto">
-            {% csrf_token %}
-            <input type="hidden" name="quantity" value="1">
-            <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
-          </form>
+          
+          <div class="mt-auto d-grid gap-2">
+            <a href="{% url 'products:product_detail' product.id %}" class="btn btn-outline-secondary btn-sm">
+              View Product
+            </a>
+
+            <form action="{% url 'orders:add_to_cart' product.id %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="btn btn-primary btn-sm w-100">
+                Add to Cart
+              </button>
+            </form>
+
+            <form action="{% url 'users:save_product' product.id %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                Save for Later
+              </button>
+            </form>
+          </div>
+
         </div>
       </div>
     </div>

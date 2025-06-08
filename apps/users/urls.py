@@ -2,8 +2,8 @@
 
 from django.urls import path
 from . import views
-from .views import profile_view
 
 urlpatterns = [
-    path('profile/', profile_view, name='profile'),
+    path('profile/', views.profile_view, name='profile'),
+    path('save/<int:product_id>/', views.save_product, name='save_product'),
 ]
