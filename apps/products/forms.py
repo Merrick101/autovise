@@ -32,9 +32,20 @@ class ProductAdminForm(forms.ModelForm):
 
 
 class BundleAdminForm(forms.ModelForm):
+    image_path = forms.CharField(
+        label="Image Path (S3 relative)",
+        required=False,
+        help_text="Optional: Directly assign S3 image path (e.g. bundles/filename.png)"
+    )
+
     class Meta:
         model = Bundle
-        fields = '__all__'
+        fields = ['name', 'slug', 'description', 'discount_percentage', 'price', 'bundle_type', 'image', 'image_path']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.image:
+            self.fields['image_path'].initial = self.instance.image.name
 
     def clean_discount_percentage(self):
         value = self.cleaned_data.get('discount_percentage')
@@ -42,15 +53,19 @@ class BundleAdminForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        image_path = cleaned_data.get("image_path")
+        if image_path:
+            self.instance.image.name = image_path
+
         bundle_type = cleaned_data.get("bundle_type")
-        instance = self.instance  # only works if editing an existing bundle
+        instance = self.instance
         product_set = instance.products.all() if instance.pk else []
 
         if len(product_set) < 3:
             raise ValidationError("A bundle must include at least 3 products.")
-
         if bundle_type == "Pro" and not any(p.tier == "Pro" for p in product_set):
             raise ValidationError("Pro-tier bundles must include at least one Pro product.")
-
         if len(product_set) != len(set(product_set)):
             raise ValidationError("A bundle cannot contain duplicate products.")
+
+        return cleaned_data

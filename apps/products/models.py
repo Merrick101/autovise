@@ -117,14 +117,23 @@ class Bundle(models.Model):
     name = models.CharField(max_length=100)
     description = RichTextField(blank=True)
     slug = models.SlugField(unique=True, blank=True)
-    discount_percentage = models.DecimalField(
-        max_digits=6,
-        decimal_places=2,
-        default=10.00,
-        help_text="Discount percentage applied to the bundle."
-    )
+    discount_percentage = models.DecimalField(max_digits=6, decimal_places=2, default=10.00)
     price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     bundle_type = models.CharField(max_length=20, choices=BUNDLE_TYPE_CHOICES, default='Standard')
+
+    image = models.ImageField(
+        upload_to='bundles/',
+        blank=True,
+        null=True,
+        max_length=255,
+        help_text="Optional: Upload an image directly."
+    )
+    image_path = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Optional: Provide relative S3 path (e.g. bundles/my-image.png)"
+    )
+
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -133,10 +142,20 @@ class Bundle(models.Model):
             base_slug = slugify(self.name)
             timestamp = now().strftime('%Y%m%d%H%M%S')
             self.slug = f"{base_slug}-{timestamp}"
+        # If image_path is given, override image name
+        if self.image_path:
+            self.image.name = self.image_path
         super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
+
+    def image_tag(self):
+        if self.image:
+            return mark_safe(f'<img src="{self.image.url}" width="60" height="60" style="object-fit: cover; border-radius: 4px;" />')
+        return "No Image"
+
+    image_tag.short_description = "Preview"
 
 
 class ProductBundle(models.Model):
