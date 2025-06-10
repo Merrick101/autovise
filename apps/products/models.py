@@ -117,7 +117,12 @@ class Bundle(models.Model):
     name = models.CharField(max_length=100)
     description = RichTextField(blank=True)
     slug = models.SlugField(unique=True, blank=True)
-    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2)
+    discount_percentage = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        default=10.00,
+        help_text="Discount percentage applied to the bundle."
+    )
     price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     bundle_type = models.CharField(max_length=20, choices=BUNDLE_TYPE_CHOICES, default='Standard')
     created_at = models.DateTimeField(default=timezone.now)

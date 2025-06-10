@@ -1,5 +1,6 @@
 # apps/products/forms.py
 
+from django.core.exceptions import ValidationError
 from django import forms
 from decimal import Decimal
 from .models import Bundle, Product
@@ -37,6 +38,19 @@ class BundleAdminForm(forms.ModelForm):
 
     def clean_discount_percentage(self):
         value = self.cleaned_data.get('discount_percentage')
-        if value is None:
-            return Decimal('10.0')
-        return value
+        return Decimal('10.0') if value is None else value
+
+    def clean(self):
+        cleaned_data = super().clean()
+        bundle_type = cleaned_data.get("bundle_type")
+        instance = self.instance  # only works if editing an existing bundle
+        product_set = instance.products.all() if instance.pk else []
+
+        if len(product_set) < 3:
+            raise ValidationError("A bundle must include at least 3 products.")
+
+        if bundle_type == "Pro" and not any(p.tier == "Pro" for p in product_set):
+            raise ValidationError("Pro-tier bundles must include at least one Pro product.")
+
+        if len(product_set) != len(set(product_set)):
+            raise ValidationError("A bundle cannot contain duplicate products.")

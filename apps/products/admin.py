@@ -3,7 +3,6 @@
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.utils.html import format_html
-from django.core.exceptions import ValidationError
 from decimal import Decimal, InvalidOperation
 from .forms import BundleAdminForm, ProductAdminForm
 from .models import Product, Category, ProductType, Tag, Bundle, ProductBundle, Subcategory
@@ -122,6 +121,7 @@ class BundleAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ProductBundleInline]
     readonly_fields = ['created_at', 'updated_at', 'calculated_price', 'bundle_info_note']
+    actions = ['recalculate_prices']  # Custom action to recalculate bundle prices
 
     fieldsets = (
         ("Basic Info", {
@@ -168,21 +168,12 @@ class BundleAdmin(admin.ModelAdmin):
         return "Note: Bundles may include products from any category."
     bundle_info_note.short_description = "Info"
 
-    def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-
-        product_set = obj.products.all()
-
-        if len(product_set) < 3:
-            raise ValidationError("A bundle must include at least 3 products.")
-
-        if obj.bundle_type == "Pro":
-            has_pro_item = any(p.tier == "Pro" for p in product_set)
-            if not has_pro_item:
-                raise ValidationError("Pro-tier bundles must include at least one Pro product.")
-
-        if len(product_set) != len(set(product_set)):
-            raise ValidationError("A bundle cannot contain duplicate products.")
+    @admin.action(description="Recalculate bundle prices")
+    def recalculate_prices(self, request, queryset):
+        for bundle in queryset:
+            total = sum(p.price for p in bundle.products.all())
+            bundle.price = round(total * Decimal('0.90'), 2)
+            bundle.save()
 
 
 @admin.register(ProductBundle)
