@@ -35,15 +35,14 @@ class ProductBundleInline(admin.TabularInline):
     extra = 1
     autocomplete_fields = ['product']
     classes = ['tab-general']
+    readonly_fields = ['product_price']
+    fields = ['product', 'product_price']  # Fields to show in the inline
 
-    def get_fieldsets(self, request, obj=None):
-        fieldsets = super().get_fieldsets(request, obj)
-        if obj:
-            count = obj.products.count()
-            self.verbose_name_plural = f"Included Products ({count})"
-        else:
-            self.verbose_name_plural = "Included Products"
-        return fieldsets
+    def product_price(self, obj):
+        if obj.product:
+            return f"£{obj.product.price:.2f}"
+        return "-"
+    product_price.short_description = "Price"
 
     def clean(self):
         super().clean()
@@ -165,10 +164,6 @@ class BundleAdmin(admin.ModelAdmin):
             'fields': ('price', 'discount_percentage'),
             'classes': ['tab-pricing'],
         }),
-        ("Pricing Preview", {
-            'fields': ('subtotal_price', 'calculated_price'),
-            'classes': ['tab-pricing', 'collapse'],
-        }),
         ("Identifiers", {
             'fields': ('sku', 'bundle_code'),
             'classes': ['tab-general', 'collapse'],
@@ -197,12 +192,13 @@ class BundleAdmin(admin.ModelAdmin):
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
+        form.instance.refresh_from_db()
         bundle = form.instance
-        if bundle.pk:
-            total = sum(p.price for p in bundle.products.all())
-            discount = bundle.discount_percentage or Decimal('10.0')
-            bundle.price = round(total * (Decimal('1.00') - discount / Decimal('100.00')), 2)
-            bundle.save()
+
+        total = sum(p.price for p in bundle.products.all())
+        discount = bundle.discount_percentage or Decimal('10.0')
+        bundle.price = round(total * (Decimal('1.00') - discount / Decimal('100.00')), 2)
+        bundle.save()
 
     def formatted_price(self, obj):
         try:
