@@ -143,9 +143,7 @@ class Bundle(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.name)
-            timestamp = now().strftime('%Y%m%d%H%M%S')
-            self.slug = f"{base_slug}-{timestamp}"
+            self.slug = slugify(self.name)
         if not self.sku:
             self.sku = f"BNDL-{self.bundle_type[:3].upper()}-{now().strftime('%y%m%d%H%M')}"
         if not self.bundle_code or self.bundle_code == 'TEMP_BUNDLE_CODE':
