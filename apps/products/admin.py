@@ -3,6 +3,7 @@
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.utils.html import format_html
+from django.core.exceptions import ValidationError
 from decimal import Decimal, InvalidOperation
 from .forms import BundleAdminForm, ProductAdminForm
 from .models import Product, Category, ProductType, Tag, Bundle, ProductBundle, Subcategory
@@ -31,11 +32,36 @@ class StockLevelFilter(SimpleListFilter):
 # Inline for managing bundle-product relationships within the Bundle admin
 class ProductBundleInline(admin.TabularInline):
     model = ProductBundle
-    verbose_name = "Included Product"
-    verbose_name_plural = "Included Products"
     extra = 1
     autocomplete_fields = ['product']
     classes = ['tab-general']
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+        if obj:
+            count = obj.products.count()
+            self.verbose_name_plural = f"Included Products ({count})"
+        else:
+            self.verbose_name_plural = "Included Products"
+        return fieldsets
+
+    def clean(self):
+        super().clean()
+        included = [
+            form.cleaned_data['product']
+            for form in self.forms
+            if form.cleaned_data and not form.cleaned_data.get('DELETE', False)
+        ]
+
+        if len(included) < 3:
+            raise ValidationError("A bundle must include at least 3 products.")
+
+        if len(set(included)) != len(included):
+            raise ValidationError("A bundle cannot contain duplicate products.")
+
+        parent = self.instance
+        if parent.bundle_type == "Pro" and not any(p.tier == "Pro" for p in included):
+            raise ValidationError("Pro-tier bundles must include at least one Pro product.")
 
 
 @admin.register(Product)
@@ -125,7 +151,8 @@ class BundleAdmin(admin.ModelAdmin):
     inlines = [ProductBundleInline]
     readonly_fields = [
         'slug', 'created_at', 'updated_at',
-        'calculated_price', 'bundle_info_note', 'image_tag'
+        'subtotal_price', 'calculated_price',
+        'bundle_info_note', 'image_tag'
     ]
     actions = ['recalculate_prices']  # Custom action to recalculate bundle prices
 
@@ -138,6 +165,10 @@ class BundleAdmin(admin.ModelAdmin):
             'fields': ('price', 'discount_percentage'),
             'classes': ['tab-pricing'],
         }),
+        ("Pricing Preview", {
+            'fields': ('subtotal_price', 'calculated_price'),
+            'classes': ['tab-pricing', 'collapse'],
+        }),
         ("Identifiers", {
             'fields': ('sku', 'bundle_code'),
             'classes': ['tab-general', 'collapse'],
@@ -149,10 +180,6 @@ class BundleAdmin(admin.ModelAdmin):
         ("Bundle Type", {
             'fields': ('bundle_type',),
             'classes': ['tab-general', 'collapse'],
-        }),
-        ("Preview", {
-            'fields': ('calculated_price',),
-            'classes': ['tab-pricing', 'collapse'],
         }),
         ("Timestamps", {
             'fields': ('created_at', 'updated_at'),
@@ -168,6 +195,15 @@ class BundleAdmin(admin.ModelAdmin):
         return obj.products.count()
     product_count.short_description = 'Number of Products'
 
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        bundle = form.instance
+        if bundle.pk:
+            total = sum(p.price for p in bundle.products.all())
+            discount = bundle.discount_percentage or Decimal('10.0')
+            bundle.price = round(total * (Decimal('1.00') - discount / Decimal('100.00')), 2)
+            bundle.save()
+
     def formatted_price(self, obj):
         try:
             price = Decimal(obj.price)
@@ -175,12 +211,21 @@ class BundleAdmin(admin.ModelAdmin):
         except (TypeError, InvalidOperation, ValueError):
             return "-"
 
+    def subtotal_price(self, obj):
+        if obj.pk:
+            total = sum(p.price for p in obj.products.all())
+            return format_html("£{0:.2f}", total)
+        return format_html("<em>Save to calculate</em>")
+    subtotal_price.short_description = "Subtotal (No Discount)"
+
     def calculated_price(self, obj):
         if obj.pk:
             total = sum(p.price for p in obj.products.all())
-            return round(total * Decimal('0.90'), 2)  # 10% discount
-        return "N/A"
-    calculated_price.short_description = "Auto Price (10% Off)"
+            discount = obj.discount_percentage or Decimal('10.0')
+            final = total * (Decimal('1.00') - discount / Decimal('100.00'))
+            return format_html("£{0:.2f}", final)
+        return format_html("<em>Save to calculate</em>")
+    calculated_price.short_description = "Discounted Price"
 
     def bundle_info_note(self, obj):
         return "Note: Bundles may include products from any category."
