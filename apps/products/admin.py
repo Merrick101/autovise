@@ -117,10 +117,16 @@ class TagAdmin(admin.ModelAdmin):
 @admin.register(Bundle)
 class BundleAdmin(admin.ModelAdmin):
     form = BundleAdminForm
-    list_display = ['name', 'slug', 'formatted_price', 'discount_percentage', 'product_count']
+    list_display = [
+        'name', 'slug', 'bundle_code', 'sku',
+        'formatted_price', 'discount_percentage', 'product_count'
+    ]
     search_fields = ['name', 'slug']
     inlines = [ProductBundleInline]
-    readonly_fields = ['slug', 'created_at', 'updated_at', 'calculated_price', 'bundle_info_note', 'image_tag']
+    readonly_fields = [
+        'slug', 'created_at', 'updated_at',
+        'calculated_price', 'bundle_info_note', 'image_tag'
+    ]
     actions = ['recalculate_prices']  # Custom action to recalculate bundle prices
 
     fieldsets = (
@@ -132,22 +138,17 @@ class BundleAdmin(admin.ModelAdmin):
             'fields': ('price', 'discount_percentage'),
             'classes': ['tab-pricing'],
         }),
+        ("Identifiers", {
+            'fields': ('sku', 'bundle_code'),
+            'classes': ['tab-general', 'collapse'],
+        }),
         ("Media", {
             'fields': ('image', 'image_path', 'image_tag'),
             'classes': ['tab-media'],
         }),
-        ("Products", {
-            'fields': ('products',),
-            'classes': ['tab-products'],
-        }),
         ("Bundle Type", {
             'fields': ('bundle_type',),
             'classes': ['tab-general', 'collapse'],
-        }),
-        ("Status Flags", {
-            'fields': ('is_draft',),
-            'classes': ['tab-status', 'collapse'],
-
         }),
         ("Preview", {
             'fields': ('calculated_price',),

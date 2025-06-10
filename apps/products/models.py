@@ -1,4 +1,4 @@
-# app/products/models.py
+# apps/products/models.py
 
 from django.db import models
 from django.utils.text import slugify
@@ -6,69 +6,6 @@ from django.utils import timezone
 from django.utils.timezone import now
 from django.utils.html import mark_safe
 from ckeditor.fields import RichTextField
-
-
-class Product(models.Model):
-    TIER_CHOICES = [
-        ('Standard', 'Standard'),
-        ('Pro', 'Pro'),
-    ]
-
-    name = models.CharField(max_length=100)
-    variant = models.CharField(max_length=100)
-    description = RichTextField()
-    slug = models.SlugField(unique=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    type = models.ForeignKey('ProductType', on_delete=models.CASCADE, related_name='products')
-    tier = models.CharField(max_length=20, choices=TIER_CHOICES)
-    category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products')
-    subcategory = models.ForeignKey(
-        'Subcategory',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='products'
-    )
-    price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
-    image = models.ImageField(
-        upload_to='products/',
-        blank=True,
-        null=True,
-        max_length=255,
-        help_text="Upload the product image (optional)."
-    )
-    stock = models.PositiveIntegerField()
-    sku = models.CharField(max_length=50, unique=True)
-    product_code = models.CharField(max_length=50, unique=True, default='TEMP_CODE')
-    image_type = models.CharField(max_length=50, blank=True, default='')
-
-    tags = models.ManyToManyField('Tag', blank=True)
-    bundles = models.ManyToManyField('Bundle', through='ProductBundle', related_name='products')
-
-    featured = models.BooleanField(default=False, help_text="Mark as a featured item.")
-    image_ready = models.BooleanField(default=False, help_text="Image has been generated and approved.")
-    is_draft = models.BooleanField(default=False, help_text="Hide product from public view (draft mode).")
-
-    class Meta:
-        verbose_name = "Product"
-        verbose_name_plural = "Products"
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.name} ({self.variant})"
-
-    def image_tag(self):
-        if self.image:
-            return mark_safe(f'<img src="{self.image.url}" width="60" height="60" style="object-fit: cover; border-radius: 4px;" />')
-        return "No Image"
-
-    image_tag.short_description = "Image"
 
 
 class Category(models.Model):
@@ -107,6 +44,70 @@ class Tag(models.Model):
         return self.name
 
 
+class Product(models.Model):
+    TIER_CHOICES = [
+        ('Standard', 'Standard'),
+        ('Pro', 'Pro'),
+    ]
+
+    name = models.CharField(max_length=100)
+    variant = models.CharField(max_length=100)
+    description = RichTextField()
+    slug = models.SlugField(unique=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    type = models.ForeignKey(ProductType, on_delete=models.CASCADE, related_name='products')
+    tier = models.CharField(max_length=20, choices=TIER_CHOICES)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
+    subcategory = models.ForeignKey(
+        Subcategory,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='products'
+    )
+
+    price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
+    image = models.ImageField(
+        upload_to='products/',
+        blank=True,
+        null=True,
+        max_length=255,
+        help_text="Upload the product image (optional)."
+    )
+    stock = models.PositiveIntegerField()
+    sku = models.CharField(max_length=50, unique=True)
+    product_code = models.CharField(max_length=50, unique=True, default='TEMP_CODE')
+    image_type = models.CharField(max_length=50, blank=True, default='')
+
+    tags = models.ManyToManyField(Tag, blank=True)
+    bundles = models.ManyToManyField('Bundle', through='ProductBundle', related_name='products')
+
+    featured = models.BooleanField(default=False, help_text="Mark as a featured item.")
+    image_ready = models.BooleanField(default=False, help_text="Image has been generated and approved.")
+    is_draft = models.BooleanField(default=False, help_text="Hide product from public view (draft mode).")
+
+    class Meta:
+        verbose_name = "Product"
+        verbose_name_plural = "Products"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.name} ({self.variant})"
+
+    def image_tag(self):
+        if self.image:
+            return mark_safe(f'<img src="{self.image.url}" width="60" height="60" style="object-fit: cover; border-radius: 4px;" />')
+        return "No Image"
+
+    image_tag.short_description = "Image"
+
+
 class Bundle(models.Model):
     BUNDLE_TYPE_CHOICES = [
         ('Standard', 'Standard'),
@@ -120,6 +121,9 @@ class Bundle(models.Model):
     discount_percentage = models.DecimalField(max_digits=6, decimal_places=2, default=10.00)
     price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     bundle_type = models.CharField(max_length=20, choices=BUNDLE_TYPE_CHOICES, default='Standard')
+
+    sku = models.CharField(max_length=50, unique=True, default='TEMP_SKU', help_text="Unique identifier for this bundle")
+    bundle_code = models.CharField(max_length=50, unique=True, default='TEMP_BUNDLE_CODE', help_text="Internal code used for SEO and tracking")
 
     image = models.ImageField(
         upload_to='bundles/',
@@ -142,7 +146,10 @@ class Bundle(models.Model):
             base_slug = slugify(self.name)
             timestamp = now().strftime('%Y%m%d%H%M%S')
             self.slug = f"{base_slug}-{timestamp}"
-        # If image_path is given, override image name
+        if not self.sku:
+            self.sku = f"BNDL-{self.bundle_type[:3].upper()}-{now().strftime('%y%m%d%H%M')}"
+        if not self.bundle_code or self.bundle_code == 'TEMP_BUNDLE_CODE':
+            self.bundle_code = f"bundle-{slugify(self.name)}"
         if self.image_path:
             self.image.name = self.image_path
         super().save(*args, **kwargs)

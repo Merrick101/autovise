@@ -40,7 +40,11 @@ class BundleAdminForm(forms.ModelForm):
 
     class Meta:
         model = Bundle
-        fields = ['name', 'slug', 'description', 'discount_percentage', 'price', 'bundle_type', 'image', 'image_path']
+        fields = [
+            'name', 'slug', 'description',
+            'discount_percentage', 'price', 'bundle_type',
+            'sku', 'bundle_code', 'image', 'image_path'
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
