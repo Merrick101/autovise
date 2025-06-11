@@ -15,8 +15,18 @@ def product_detail_view(request, pk):
 
 
 def bundle_list_view(request):
-    bundles = Bundle.objects.all()
-    return render(request, 'products/bundle_list.html', {'bundles': bundles})
+    bundle_type = request.GET.get('type')  # e.g., "Pro", "Special", etc.
+
+    if bundle_type in ["Standard", "Pro", "Special"]:
+        bundles = Bundle.objects.filter(bundle_type=bundle_type)
+    else:
+        bundles = Bundle.objects.all()
+
+    context = {
+        'bundles': bundles,
+        'active_filter': bundle_type
+    }
+    return render(request, 'products/bundle_list.html', context)
 
 
 def bundle_detail_view(request, bundle_id):

@@ -6,6 +6,21 @@
 
 <h2 class="mb-4">Autovise Bundles</h2>
 
+<div class="mb-4 d-flex gap-2">
+  <a href="{% url 'products:bundle_list' %}" class="btn btn-outline-secondary {% if not active_filter %}active{% endif %}">
+    All
+  </a>
+  <a href="?type=Standard" class="btn btn-outline-secondary {% if active_filter == 'Standard' %}active{% endif %}">
+    Standard
+  </a>
+  <a href="?type=Pro" class="btn btn-outline-secondary {% if active_filter == 'Pro' %}active{% endif %}">
+    Pro
+  </a>
+  <a href="?type=Special" class="btn btn-outline-secondary {% if active_filter == 'Special' %}active{% endif %}">
+    Special
+  </a>
+</div>
+
 <div class="row">
   {% for bundle in bundles %}
     <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4">

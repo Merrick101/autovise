@@ -19,6 +19,12 @@
 
 /* Product List Styles */
 
+.btn.active {
+  border-color: #0d6efd;
+  background-color: #0d6efd;
+  color: #ffffff;
+}
+
 .card {
   transition: all 0.2s ease-in-out;
 }
