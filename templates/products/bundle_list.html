@@ -42,8 +42,10 @@
           <div>
             <h5 class="card-title product-title">{{ bundle.name }}</h5>
             <p class="card-text fw-semibold text-success">
-              £{{ bundle.calculated_price }}
-                <small class="text-muted text-decoration-line-through">£{{ bundle.subtotal_price }}</small>
+              £{{ bundle.price|floatformat:2 }}
+              {% if bundle.subtotal_price > bundle.price %}
+                <small class="text-muted text-decoration-line-through">£{{ bundle.subtotal_price|floatformat:2 }}</small>
+              {% endif %}
             </p>
             <p class="card-text small text-muted">{{ bundle.description|striptags|truncatewords:12 }}</p>
           </div>

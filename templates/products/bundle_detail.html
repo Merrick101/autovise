@@ -23,7 +23,11 @@
         <span class="badge bg-info text-dark">Special</span>
       {% endif %}
 
-      <p class="mt-3 lead fw-semibold">£{{ bundle.price }}</p>
+      <p class="mt-3 lead fw-semibold">£{{ bundle.price }}
+        {% if bundle.subtotal_price > bundle.price %}
+          <small class="text-muted text-decoration-line-through">£{{ bundle.subtotal_price|floatformat:2 }}</small>
+        {% endif %}
+      </p>
 
       <div class="mb-3 text-muted">
         {{ bundle.description|safe }}
