@@ -24,7 +24,8 @@ def bundle_list_view(request):
 
     context = {
         'bundles': bundles,
-        'active_filter': bundle_type
+        'active_filter': bundle_type,
+        'promo_banner': "💡 10% Off All Bundles — Discount Applied Automatically"
     }
     return render(request, 'products/bundle_list.html', context)
 

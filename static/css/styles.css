@@ -1,13 +1,31 @@
+/* Base Styles */
+
+body {
+  font-family: 'roboto', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: #28282B; /* Matte Black */
+}
+
 /* Navbar Styles */
 
+@font-face {
+  font-family: 'AutoviseDisplay';
+  src: url('/static/fonts/AutoviseDisplay.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 .logo-text {
-  font-family: 'Goldman', sans-serif;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #0067bc;
-  transform: skewX(-12deg);
-  letter-spacing: 0.05em;
-  margin: 0;
+  font-family: 'AutoviseDisplay', sans-serif;
+  color: #4682B4; /* Steel Blue */
+  letter-spacing: 3px;
+  font-size: 2.1rem !important;
 }
 
 .nav-link:focus-visible,
@@ -15,6 +33,21 @@
 .dropdown-item:focus-visible {
   outline: 2px solid #0067bc;
   outline-offset: 2px;
+}
+
+.promo-banner {
+  background-color: #4682B4; /* Steel Blue */
+  color: white;
+  padding: 0.4rem 1rem;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  z-index: 900;
+  position: relative;
+}
+
+.promo-text {
+  margin: 0 auto;
+  font-weight: 500;
 }
 
 /* Product List Styles */
