@@ -48,6 +48,35 @@
               {% endif %}
             </p>
             <p class="card-text small text-muted">{{ bundle.description|striptags|truncatewords:12 }}</p>
+            <div class="d-flex gap-1 my-2">
+              {% for product in bundle.products.all|slice:":3" %}
+                {% if product.image %}
+                  <img src="{{ product.image.url }}"
+                      class="img-thumbnail"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title="{{ product.name }}"
+                      alt="{{ product.name }}"
+                      style="width: 45px; height: 45px; object-fit: cover;">
+                {% elif product.image_url %}
+                  <img src="{{ product.image_url }}"
+                      class="img-thumbnail"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title="{{ product.name }}"
+                      alt="{{ product.name }}"
+                      style="width: 45px; height: 45px; object-fit: cover;">
+                {% else %}
+                  <img src="{% static 'images/placeholder.jpg' %}"
+                      class="img-thumbnail"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title="{{ product.name }}"
+                      alt="{{ product.name }}"
+                      style="width: 45px; height: 45px; object-fit: cover;">
+                {% endif %}
+              {% endfor %}
+            </div>
           </div>
 
           <div class="mt-auto d-grid gap-2">

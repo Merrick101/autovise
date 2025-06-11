@@ -12,20 +12,13 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Navbar Styles */
 
-@font-face {
-  font-family: 'AutoviseDisplay';
-  src: url('/static/fonts/AutoviseDisplay.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 .logo-text {
-  font-family: 'AutoviseDisplay', sans-serif;
+  font-family: 'Orbitron', sans-serif;
   color: #4682B4; /* Steel Blue */
-  letter-spacing: 3px;
-  font-size: 2.1rem !important;
+  letter-spacing: 2px;
+  font-style: italic;
+  font-size: 1.8rem !important;
+  font-weight: 900 !important;
 }
 
 .nav-link:focus-visible,
