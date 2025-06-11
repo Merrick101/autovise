@@ -16,7 +16,7 @@
         {% endif %}
 
         {% if product.image %}
-          <img src="{{ product.image.url }}" class="card-img-top img-fluid" alt="{{ product.name }}">
+          <img src="{{ product.image.url }}" class="card-img-top img-fluid product-list-image" alt="{{ product.name }}">
         {% else %}
           <img src="{% static 'images/placeholder.jpg' %}" class="card-img-top img-fluid" alt="Placeholder">
         {% endif %}

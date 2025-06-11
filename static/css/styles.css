@@ -29,11 +29,24 @@
 
 .card-img-top {
   aspect-ratio: 1 / 1; /* or 4/3, 3/2 */
-  object-fit: cover;
 }
 
 .product-title {
   font-size: clamp(1rem, 2.5vw, 1.35rem);
   font-weight: 600;
   line-height: 1.2;
+}
+
+.product-list-image {
+  height: 220px;
+  object-fit: contain;
+  object-position: center;
+  background-color: #f8f9fa;
+  width: 100%;
+}
+
+.bundle-image {
+  height: 220px;
+  object-fit: contain;
+  object-position: center;
 }
