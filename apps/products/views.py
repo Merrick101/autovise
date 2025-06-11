@@ -17,3 +17,8 @@ def product_detail_view(request, pk):
 def bundle_list_view(request):
     bundles = Bundle.objects.all()
     return render(request, 'products/bundle_list.html', {'bundles': bundles})
+
+
+def bundle_detail_view(request, bundle_id):
+    bundle = get_object_or_404(Bundle, id=bundle_id)
+    return render(request, 'products/bundle_detail.html', {'bundle': bundle})

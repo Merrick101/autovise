@@ -1,12 +1,13 @@
 # apps/products/urls.py
 
 from django.urls import path
-from .views import product_list_view, product_detail_view, bundle_list_view
+from . import views
 
 app_name = 'products'
 
 urlpatterns = [
-    path('', product_list_view, name='product_list'),
-    path('<int:pk>/', product_detail_view, name='product_detail'),
-    path('bundles/', bundle_list_view, name='bundle_list'),
+    path('', views.product_list_view, name='product_list'),
+    path('<int:pk>/', views.product_detail_view, name='product_detail'),
+    path('bundles/', views.bundle_list_view, name='bundle_list'),
+    path('bundles/<int:bundle_id>/', views.bundle_detail_view, name='bundle_detail'),
 ]

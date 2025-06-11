@@ -1,0 +1,72 @@
+<!-- templates/products/bundle_detail.html -->
+
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-5">
+      {% if bundle.image %}
+        <img src="{{ bundle.image.url }}" class="img-fluid rounded" alt="{{ bundle.name }}">
+      {% else %}
+        <img src="{% static 'images/placeholder.jpg' %}" class="img-fluid rounded" alt="Placeholder">
+      {% endif %}
+    </div>
+
+    <div class="col-md-7">
+      <h2>{{ bundle.name }}</h2>
+
+      {% if bundle.bundle_type == "Pro" %}
+        <span class="badge bg-warning text-dark">Pro</span>
+      {% elif bundle.bundle_type == "Special" %}
+        <span class="badge bg-info text-dark">Special</span>
+      {% endif %}
+
+      <p class="mt-3 lead fw-semibold">£{{ bundle.price }}</p>
+
+      <div class="mb-3 text-muted">
+        {{ bundle.description|safe }}
+      </div>
+
+      <form action="{% url 'orders:add_bundle_to_cart' bundle.id %}" method="post" class="mb-2">
+        {% csrf_token %}
+        <input type="hidden" name="quantity" value="1">
+        <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+      </form>
+
+      <form action="{% url 'users:save_bundle' bundle.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-primary w-100">Save for Later</button>
+      </form>
+    </div>
+  </div>
+
+  <hr class="my-5">
+
+  <h4 class="mb-3">Included Products</h4>
+  <div class="row">
+    {% for product in bundle.products.all %}
+      <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+        <div class="card h-100 shadow-sm">
+          {% if product.tier == "Pro" %}
+            <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Pro</span>
+          {% endif %}
+
+          {% if product.image %}
+            <img src="{{ product.image.url }}" class="card-img-top img-fluid" alt="{{ product.name }}">
+          {% else %}
+            <img src="{% static 'images/placeholder.jpg' %}" class="card-img-top img-fluid" alt="Placeholder">
+          {% endif %}
+
+          <div class="card-body">
+            <h6 class="card-title">{{ product.name }}</h6>
+            <p class="card-text small fw-semibold">£{{ product.price }}</p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

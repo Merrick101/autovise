@@ -1,22 +1,60 @@
+<!-- templates/products/bundle_list.html -->
+
 {% extends "base.html" %}
-
-{% block title %}Bundles | Autovise{% endblock %}
-
+{% load static %}
 {% block content %}
-  <h1 class="mb-4">Bundle Offers</h1>
-  <div class="row">
-    {% for bundle in bundles %}
-      <div class="col-12 col-sm-6 col-lg-4 mb-4">
-        <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">{{ bundle.name }}</h5>
-            <p class="card-text">{{ bundle.description }}</p>
-            <p class="card-text fw-bold">£{{ bundle.price }}</p>
+
+<h2 class="mb-4">Autovise Bundles</h2>
+
+<div class="row">
+  {% for bundle in bundles %}
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+      <div class="card h-100 shadow-sm">
+
+        {% if bundle.bundle_type == "Pro" %}
+        <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Pro</span>
+        {% elif bundle.bundle_type == "Special" %}
+        <span class="badge bg-info text-dark position-absolute top-0 end-0 m-2">Special</span>
+        {% endif %}
+
+        {% if bundle.image %}
+          <img src="{{ bundle.image.url }}" class="card-img-top img-fluid" alt="{{ bundle.name }}">
+        {% else %}
+          <img src="{% static 'images/placeholder.jpg' %}" class="card-img-top img-fluid" alt="Placeholder">
+        {% endif %}
+
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="card-title product-title">{{ bundle.name }}</h5>
+            <p class="card-text fw-semibold">£{{ bundle.price }}</p>
+            <p class="card-text small text-muted">{{ bundle.description|striptags|truncatewords:12 }}</p>
           </div>
+
+          <div class="mt-auto d-grid gap-2">
+            <a href="{% url 'products:bundle_detail' bundle.id %}" class="btn btn-outline-secondary btn-sm">
+              View Bundle
+            </a>
+
+            <form action="{% url 'orders:add_bundle_to_cart' bundle.id %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="btn btn-primary btn-sm w-100">
+                Add to Cart
+              </button>
+            </form>
+
+            <form action="{% url 'users:save_bundle' bundle.id %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                Save for Later
+              </button>
+            </form>
+          </div>
+
         </div>
       </div>
-    {% empty %}
-      <p>No bundles available at this time.</p>
-    {% endfor %}
-  </div>
+    </div>
+  {% endfor %}
+</div>
+
 {% endblock %}

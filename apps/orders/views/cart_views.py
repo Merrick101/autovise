@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.contrib import messages
 
-from apps.products.models import Product
+from apps.products.models import Product, Bundle
 from apps.orders.models import CartItem
 from apps.orders.utils.cart import (
     add_to_cart, get_active_cart, save_cart, calculate_cart_summary
@@ -18,6 +18,27 @@ def add_to_cart_view(request, product_id):
         add_to_cart(request, product_id, quantity)
         messages.success(request, f"Added {product.name} to your cart.")
     return redirect(request.META.get('HTTP_REFERER', 'products:product_list'))
+
+
+def add_bundle_to_cart_view(request, bundle_id):
+    bundle = get_object_or_404(Bundle, id=bundle_id)
+    cart = request.session.get('cart', {})
+
+    item_key = f"bundle_{bundle.id}"
+    quantity = int(request.POST.get('quantity', 1))
+
+    if item_key in cart:
+        cart[item_key]['quantity'] += quantity
+    else:
+        cart[item_key] = {
+            'type': 'bundle',
+            'name': bundle.name,
+            'price': str(bundle.price),
+            'quantity': quantity,
+        }
+
+    request.session['cart'] = cart
+    return redirect('products:bundle_detail', bundle_id=bundle.id)
 
 
 def cart_view(request):

@@ -2,7 +2,7 @@
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from apps.products.models import Product
+from apps.products.models import Product, Bundle
 from .models import UserProfile
 from .forms import UserForm, UserProfileForm
 
@@ -40,6 +40,19 @@ def save_product(request, product_id):
 
     # Redirect back to the same page or product detail
     return redirect(request.META.get('HTTP_REFERER', 'products:product_list'))
+
+
+@login_required
+def save_bundle(request, bundle_id):
+    bundle = get_object_or_404(Bundle, id=bundle_id)
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+    if bundle in profile.saved_bundles.all():
+        profile.saved_bundles.remove(bundle)
+    else:
+        profile.saved_bundles.add(bundle)
+
+    return redirect(request.META.get('HTTP_REFERER', 'products:bundle_list'))
 
 
 @login_required
