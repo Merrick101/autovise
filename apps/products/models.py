@@ -5,6 +5,7 @@ from django.utils.text import slugify
 from django.utils import timezone
 from django.utils.timezone import now
 from django.utils.html import mark_safe
+from decimal import Decimal
 from ckeditor.fields import RichTextField
 
 
@@ -120,6 +121,7 @@ class Bundle(models.Model):
     slug = models.SlugField(unique=True, blank=True)
     discount_percentage = models.DecimalField(max_digits=6, decimal_places=2, default=10.00)
     price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
+    subtotal_price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     bundle_type = models.CharField(max_length=20, choices=BUNDLE_TYPE_CHOICES, default='Standard')
 
     sku = models.CharField(max_length=50, unique=True, default='TEMP_SKU', help_text="Unique identifier for this bundle")
@@ -161,6 +163,12 @@ class Bundle(models.Model):
         return "No Image"
 
     image_tag.short_description = "Preview"
+
+    def calculated_price(self):
+        total = sum(p.price for p in self.products.all())
+        discount = self.discount_percentage or Decimal('10.0')
+        final = total * (Decimal('1.00') - discount / Decimal('100.00'))
+        return round(final, 2)
 
 
 class ProductBundle(models.Model):

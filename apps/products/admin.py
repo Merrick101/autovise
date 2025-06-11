@@ -197,13 +197,13 @@ class BundleAdmin(admin.ModelAdmin):
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
-        form.instance.refresh_from_db()
         bundle = form.instance
-
-        total = sum(p.price for p in bundle.products.all())
-        discount = bundle.discount_percentage or Decimal('10.0')
-        bundle.price = round(total * (Decimal('1.00') - discount / Decimal('100.00')), 2)
-        bundle.save()
+        if bundle.pk:
+            total = sum(p.price for p in bundle.products.all())
+            discount = bundle.discount_percentage or Decimal('10.0')
+            bundle.subtotal_price = total
+            bundle.price = round(total * (Decimal('1.00') - discount / Decimal('100.00')), 2)
+            bundle.save()
 
     def formatted_price(self, obj):
         try:
@@ -236,7 +236,8 @@ class BundleAdmin(admin.ModelAdmin):
     def recalculate_prices(self, request, queryset):
         for bundle in queryset:
             total = sum(p.price for p in bundle.products.all())
-            bundle.price = round(total * Decimal('0.90'), 2)
+            bundle.subtotal_price = total
+            bundle.price = round(total * (Decimal('1.00') - bundle.discount_percentage / Decimal('100.00')), 2)
             bundle.save()
 
 
