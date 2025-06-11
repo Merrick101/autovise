@@ -35,14 +35,19 @@ class ProductBundleInline(admin.TabularInline):
     extra = 1
     autocomplete_fields = ['product']
     classes = ['tab-general']
-    readonly_fields = ['product_price']
-    fields = ['product', 'product_price']  # Fields to show in the inline
+    readonly_fields = ['product_price', 'product_tier']
 
     def product_price(self, obj):
         if obj.product:
             return f"£{obj.product.price:.2f}"
         return "-"
     product_price.short_description = "Price"
+
+    def product_tier(self, obj):
+        if obj.product and obj.product.tier:
+            return obj.product.tier
+        return "-"
+    product_tier.short_description = "Tier"
 
     def clean(self):
         super().clean()
@@ -143,8 +148,8 @@ class TagAdmin(admin.ModelAdmin):
 class BundleAdmin(admin.ModelAdmin):
     form = BundleAdminForm
     list_display = [
-        'name', 'slug', 'bundle_code', 'sku',
-        'formatted_price', 'discount_percentage', 'product_count'
+        'name', 'bundle_type', 'bundle_code', 'sku',
+        'price', 'discount_percentage', 'product_count'
     ]
     search_fields = ['name', 'slug']
     inlines = [ProductBundleInline]
