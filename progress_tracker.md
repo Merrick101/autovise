@@ -457,7 +457,7 @@ Key Outcomes:
 
 ---
 
-Task 9 from EPIC 08: Bundles & Discount Pricing System
+## Task 9 from EPIC 08: Bundles & Discount Pricing System
 
 Status: Completed
 
@@ -501,3 +501,25 @@ The only remaining task is verifying image rendering within the Heroku productio
 - Tools used: DALL·E, Photoshop, Photopea, AWS S3
 
 ---
+
+## Task 3 from EPIC 08: Bundles & Discount Pricing System
+
+**Summary:**
+Implemented a full frontend interface to display all bundles with dynamic filtering, pricing logic, product previews, and cart integration. Users can browse bundles by type (Standard, Pro, Special), view thumbnail previews of included products, and add bundles to their cart with one click. Fallback image logic ensures graceful display when preview assets are missing.
+
+**Key Actions:**
+- Populated bundles in the Django Admin with required product links and tier rules
+- Built bundle_list.html and associated view using Bundle.objects.all()
+- Added filtering by bundle_type (Standard, Pro, Special)
+- Displayed each bundle’s name, description, discounted price, and “Add to Cart” button
+- Included up to 3 product thumbnails per bundle with Bootstrap tooltips
+- Integrated “Add to Cart” functionality using existing order logic
+- (Optional) Stored bundle code metadata for cart session (if applicable)
+
+**Confirmation:**
+- ✔️ All acceptance criteria met
+- ✔️ Fully tested in browser with correct behavior and layout
+- ✔️ Fallback and tooltip logic implemented and functioning
+
+---
+

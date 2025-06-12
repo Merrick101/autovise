@@ -149,9 +149,9 @@ class BundleAdmin(admin.ModelAdmin):
     form = BundleAdminForm
     list_display = [
         'name', 'bundle_type', 'bundle_code', 'sku',
-        'price', 'discount_percentage', 'product_count'
+        'price', 'discount_percentage', 'product_count', 'tag_list',
     ]
-    search_fields = ['name', 'slug']
+    search_fields = ['name', 'bundle_code', 'sku', 'tags__name']
     inlines = [ProductBundleInline]
     readonly_fields = [
         'slug', 'created_at', 'updated_at',
@@ -178,7 +178,7 @@ class BundleAdmin(admin.ModelAdmin):
             'classes': ['tab-media'],
         }),
         ("Bundle Type", {
-            'fields': ('bundle_type',),
+            'fields': ('bundle_type', 'tags'),
             'classes': ['tab-general', 'collapse'],
         }),
         ("Timestamps", {
@@ -190,6 +190,10 @@ class BundleAdmin(admin.ModelAdmin):
             'classes': ['tab-meta', 'collapse'],
         }),
     )
+
+    def tag_list(self, obj):
+        return ", ".join(tag.name for tag in obj.tags.all())
+    tag_list.short_description = "Tags"
 
     def product_count(self, obj):
         return obj.products.count()

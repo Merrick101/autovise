@@ -140,6 +140,7 @@ class Bundle(models.Model):
         help_text="Optional: Provide relative S3 path (e.g. bundles/my-image.png)"
     )
 
+    tags = models.ManyToManyField('Tag', blank=True, related_name='bundles')
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
