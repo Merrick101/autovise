@@ -552,3 +552,24 @@ All admin-side functionality for bundle management has been implemented and vali
 
 ---
 
+## Task 1 from EPIC 12: Stripe Payments Integration
+
+**Status:**
+Complete 
+
+**Completion Summary:**
+Successfully finalized foundational Stripe integration logic. All API keys are securely loaded from environment variables, and a dedicated stripe_helpers.py module has been created to manage session creation and webhook verification. The webhook view is fully functional, verified via Stripe CLI, and now logs incoming events clearly. The Order model has been updated to support guest checkouts, and create_order_from_stripe_session() has been refactored to accommodate both guest and authenticated users. All edge cases (missing users, products, failed emails) are logged with appropriate fallbacks. Testing was completed using stripe trigger and webhook endpoint verification.
+
+**Key Actions:**
+- Updates:
+  - config/urls.py (direct route for /orders/webhook/)
+  - apps/orders/views/webhook.py
+  - apps/orders/utils/stripe_helpers.py
+  - apps/orders/utils/order.py
+  - apps/orders/models.py
+  - .env, requirements.txt, settings.py
+  - Stripe CLI test output logs
+- System is now webhook-compatible, production-ready, and logically structured.
+
+---
+
