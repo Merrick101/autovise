@@ -13,6 +13,13 @@ logger = logging.getLogger(__name__)
 @require_POST
 @csrf_exempt
 def stripe_webhook_view(request):
+    logger.info("[WEBHOOK] Stripe webhook endpoint was hit.")
+    print("[WEBHOOK] Endpoint triggered")
+
+    if request.method != "POST":
+        logger.warning("[WEBHOOK] Received non-POST request.")
+        return HttpResponse(status=405)
+
     event = verify_webhook_signature(request)
     if event is None:
         return HttpResponseBadRequest("Invalid signature or payload")

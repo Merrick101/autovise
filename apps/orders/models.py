@@ -6,10 +6,21 @@ from apps.products.models import Product
 
 
 class Order(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     total_price = models.DecimalField(max_digits=8, decimal_places=2)
+    total_amount = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
+    delivery_fee = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    discount_total = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
     is_first_order = models.BooleanField(default=False)
+    stripe_session_id = models.CharField(max_length=255, blank=True, null=True)
+    stripe_payment_intent = models.CharField(max_length=255, blank=True, null=True)
+    is_paid = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Order #{self.id} for {self.user.username}"

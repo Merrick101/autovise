@@ -14,5 +14,5 @@ urlpatterns = [
     path('users/', include('apps.users.urls')),
     path('', include('apps.pages.urls')),
     path('assets/', include('apps.assets.urls')),
-    path('webhooks/stripe/', stripe_webhook_view, name='stripe_webhook'),
+    path("orders/webhook/", stripe_webhook_view, name="stripe_webhook"),
 ]
