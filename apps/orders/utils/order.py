@@ -11,16 +11,23 @@ logger = logging.getLogger(__name__)
 
 
 def create_order_from_stripe_session(session):
-    user_id = session.get('metadata', {}).get('user_id')
+    """
+    Creates an Order instance from a completed Stripe session object.
+    Handles both guest and authenticated users, cart cleanup, and email notification.
+    """
 
-    # Attempt to find user (optional, supports guest checkout)
+    user_id = session.get('metadata', {}).get('user_id')
     User = get_user_model()
     user = None
+
     if user_id and user_id != "guest":
         try:
             user = User.objects.get(id=user_id)
+            logger.info(f"[ORDER] Authenticated user found: {user.email}")
         except User.DoesNotExist:
-            pass
+            logger.warning(f"[ORDER] User ID {user_id} not found. Proceeding as guest.")
+    else:
+        logger.info("[ORDER] Guest checkout session detected.")
 
     # Create the order
     order = Order.objects.create(
@@ -44,7 +51,7 @@ def create_order_from_stripe_session(session):
                 quantity=1  # Assuming quantity is 1 for simplicity
             )
         except Product.DoesNotExist:
-            continue
+            logger.warning(f"[ORDER] Product ID {product_id} not found in DB. Skipping.")
 
     # Optional: clean up user cart
     if user:
@@ -61,10 +68,13 @@ def create_order_from_stripe_session(session):
             "user": user,
             "order": order,
         })
-        send_mail(
-            subject,
-            message,
-            "no-reply@autovise.co.uk",  # From email
-            [user.email],
-            fail_silently=True,
-        )
+        try:
+            send_mail(
+                subject,
+                message,
+                "no-reply@autovise.co.uk",  # From email
+                [user.email],
+                fail_silently=True,
+            )
+        except Exception as e:
+            logger.error(f"[EMAIL] Failed to send confirmation to {user.email}: {e}")

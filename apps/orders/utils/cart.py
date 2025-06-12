@@ -13,6 +13,10 @@ def is_first_time_user(user):
 
 
 def add_to_cart(request, product_id, quantity=1):
+    """
+    Add a product to the active user's cart or session cart.
+    If the product is already present, increase its quantity.
+    """
     product = Product.objects.get(id=product_id)
 
     if request.user.is_authenticated:
@@ -55,6 +59,14 @@ def clear_session_cart(request):
 
 
 def calculate_cart_summary(request, cart_data, cart_type):
+    """
+    Calculate full cart breakdown including:
+    - Bundle and first-time discounts
+    - Delivery fee logic
+    - Grand total and estimated delivery date
+    Returns structured summary dictionary for use in views.
+    """
+
     items = []
     total = 0
     bundle_discount_total = 0
