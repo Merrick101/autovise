@@ -2,14 +2,12 @@
 
 from django.shortcuts import redirect
 from django.conf import settings
-from apps.orders.utils.cart import get_active_cart
 from django.contrib.auth.decorators import login_required
-import stripe
+from apps.orders.utils.cart import get_active_cart
+from apps.orders.utils.stripe_helpers import create_checkout_session
 
 
-stripe.api_key = settings.STRIPE_SECRET_KEY
-
-
+@login_required
 def checkout_view(request):
     cart_data, cart_type = get_active_cart(request)
     line_items = []
@@ -27,7 +25,7 @@ def checkout_view(request):
             })
             product_ids.append(str(item.product.id))
     else:
-        for code, item in cart_data.items():
+        for _, item in cart_data.items():
             line_items.append({
                 'price_data': {
                     'currency': 'gbp',
@@ -43,13 +41,12 @@ def checkout_view(request):
         'product_ids': ','.join(product_ids)
     }
 
-    checkout_session = stripe.checkout.Session.create(
-        payment_method_types=['card'],
-        mode='payment',
+    session = create_checkout_session(
+        user=request.user,
         line_items=line_items,
-        success_url=request.build_absolute_uri('/checkout/success/'),
-        cancel_url=request.build_absolute_uri('/checkout/cancel/'),
         metadata=metadata,
+        success_url=request.build_absolute_uri('/checkout/success/'),
+        cancel_url=request.build_absolute_uri('/checkout/cancel/')
     )
 
-    return redirect(checkout_session.url)
+    return redirect(session.url) if session else redirect('orders:cart')
