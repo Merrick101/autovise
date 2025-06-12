@@ -167,7 +167,7 @@ class Bundle(models.Model):
 
     def calculated_price(self):
         total = sum(p.price for p in self.products.all())
-        discount = self.discount_percentage or Decimal('10.0')
+        discount = Decimal(self.discount_percentage) if self.discount_percentage else Decimal('10.0')
         final = total * (Decimal('1.00') - discount / Decimal('100.00'))
         return round(final, 2)
 

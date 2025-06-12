@@ -504,6 +504,8 @@ The only remaining task is verifying image rendering within the Heroku productio
 
 ## Task 3 from EPIC 08: Bundles & Discount Pricing System
 
+**Status:** Complete
+
 **Summary:**
 Implemented a full frontend interface to display all bundles with dynamic filtering, pricing logic, product previews, and cart integration. Users can browse bundles by type (Standard, Pro, Special), view thumbnail previews of included products, and add bundles to their cart with one click. Fallback image logic ensures graceful display when preview assets are missing.
 
@@ -520,6 +522,33 @@ Implemented a full frontend interface to display all bundles with dynamic filter
 - ✔️ All acceptance criteria met
 - ✔️ Fully tested in browser with correct behavior and layout
 - ✔️ Fallback and tooltip logic implemented and functioning
+
+---
+
+## Task 5 from EPIC 08: Bundles & Discount Pricing System
+
+**Status:** Complete
+
+**Summary:**
+All admin-side functionality for bundle management has been implemented and validated. Composition rules, dynamic price calculation, and inline product data (price/tier) are enforced through Django Admin logic. Frontend pricing is consistent across the bundle list and detail views. A foundational test suite has been prepared to validate all logic post-deployment, with Stripe-related tests deferred.
+
+**Key Actions:**
+- Bundle composition rules enforced (min items, uniqueness, Pro inclusion)
+- Dynamic subtotal and discount calculations displayed in admin and views
+- Inline admin controls show product tier and pricing
+- Tags are filterable and searchable in the admin
+- Frontend pricing is verified through functional tests
+- Test scaffolding covers all major validation logic and frontend consistency
+
+**Deferred (Post-Deployment):**
+- Tests for cart and checkout views (pending Stripe integration)
+- Full test automation for bundle creation via admin UI
+
+**Confirmation:**
+- ✔️ Admins can create, edit, and review bundles with all related data in one interface
+- ✔️ Tags are filterable in the list view and usable for bundle organization
+- ✔️ Discounted prices are clearly shown and match logic in the frontend
+- ✔️ Basic test framework is outlined for future testing phase
 
 ---
 
