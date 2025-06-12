@@ -573,3 +573,21 @@ Successfully finalized foundational Stripe integration logic. All API keys are s
 
 ---
 
+## Task 2 from EPIC 12: Stripe Payments Integration
+
+**Status:**
+Complete 
+
+**Completion Summary:**
+Successfully implemented a dynamic backend checkout flow using Stripe. The checkout_view now constructs line items from the active cart (DB or session), applies bundle and first-time discounts, and includes delivery fees as needed. Product metadata and user ID are passed securely to Stripe, and all totals are pre-calculated for accuracy. Protective logic has been added to gracefully handle empty or invalid carts, ensuring that users are redirected with helpful messages instead of initiating a session. Total verification logging confirms Stripe line item totals match the application’s computed grand total.
+
+**Key Actions:**
+- Updates:
+ - apps/orders/views/checkout.py
+ - apps/orders/utils/cart.py
+ - apps/orders/utils/stripe_helpers.py
+ - Project logs and Stripe test sessions
+- Checkout backend logic is secure, dynamic, and fully aligned with catalog discounting and cart validation rules.
+
+---
+
