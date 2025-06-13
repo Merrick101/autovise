@@ -285,17 +285,22 @@ Outcome:
 
 ---
 
-**Task 2 - Admin Roles & Permissions Setup:**
+## Task 2 - Admin Roles & Permissions Setup
 
-Configured role-based access control within Django Admin, clearly separating superuser and staff responsibilities. Implemented group-based permissions for catalog management while restricting order access to superusers only.
+**Status:** 
+- Complete
 
-Key Actions:
+**Summary:**
+- Configured role-based access control within Django Admin, clearly separating superuser and staff responsibilities. Implemented group-based permissions for catalog management while restricting order access to superusers only.
+
+**Key Actions:**
 - Created a dedicated Catalog Editors group with permissions for Product, Category, Bundle, Tag, and ProductType
 - Assigned staff users to the group using the Django Admin interface
 - Verified staff can manage catalog data but cannot access Orders
 - Implemented OrderAdmin permission overrides to enforce superuser-only access
 - Confirmed admin visibility and field access reflects assigned role
-Outcome:
+
+**Key Outcomes:**
 - Staff users can manage product and bundle data, but not orders
 - Superusers retain full access to all admin features
 - Permissions are enforced securely and tested across user roles
@@ -588,6 +593,29 @@ Successfully implemented a dynamic backend checkout flow using Stripe. The check
  - apps/orders/utils/stripe_helpers.py
  - Project logs and Stripe test sessions
 - Checkout backend logic is secure, dynamic, and fully aligned with catalog discounting and cart validation rules.
+
+---
+
+## Task 3 - Front-End Stripe Checkout Integration
+
+**Status:**
+- Complete
+
+**Summary:**
+- Connected the frontend cart page to the backend checkout_view, allowing users to initiate a secure Stripe Checkout session. Enhanced UX by adding a loading spinner during redirection, graceful fallback messaging for failures, and validated cart state before submission. Styling aligns with Bootstrap conventions and is consistent with site branding.
+
+**Key Actions:**
+- Replaced static checkout link with POST form and CSRF token
+- Integrated a Bootstrap-styled "Proceed to Checkout" button with loading spinner
+- Added JavaScript logic to show spinner and prevent double submission
+- Implemented fallback redirect with error messaging if session creation fails
+- Validated cart is not empty before allowing checkout to proceed
+
+**Key Outcomes:**
+- Users can securely initiate Stripe Checkout from the cart page
+- Button behavior provides responsive visual feedback
+- Empty carts are gracefully blocked from triggering checkout
+- Frontend integration is robust, accessible, and consistent with project styling
 
 ---
 

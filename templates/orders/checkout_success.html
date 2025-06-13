@@ -4,18 +4,27 @@
 {% block content %}
   <div class="container mt-5">
     <h2>🎉 Order Confirmed</h2>
+
     {% if order %}
-      <p>Thank you for your purchase, {{ order.user.username }}!</p>
+      <p>Thank you for your purchase{% if order.user %}, {{ order.user.username }}{% endif %}!</p>
 
       <h4>Order Summary:</h4>
-      <ul>
+      <ul class="list-unstyled">
         {% for item in order.items.all %}
           <li>{{ item.quantity }} × {{ item.product.name }} – £{{ item.subtotal|floatformat:2 }}</li>
         {% endfor %}
       </ul>
-      <p><strong>Total:</strong> £{{ order.total_price }}</p>
+
+      <p><strong>Subtotal:</strong> £{{ order.total_price|floatformat:2 }}</p>
+      {% if order.delivery_fee %}
+        <p><strong>Delivery Fee:</strong> £{{ order.delivery_fee|floatformat:2 }}</p>
+      {% endif %}
+      {% if order.discount_total %}
+        <p><strong>Discount Applied:</strong> £{{ order.discount_total|floatformat:2 }}</p>
+      {% endif %}
+      <p><strong>Paid Total:</strong> £{{ order.total_price|floatformat:2 }}</p>
     {% else %}
-      <p>Your order has been received. (No details available)</p>
+      <p>Your order has been received, but no details could be loaded. If you believe this is an error, please contact support.</p>
     {% endif %}
 
     <p>If you have any questions, please <a href="{{ contact_page_url }}">contact support</a> or email us at <a href="mailto:{{ support_email }}">{{ support_email }}</a>.</p>

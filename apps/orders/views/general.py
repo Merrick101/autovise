@@ -13,7 +13,7 @@ def checkout_success_view(request):
 
     context = {
         'order': order,
-        'support_email': 'support@autovise.co.uk',
+        'support_email': 'hello.autovise@gmail.com',
         'contact_page_url': '/contact/',
     }
     return render(request, 'orders/checkout_success.html', context)
