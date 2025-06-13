@@ -64,4 +64,8 @@ def checkout_view(request):
         cancel_url=request.build_absolute_uri('/checkout/cancel/')
     )
 
-    return redirect(session.url) if session else redirect('orders:cart')
+    if session:
+        return redirect(session.url)
+    else:
+        messages.error(request, "Checkout failed. Please try again or contact support.")
+        return redirect('orders:cart')
