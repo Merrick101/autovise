@@ -27,3 +27,7 @@ def checkout_success_view(request):
         'contact_page_url': '/contact/',
     }
     return render(request, 'orders/checkout_success.html', context)
+
+
+def checkout_cancel_view(request):
+    return render(request, 'orders/checkout_cancel.html')
