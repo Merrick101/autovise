@@ -84,12 +84,10 @@
               View Bundle
             </a>
 
-            <form action="{% url 'orders:add_bundle_to_cart' bundle.id %}" method="post">
+            <form action="{% url 'orders:add_bundle_to_cart' bundle.id %}" method="post" class="mb-2 prevent-multi-submit">
               {% csrf_token %}
               <input type="hidden" name="quantity" value="1">
-              <button type="submit" class="btn btn-primary btn-sm w-100">
-                Add to Cart
-              </button>
+              <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
             </form>
 
             <form action="{% url 'users:save_bundle' bundle.id %}" method="post">

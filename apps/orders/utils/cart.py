@@ -1,7 +1,8 @@
 # apps/orders/utils/cart.py
 
 from apps.orders.models import Cart, CartItem
-from apps.products.models import Product
+from apps.products.models import Product, Bundle
+from decimal import Decimal
 from datetime import date, timedelta
 import logging
 
@@ -68,43 +69,67 @@ def calculate_cart_summary(request, cart_data, cart_type):
     """
 
     items = []
-    total = 0
-    bundle_discount_total = 0
-    cart_discount_total = 0
+    total = Decimal("0.00")
+    bundle_discount_total = Decimal("0.00")
+    cart_discount_total = Decimal("0.00")
     first_time_discount = False
 
-    def is_bundle(product):
+    def is_bundle_product(product):
         return product.type and product.type.name.lower() == "bundle"
 
     if cart_type == 'db':
         for item in cart_data.items.select_related('product'):
             product = item.product
-            subtotal = item.quantity * product.price
-            if is_bundle(product):
-                bundle_discount_total += subtotal * 0.10
+            subtotal = Decimal(item.quantity) * product.price
+            if is_bundle_product(product):
+                bundle_discount_total += subtotal * Decimal("0.10")
             items.append({
                 'product': product,
                 'quantity': item.quantity,
                 'subtotal': subtotal,
                 'tier': product.tier,
-                'is_bundle': True if is_bundle(product) else False,
+                'is_bundle': is_bundle_product(product),
             })
             total += subtotal
     else:
-        for _, item in cart_data.items():
-            try:
-                product = Product.objects.get(id=item['product_id'])
-            except Product.DoesNotExist:
+        for key, item in cart_data.items():
+            if item.get('type') == 'bundle':
+                # Handle session cart bundle items
+                try:
+                    bundle_id = int(key.split('_')[1])  # from "bundle_7"
+                    bundle = Bundle.objects.get(id=bundle_id)
+                except (IndexError, ValueError, Bundle.DoesNotExist):
+                    continue
+
+                subtotal = Decimal(item['quantity']) * Decimal(item['price'])
+                items.append({
+                    'product': bundle,
+                    'quantity': item['quantity'],
+                    'subtotal': subtotal,
+                    'tier': bundle.bundle_type,
+                    'is_bundle': True,
+                })
+                total += subtotal
                 continue
-            subtotal = item['quantity'] * product.price
-            if is_bundle(product):
-                bundle_discount_total += subtotal * 0.10
+
+            # Handle normal product items
+            try:
+                product_id = item.get('product_id')
+                if not product_id:
+                    continue
+                product = Product.objects.get(id=product_id)
+            except (Product.DoesNotExist, KeyError):
+                continue
+
+            subtotal = Decimal(item['quantity']) * product.price
+            if is_bundle_product(product):
+                bundle_discount_total += subtotal * Decimal("0.10")
             items.append({
                 'product': product,
                 'quantity': item['quantity'],
                 'subtotal': subtotal,
                 'tier': product.tier,
-                'is_bundle': is_bundle(product),
+                'is_bundle': is_bundle_product(product),
             })
             total += subtotal
 
@@ -113,13 +138,13 @@ def calculate_cart_summary(request, cart_data, cart_type):
 
     if request.user.is_authenticated and is_first_time_user(request.user):
         first_time_discount = True
-        cart_discount_total = total * 0.10
+        cart_discount_total = total * Decimal("0.10")
         total -= cart_discount_total
 
-    delivery_fee = 4.99
-    free_delivery = first_time_discount or total_before_discount >= 40
+    delivery_fee = Decimal("4.99")
+    free_delivery = first_time_discount or total_before_discount >= Decimal("40.00")
     if free_delivery:
-        delivery_fee = 0.00
+        delivery_fee = Decimal("0.00")
 
     grand_total = total + delivery_fee
     estimated_delivery = date.today() + timedelta(days=2)

@@ -33,7 +33,7 @@
         {{ bundle.description|safe }}
       </div>
 
-      <form action="{% url 'orders:add_bundle_to_cart' bundle.id %}" method="post" class="mb-2">
+      <form action="{% url 'orders:add_bundle_to_cart' bundle.id %}" method="post" class="mb-2 prevent-multi-submit">
         {% csrf_token %}
         <input type="hidden" name="quantity" value="1">
         <button type="submit" class="btn btn-primary w-100">Add to Cart</button>

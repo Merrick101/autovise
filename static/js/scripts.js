@@ -17,3 +17,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 });
+  // Prevent multiple checkout submissions
+ document.querySelectorAll('.prevent-multi-submit').forEach(form => {
+    form.addEventListener('submit', e => {
+      const btn = form.querySelector('button[type="submit"]');
+      if (btn.disabled) {
+        e.preventDefault(); // prevent double submission
+        return;
+      }
+      btn.disabled = true;
+      btn.innerText = 'Adding...';
+    });
+  });
