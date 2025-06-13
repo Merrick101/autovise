@@ -31,3 +31,8 @@ def checkout_success_view(request):
 
 def checkout_cancel_view(request):
     return render(request, 'orders/checkout_cancel.html')
+
+
+@login_required
+def order_history_view(request):
+    return render(request, 'orders/order_history.html')
