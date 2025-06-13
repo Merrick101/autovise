@@ -1,9 +1,7 @@
 <!-- templates/account/signup.html -->
 
 {% extends "base.html" %}
-{% load socialaccount %}
-{% load static %}
-{% load widget_tweaks %}
+{% load static socialaccount widget_tweaks %}
 
 {% block title %}Sign Up{% endblock %}
 
@@ -29,17 +27,16 @@
       <button type="submit" class="btn btn-success w-100">Sign Up</button>
     </form>
 
-    {% if socialaccount_providers %}
-      <hr>
-      <div class="text-center">
-        <p class="mb-2">Or sign up with:</p>
-        {% for provider in socialaccount_providers %}
-          <a href="{% provider_login_url provider.id %}" class="btn btn-outline-secondary w-100 mb-2">
-            {{ provider.name }}
-          </a>
-        {% endfor %}
-      </div>
-    {% endif %}
+    <hr>
+    <div class="text-center">
+      <p class="mb-2">Or sign up with:</p>
+      <a href="{% provider_login_url "google" %}"
+         class="btn btn-outline-dark w-100 mb-2 d-flex align-items-center justify-content-center gap-2">
+        <i class="fab fa-google"></i>
+        Continue with Google
+      </a>
+      {% providers_media_js %}
+    </div>
 
     <div class="mt-3 text-center">
       <p>Already have an account? <a href="{% url 'account_login' %}">Log in</a></p>

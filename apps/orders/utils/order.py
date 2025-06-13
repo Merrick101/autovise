@@ -30,6 +30,9 @@ def create_order_from_stripe_session(session):
 
     # Extract product IDs from session metadata
     product_ids = session.get('metadata', {}).get('product_ids', '')
+    if not product_ids:
+        logger.warning(f"[ORDER] No product_ids found in session metadata. Skipping order creation.")
+        return
     product_ids = product_ids.split(',') if product_ids else []
 
     total_amount = int(float(session.get('amount_total', 0))) / 100.0

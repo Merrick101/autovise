@@ -137,11 +137,28 @@ STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET")
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
         },
     },
+
+    'loggers': {
+        # capture everything from django-allauth
+        'allauth': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        # optionally, if you want socialaccount internals too
+        'allauth.socialaccount': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+
     'root': {
         'handlers': ['console'],
         'level': 'INFO',
@@ -191,8 +208,13 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'hello.autovise@gmail.com'
+EMAIL_BACKEND = config('EMAIL_BACKEND')
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
 ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
@@ -208,27 +230,24 @@ ACCOUNT_RATE_LIMITS = {
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 
+SOCIALACCOUNT_AUTO_SIGNUP = True   # Skip extra final step for social signups
+SOCIALACCOUNT_QUERY_EMAIL = True    # Ensure email is queried from provider
+SOCIALACCOUNT_LOGIN_ON_GET = True   # Login immediately after social login
+SOCIALACCOUNT_LOGIN_REDIRECT_URL = "/"
 
 GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = config('GOOGLE_CLIENT_SECRET')
 
 SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
+    "google": {
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {
+            "access_type": "online",
+            "prompt": "select_account"
         },
-        'APP': {
-            'client_id': GOOGLE_CLIENT_ID,
-            'secret': GOOGLE_CLIENT_SECRET,
-            'key': ''
-        }
+        "OAUTH_PKCE_ENABLED": True
     }
 }
-
 
 CKEDITOR_CONFIGS = {
     'default': {
