@@ -1,21 +1,26 @@
-<!-- templates/orders/checkout_success.html -->
-
 {% extends "base.html" %}
 {% block content %}
   <div class="container mt-5">
     <h2>🎉 Order Confirmed</h2>
 
     {% if order %}
-      <p>Thank you for your purchase{% if order.user %}, {{ order.user.username }}{% endif %}!</p>
+      <p>
+        Thank you for your purchase{% if order.user %}, {{ order.user.username }}{% endif %}!
+      </p>
 
       <h4>Order Summary:</h4>
       <ul class="list-unstyled">
         {% for item in order.items.all %}
-          {% if item.product.type.name == "Bundle" %}
-            {{ item.quantity }} × <strong>{{ item.product.name }}</strong> (Bundle) – £{{ item.unit_price }}
-          {% else %}
-            {{ item.quantity }} × {{ item.product.name }} – £{{ item.unit_price }}
-          {% endif %}
+          <li>
+            {% if item.bundle %}
+              {{ item.quantity }} ×
+              <strong>{{ item.bundle.name }}</strong>
+              (Bundle) – £{{ item.unit_price|floatformat:2 }}
+            {% else %}
+              {{ item.quantity }} ×
+              {{ item.product.name }} – £{{ item.unit_price|floatformat:2 }}
+            {% endif %}
+          </li>
         {% endfor %}
       </ul>
 
@@ -28,11 +33,20 @@
       {% endif %}
       <p><strong>Paid Total:</strong> £{{ order.total_price|floatformat:2 }}</p>
     {% else %}
-      <p>Your order has been received, but no details could be loaded. If you believe this is an error, please contact support.</p>
+      <p>
+        Your order has been received, but no details could be loaded.
+        If you believe this is an error, please contact support.
+      </p>
     {% endif %}
 
-    <p>If you have any questions, please <a href="{{ contact_page_url }}">contact support</a> or email us at <a href="mailto:{{ support_email }}">{{ support_email }}</a>.</p>
+    <p>
+      If you have any questions, please
+      <a href="{{ contact_page_url }}">contact support</a>
+      or email us at <a href="mailto:{{ support_email }}">{{ support_email }}</a>.
+    </p>
 
-    <a href="{% url 'products:product_list' %}" class="btn btn-primary mt-3">Continue Shopping</a>
+    <a href="{% url 'products:product_list' %}" class="btn btn-primary mt-3">
+      Continue Shopping
+    </a>
   </div>
 {% endblock %}

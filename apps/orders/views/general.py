@@ -6,46 +6,64 @@ from django.contrib.auth.decorators import login_required
 from apps.orders.models import Order
 from apps.orders.utils.stripe_helpers import retrieve_checkout_session
 from apps.orders.utils.cart import clear_session_cart
+from apps.orders.views.cart_views import clear_cart
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 def checkout_success_view(request):
-    # This assumes the session ID was stored during webhook processing
-    # or passed as a query parameter after successful payment.
-    session_id = request.GET.get('session_id')
-    logger.info(f"[ORDER DEBUG] Looking up Order with session ID from URL: {session_id}")
-
-    logger.debug(f"[SUCCESS] Query string: {request.GET.urlencode()}")
-    logger.debug(f"[SUCCESS] Extracted session_id: {session_id}")
+    """
+    Display the order confirmation page after a successful Stripe checkout.
+    Expects ?session_id=<SESSION_ID> in the URL.
+    """
+    # 1) Extract and validate the session_id
+    session_id = request.GET.get("session_id")
+    logger.info(f"[ORDER] checkout_success called with session_id={session_id}")
 
     if not session_id or session_id == "{CHECKOUT_SESSION_ID}":
-        messages.warning(request, "Invalid session ID. Please check your email or contact support.")
-        return redirect('products:product_list')
+        messages.warning(
+            request,
+            "Invalid session ID. Please check your email or contact support."
+        )
+        return redirect("products:product_list")
 
+    # 2) Retrieve the Stripe session to verify payment
     session = retrieve_checkout_session(session_id)
+    if not session or session.payment_status != "paid":
+        messages.error(
+            request,
+            "Unable to verify your payment. Please contact support if your card was charged."
+        )
+        return redirect("products:product_list")
 
-    if not session:
-        messages.error(request, "Unable to verify your payment session. Please contact support.")
-        return redirect('products:product_list')
-
-    # Try to find the order using the real session ID
+    # 3) Find Order by stripe_session_id
     order = Order.objects.filter(stripe_session_id=session_id).first()
-
     if not order:
-        messages.warning(request, "Order not found for this session. Please contact support if this was unexpected.")
-        return redirect('products:product_list')
+        messages.warning(
+            request,
+            "Order not found for this session. Please contact support."
+        )
+        return redirect("products:product_list")
 
-    if not request.user.is_authenticated:
+    # 4) Mark the order as paid and store payment intent
+    if not order.is_paid:
+        order.is_paid = True
+        order.stripe_payment_intent = session.payment_intent
+        order.save(update_fields=["is_paid", "stripe_payment_intent"])
+
+    # 5) Clear the cart after a confirmed order
+    if request.user.is_authenticated:
+        clear_cart(request)
+    else:
         clear_session_cart(request)
 
-    context = {
-        'order': order,
-        'support_email': 'hello.autovise@gmail.com',
-        'contact_page_url': '/contact/',
-    }
-    return render(request, 'orders/checkout_success.html', context)
+    # 6) Render the confirmation template
+    return render(request, "orders/checkout_success.html", {
+        "order": order,
+        "support_email": "hello.autovise@gmail.com",
+        "contact_page_url": "/contact/",
+    })
 
 
 def checkout_cancel_view(request):

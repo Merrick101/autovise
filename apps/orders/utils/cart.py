@@ -65,7 +65,8 @@ def calculate_cart_summary(request, cart_data, cart_type):
     - Bundle and first-time discounts
     - Delivery fee logic
     - Grand total and estimated delivery date
-    Returns structured summary dictionary for use in views.
+
+    Returns a structured summary dict for use in views.
     """
 
     items = []
@@ -77,92 +78,118 @@ def calculate_cart_summary(request, cart_data, cart_type):
     def is_bundle_product(product):
         return product.type and product.type.name.lower() == "bundle"
 
-    if cart_type == 'db':
-        for item in cart_data.items.select_related('product'):
-            product = item.product
-            quantity = item.quantity
+    # 1) DB-backed cart: same as before, but record both product/bundle keys
+    if cart_type == "db":
+        for ci in cart_data.items.select_related("product"):
+            product = ci.product
+            quantity = ci.quantity
             unit_price = product.price
-            subtotal = Decimal(quantity) * unit_price
+            subtotal = unit_price * quantity
 
+            # accumulate raw bundle discount (10% of line subtotal)
             if is_bundle_product(product):
                 bundle_discount_total += subtotal * Decimal("0.10")
 
+            # compute any per-line discounted price (e.g. bundle/subtotal logic)
             discounted_price = subtotal / quantity if quantity > 0 else unit_price
-            discount_percent = ((unit_price - discounted_price) / unit_price * Decimal("100.00")) if unit_price > 0 and discounted_price < unit_price else Decimal("0.00")
+            discount_percent = (
+                (unit_price - discounted_price) / unit_price * Decimal("100.00")
+                if unit_price > 0 and discounted_price < unit_price
+                else Decimal("0.00")
+            )
 
+            is_bundle = is_bundle_product(product)
             items.append({
-                'product': product,
-                'quantity': quantity,
-                'subtotal': subtotal,
-                'tier': product.tier,
-                'is_bundle': is_bundle_product(product),
-                'unit_price': unit_price,
-                'discounted_price': discounted_price,
-                'discount_percent': discount_percent,
+                "product": None if is_bundle else product,
+                "bundle":  product if is_bundle else None,
+                "quantity": quantity,
+                "unit_price": unit_price,
+                "discounted_price": discounted_price,
+                "discount_percent": discount_percent,
+                "subtotal": subtotal,
+                "tier": product.tier,
+                "is_bundle": is_bundle,
             })
-
             total += subtotal
 
+    # 2) Session-backed cart: detect bundles by key prefix "bundle_<id>"
     else:
-        for key, item in cart_data.items():
-            if item.get('type') == 'bundle':
+        for key, entry in cart_data.items():
+            # --- bundle entry if key starts with "bundle_" ---
+            if key.startswith("bundle_"):
                 try:
-                    bundle_id = int(key.split('_')[1])  # from "bundle_7"
-                    bundle = Bundle.objects.get(id=bundle_id)
-                    quantity = item['quantity']
-                    unit_price = Decimal(bundle.subtotal_price)
-                    discounted_price = Decimal(item['price'])
-                    subtotal = Decimal(quantity) * discounted_price
-                    discount_percent = ((unit_price - discounted_price) / unit_price * Decimal("100.00")) if unit_price > 0 and discounted_price < unit_price else Decimal("0.00")
-
-                    items.append({
-                        'product': bundle,
-                        'quantity': quantity,
-                        'subtotal': subtotal,
-                        'tier': bundle.bundle_type,
-                        'is_bundle': True,
-                        'unit_price': unit_price,
-                        'discounted_price': discounted_price,
-                        'discount_percent': discount_percent,
-                    })
-
-                    total += subtotal
-                except (IndexError, ValueError, Bundle.DoesNotExist):
+                    bundle_id = int(key.split("_", 1)[1])
+                    bundle = Bundle.objects.get(pk=bundle_id)
+                except (ValueError, Bundle.DoesNotExist):
                     continue
-                continue
 
-            try:
-                product_id = item.get('product_id')
-                if not product_id:
-                    continue
-                product = Product.objects.get(id=product_id)
-                quantity = item['quantity']
-                unit_price = product.price
-                discounted_price = Decimal(item.get('price', unit_price))
-                subtotal = Decimal(quantity) * discounted_price
-                is_bundle = is_bundle_product(product)
+                quantity = entry.get("quantity", 0)
+                # assume bundle.subtotal_price is pre-discount total
+                base_price = Decimal(bundle.subtotal_price)
+                discounted_price = Decimal(entry.get("price", base_price))
+                subtotal = discounted_price * quantity
 
-                if is_bundle:
-                    bundle_discount_total += subtotal * Decimal("0.10")
-
-                discount_percent = ((unit_price - discounted_price) / unit_price * Decimal("100.00")) if unit_price > 0 and discounted_price < unit_price else Decimal("0.00")
+                # accumulate bundle discount (10% of raw price * qty)
+                bundle_discount_total += base_price * quantity * Decimal("0.10")
+                discount_percent = (
+                    (base_price - discounted_price) / base_price * Decimal("100.00")
+                    if base_price > 0 and discounted_price < base_price
+                    else Decimal("0.00")
+                )
 
                 items.append({
-                    'product': product,
-                    'quantity': quantity,
-                    'subtotal': subtotal,
-                    'tier': product.tier,
-                    'is_bundle': is_bundle,
-                    'unit_price': unit_price,
-                    'discounted_price': discounted_price,
-                    'discount_percent': discount_percent,
+                    "product": None,
+                    "bundle":  bundle,
+                    "quantity": quantity,
+                    "unit_price": base_price,
+                    "discounted_price": discounted_price,
+                    "discount_percent": discount_percent,
+                    "subtotal": subtotal,
+                    "tier": bundle.bundle_type,
+                    "is_bundle": True,
                 })
-
                 total += subtotal
-
-            except (Product.DoesNotExist, KeyError):
                 continue
 
+            # --- otherwise treat as a normal Product entry ---
+            prod_id = entry.get("product_id")
+            if not prod_id:
+                continue
+            try:
+                product = Product.objects.get(pk=prod_id)
+            except Product.DoesNotExist:
+                continue
+
+            quantity = entry.get("quantity", 0)
+            unit_price = product.price
+            discounted_price = Decimal(entry.get("price", unit_price))
+            subtotal = discounted_price * quantity
+
+            # accumulate bundle discount if this ProductType is actually a bundle
+            is_bundle = is_bundle_product(product)
+            if is_bundle:
+                bundle_discount_total += unit_price * quantity * Decimal("0.10")
+
+            discount_percent = (
+                (unit_price - discounted_price) / unit_price * Decimal("100.00")
+                if unit_price > 0 and discounted_price < unit_price
+                else Decimal("0.00")
+            )
+
+            items.append({
+                "product": product,
+                "bundle": None,
+                "quantity": quantity,
+                "unit_price": unit_price,
+                "discounted_price": discounted_price,
+                "discount_percent": discount_percent,
+                "subtotal": subtotal,
+                "tier": product.tier,
+                "is_bundle": is_bundle,
+            })
+            total += subtotal
+
+    # 3) apply bundle & first-time discounts
     total_before_discount = total
     total -= bundle_discount_total
 
@@ -171,35 +198,34 @@ def calculate_cart_summary(request, cart_data, cart_type):
         cart_discount_total = total * Decimal("0.10")
         total -= cart_discount_total
 
-    delivery_fee = Decimal("4.99")
-    free_delivery = first_time_discount or total_before_discount >= Decimal("40.00")
-    if free_delivery:
-        delivery_fee = Decimal("0.00")
+    # 4) delivery fee & grand total
+    delivery_fee = Decimal("0.00") if (
+        first_time_discount or total_before_discount >= Decimal("40.00")
+    ) else Decimal("4.99")
 
     grand_total = total + delivery_fee
     estimated_delivery = date.today() + timedelta(days=2)
-
-    logger.debug(
-        f"[CART] Items: {len(items)} | "
-        f"Subtotal: {total_before_discount:.2f} | "
-        f"Bundle Discount: {bundle_discount_total:.2f} | "
-        f"First-Time Discount: {cart_discount_total:.2f} | "
-        f"Final: {total:.2f} | Delivery: {delivery_fee:.2f} | Grand: {grand_total:.2f}"
-    )
-
     total_saved = bundle_discount_total + cart_discount_total
 
+    logger.debug(
+        f"[CART] Items:{len(items)} Sub:{total_before_discount:.2f} "
+        f"BundleDisc:{bundle_discount_total:.2f} "
+        f"FirstTimeDisc:{cart_discount_total:.2f} "
+        f"Final:{total:.2f} Delivery:{delivery_fee:.2f} "
+        f"Grand:{grand_total:.2f}"
+    )
+
     return {
-        'cart_items': items,
-        'cart_type': cart_type,
-        'cart_total': total,
-        'total_before_discount': total_before_discount,
-        'bundle_discount': bundle_discount_total,
-        'cart_discount': cart_discount_total,
-        'first_time_discount': first_time_discount,
-        'free_delivery': free_delivery,
-        'delivery_fee': delivery_fee,
-        'grand_total': grand_total,
-        'estimated_delivery': estimated_delivery,
-        'total_saved': total_saved,
+        "cart_items": items,
+        "cart_type": cart_type,
+        "cart_total": total,
+        "total_before_discount": total_before_discount,
+        "bundle_discount": bundle_discount_total,
+        "cart_discount": cart_discount_total,
+        "first_time_discount": first_time_discount,
+        "free_delivery": delivery_fee == 0,
+        "delivery_fee": delivery_fee,
+        "grand_total": grand_total,
+        "estimated_delivery": estimated_delivery,
+        "total_saved": total_saved,
     }

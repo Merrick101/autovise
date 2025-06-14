@@ -21,8 +21,13 @@
         {% for item in cart_items %}
           <tr>
             <td>
-              {{ item.product.name }}<br>
-              <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" width="60">
+              {% if item.bundle %}
+                {{ item.bundle.name }}<br>
+                <img src="{{ item.bundle.image.url }}" alt="{{ item.bundle.name }}" width="60">
+              {% else %}
+                {{ item.product.name }}<br>
+                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" width="60">
+              {% endif %}
             </td>
             <td>
               <form action="{% url 'orders:update_quantity' item|item_key %}" method="post" class="d-inline">
