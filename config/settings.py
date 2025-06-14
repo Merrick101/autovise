@@ -1,5 +1,6 @@
 # config/settings.py
 
+from django.core.exceptions import ImproperlyConfigured
 from decouple import config
 from pathlib import Path
 from dotenv import load_dotenv
@@ -103,7 +104,9 @@ JAZZMIN_SETTINGS = {
     "order_with_respect_to": ["products", "orders", "users"],
 
     "topmenu_links": [
-        {"name": "Dashboard", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Dashboard", "url": "admin:index", "permissions": [
+            "auth.view_user"
+        ]},
     ],
 
     "icons": {
@@ -130,9 +133,30 @@ JAZZMIN_SETTINGS = {
 
 
 # Stripe Credentials
-STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY")
-STRIPE_PUBLISHABLE_KEY = config("STRIPE_PUBLISHABLE_KEY")
-STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET")
+STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY", cast=str)
+STRIPE_PUBLISHABLE_KEY = config("STRIPE_PUBLISHABLE_KEY", cast=str)
+STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET", cast=str)
+
+# Ensure none are missing or empty
+for var_name in [
+    "STRIPE_SECRET_KEY", "STRIPE_PUBLISHABLE_KEY", "STRIPE_WEBHOOK_SECRET"
+]:
+    if not globals().get(var_name):
+        raise ImproperlyConfigured(
+            f"Missing required environment variable: {var_name}"
+        )
+
+if not DEBUG:
+    for var_name, key in [
+        ("STRIPE_SECRET_KEY", STRIPE_SECRET_KEY),
+        ("STRIPE_PUBLISHABLE_KEY", STRIPE_PUBLISHABLE_KEY),
+        ("STRIPE_WEBHOOK_SECRET", STRIPE_WEBHOOK_SECRET),
+    ]:
+        # disallow test keys in production
+        if key.startswith("sk_test_") or key.startswith("pk_test_") or key.startswith("whsec_test_"):
+            raise ImproperlyConfigured(
+                f"In production (DEBUG=False), {var_name} must be a live key, not a test key."
+            )
 
 
 LOGGING = {

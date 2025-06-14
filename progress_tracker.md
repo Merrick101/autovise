@@ -651,3 +651,34 @@ Successfully implemented a dynamic backend checkout flow using Stripe. The check
 
 ---
 
+## Task 5 - Webhook Listener for Order Confirmation
+
+**Status:**
+
+Complete
+
+**Summary:**
+
+Added a secure, CSRF-exempt Stripe webhook endpoint that handles only checkout.session.completed events, verifies signatures, atomically marks orders as paid, stores the payment intent, and sends configurable confirmation emails.
+
+**Key Actions:**
+- Created stripe_webhook_view (POST-only) at /webhook/stripe/ and wired it into the URLconf.
+- Implemented verify_webhook_signature in stripe_helpers.py to reject bad payloads or signatures.
+- Refactored update_order_from_stripe_session to:
+- Look up the Order by metadata['order_id'] or fallback to stripe_session_id
+- Use transaction.atomic() to set is_paid and save stripe_payment_intent
+- Delegate email sending to send_order_confirmation_email (governed by SEND_ORDER_CONFIRMATION_EMAIL)
+- Introduced send_order_confirmation_email helper with a feature flag for toggling email dispatch.
+- Ensured the view returns:
+  - 200 OK for valid events (preventing Stripe retries)
+  - 400 Bad Request for invalid signatures/payloads
+  - 500 Internal Server Error if processing fails
+
+**Key Outcomes:**
+- Webhook endpoint securely validates and processes payment events.
+- Orders reliably transition to paid state and store the Stripe payment intent.
+- Confirmation emails are sent (or skipped) based on configuration.
+- Invalid or replayed events are rejected or idempotently ignored, and Stripe receives proper acknowledgments.
+
+---
+
