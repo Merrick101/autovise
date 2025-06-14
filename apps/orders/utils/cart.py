@@ -187,6 +187,8 @@ def calculate_cart_summary(request, cart_data, cart_type):
         f"Final: {total:.2f} | Delivery: {delivery_fee:.2f} | Grand: {grand_total:.2f}"
     )
 
+    total_saved = bundle_discount_total + cart_discount_total
+
     return {
         'cart_items': items,
         'cart_type': cart_type,
@@ -199,4 +201,5 @@ def calculate_cart_summary(request, cart_data, cart_type):
         'delivery_fee': delivery_fee,
         'grand_total': grand_total,
         'estimated_delivery': estimated_delivery,
+        'total_saved': total_saved,
     }

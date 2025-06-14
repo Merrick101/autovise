@@ -11,7 +11,11 @@
       <h4>Order Summary:</h4>
       <ul class="list-unstyled">
         {% for item in order.items.all %}
-          <li>{{ item.quantity }} × {{ item.product.name }} – £{{ item.subtotal|floatformat:2 }}</li>
+          {% if item.product.type.name == "Bundle" %}
+            {{ item.quantity }} × <strong>{{ item.product.name }}</strong> (Bundle) – £{{ item.unit_price }}
+          {% else %}
+            {{ item.quantity }} × {{ item.product.name }} – £{{ item.unit_price }}
+          {% endif %}
         {% endfor %}
       </ul>
 
