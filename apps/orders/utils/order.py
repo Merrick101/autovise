@@ -13,34 +13,38 @@ logger = logging.getLogger(__name__)
 def update_order_from_stripe_session(session):
     """
     Idempotently mark the existing Order paid and send confirmation email.
-    Expects `order_id` in session.metadata.
+    Tries metadata['order_id'] first, then falls back to stripe_session_id.
     """
-    metadata = getattr(session, "metadata", {})
+    metadata = getattr(session, "metadata", {}) or {}
+    order = None
+
+    # 1) Primary lookup by metadata.order_id
     order_id = metadata.get("order_id")
-    if not order_id:
-        logger.error("[ORDER] No order_id in Stripe session metadata")
-        return None
+    if order_id:
+        order = Order.objects.filter(pk=order_id).first()
+        if not order:
+            logger.warning(f"[ORDER] No Order with ID {order_id} in metadata")
 
-    try:
-        order = Order.objects.get(pk=order_id)
-    except Order.DoesNotExist:
-        logger.error(f"[ORDER] Order {order_id} not found in DB")
-        return None
+    # 2) Fallback lookup by stripe_session_id
+    if order is None:
+        session_id = session.get("id")
+        order = Order.objects.filter(stripe_session_id=session_id).first()
+        if not order:
+            logger.error(f"[ORDER] No Order found for stripe_session_id={session_id!r}")
+            return None
 
-    # If not already paid, mark and email
+    # 3) Mark paid and send email if not already done
     if not order.is_paid:
         order.is_paid = True
         order.stripe_payment_intent = session.get("payment_intent")
         order.save(update_fields=["is_paid", "stripe_payment_intent"])
         logger.info(f"[ORDER] Marked Order #{order.id} as paid")
 
-        # Send confirmation email if user is present
         if order.user and order.user.email:
             subject = f"Your Autovise Order #{order.id} Confirmation"
             context = {"user": order.user, "order": order}
             text_body = render_to_string("emails/order_confirmation.txt", context)
             html_body = render_to_string("emails/order_confirmation.html", context)
-
             try:
                 send_mail(
                     subject=subject,
