@@ -80,58 +80,88 @@ def calculate_cart_summary(request, cart_data, cart_type):
     if cart_type == 'db':
         for item in cart_data.items.select_related('product'):
             product = item.product
-            subtotal = Decimal(item.quantity) * product.price
+            quantity = item.quantity
+            unit_price = product.price
+            subtotal = Decimal(quantity) * unit_price
+
             if is_bundle_product(product):
                 bundle_discount_total += subtotal * Decimal("0.10")
+
+            discounted_price = subtotal / quantity if quantity > 0 else unit_price
+            discount_percent = ((unit_price - discounted_price) / unit_price * Decimal("100.00")) if unit_price > 0 and discounted_price < unit_price else Decimal("0.00")
+
             items.append({
                 'product': product,
-                'quantity': item.quantity,
+                'quantity': quantity,
                 'subtotal': subtotal,
                 'tier': product.tier,
                 'is_bundle': is_bundle_product(product),
+                'unit_price': unit_price,
+                'discounted_price': discounted_price,
+                'discount_percent': discount_percent,
             })
+
             total += subtotal
+
     else:
         for key, item in cart_data.items():
             if item.get('type') == 'bundle':
-                # Handle session cart bundle items
                 try:
                     bundle_id = int(key.split('_')[1])  # from "bundle_7"
                     bundle = Bundle.objects.get(id=bundle_id)
+                    quantity = item['quantity']
+                    unit_price = Decimal(bundle.subtotal_price)
+                    discounted_price = Decimal(item['price'])
+                    subtotal = Decimal(quantity) * discounted_price
+                    discount_percent = ((unit_price - discounted_price) / unit_price * Decimal("100.00")) if unit_price > 0 and discounted_price < unit_price else Decimal("0.00")
+
+                    items.append({
+                        'product': bundle,
+                        'quantity': quantity,
+                        'subtotal': subtotal,
+                        'tier': bundle.bundle_type,
+                        'is_bundle': True,
+                        'unit_price': unit_price,
+                        'discounted_price': discounted_price,
+                        'discount_percent': discount_percent,
+                    })
+
+                    total += subtotal
                 except (IndexError, ValueError, Bundle.DoesNotExist):
                     continue
-
-                subtotal = Decimal(item['quantity']) * Decimal(item['price'])
-                items.append({
-                    'product': bundle,
-                    'quantity': item['quantity'],
-                    'subtotal': subtotal,
-                    'tier': bundle.bundle_type,
-                    'is_bundle': True,
-                })
-                total += subtotal
                 continue
 
-            # Handle normal product items
             try:
                 product_id = item.get('product_id')
                 if not product_id:
                     continue
                 product = Product.objects.get(id=product_id)
+                quantity = item['quantity']
+                unit_price = product.price
+                discounted_price = Decimal(item.get('price', unit_price))
+                subtotal = Decimal(quantity) * discounted_price
+                is_bundle = is_bundle_product(product)
+
+                if is_bundle:
+                    bundle_discount_total += subtotal * Decimal("0.10")
+
+                discount_percent = ((unit_price - discounted_price) / unit_price * Decimal("100.00")) if unit_price > 0 and discounted_price < unit_price else Decimal("0.00")
+
+                items.append({
+                    'product': product,
+                    'quantity': quantity,
+                    'subtotal': subtotal,
+                    'tier': product.tier,
+                    'is_bundle': is_bundle,
+                    'unit_price': unit_price,
+                    'discounted_price': discounted_price,
+                    'discount_percent': discount_percent,
+                })
+
+                total += subtotal
+
             except (Product.DoesNotExist, KeyError):
                 continue
-
-            subtotal = Decimal(item['quantity']) * product.price
-            if is_bundle_product(product):
-                bundle_discount_total += subtotal * Decimal("0.10")
-            items.append({
-                'product': product,
-                'quantity': item['quantity'],
-                'subtotal': subtotal,
-                'tier': product.tier,
-                'is_bundle': is_bundle_product(product),
-            })
-            total += subtotal
 
     total_before_discount = total
     total -= bundle_discount_total

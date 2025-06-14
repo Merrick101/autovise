@@ -15,6 +15,7 @@ def create_order_from_stripe_session(session):
     Creates an Order instance from a completed Stripe session object.
     Handles both guest and authenticated users, cart cleanup, and email notification.
     """
+    logger.info(f"[ORDER DEBUG] Saving Order with Stripe session ID: {session['id']}")
     user_id = session.get('metadata', {}).get('user_id')
     User = get_user_model()
     user = None

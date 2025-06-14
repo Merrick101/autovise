@@ -1,8 +1,8 @@
 # apps/orders/views/checkout.py
 
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from apps.orders.utils.cart import get_active_cart, calculate_cart_summary
 from apps.orders.utils.stripe_helpers import create_checkout_session
@@ -11,7 +11,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@login_required
 def checkout_view(request):
     cart_data, cart_type = get_active_cart(request)
 
@@ -28,11 +27,13 @@ def checkout_view(request):
 
     for item in summary['cart_items']:
         product = item['product']
+        unit_amount = int(item['subtotal'] / item['quantity'] * 100)
+
         line_items.append({
             'price_data': {
                 'currency': 'gbp',
                 'product_data': {'name': product.name},
-                'unit_amount': int(item['subtotal'] / item['quantity'] * 100),
+                'unit_amount': unit_amount,
             },
             'quantity': item['quantity'],
         })
@@ -49,9 +50,18 @@ def checkout_view(request):
         })
 
     metadata = {
-        'user_id': str(request.user.id),
+        'user_id': str(request.user.id) if request.user.is_authenticated else "guest",
         'product_ids': ','.join(product_ids)
     }
+
+    domain = request.scheme + "://" + request.get_host()
+
+    success_url = request.build_absolute_uri(
+        reverse('orders:checkout_success')
+    ) + "?session_id={CHECKOUT_SESSION_ID}"
+    cancel_url = request.build_absolute_uri(
+        reverse('orders:checkout_cancel')
+    )
 
     expected_total = sum(item['price_data']['unit_amount'] * item['quantity'] for item in line_items)
     logger.info(f"[CHECKOUT] Stripe line item total (pence): {expected_total} | £{expected_total / 100:.2f}")
@@ -60,8 +70,8 @@ def checkout_view(request):
         user=request.user,
         line_items=line_items,
         metadata=metadata,
-        success_url=request.build_absolute_uri('/checkout/success/'),
-        cancel_url=request.build_absolute_uri('/checkout/cancel/')
+        success_url=success_url,
+        cancel_url=cancel_url
     )
 
     if session:
