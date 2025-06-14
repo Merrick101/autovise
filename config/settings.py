@@ -217,6 +217,17 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
+SEND_ORDER_CONFIRMATION_EMAIL = config(
+    'SEND_ORDER_CONFIRMATION_EMAIL',
+    default=True,
+    cast=bool,
+)
+USE_CELERY_FOR_EMAIL = config(
+    'USE_CELERY_FOR_EMAIL',
+    default=False,
+    cast=bool,
+)
+
 ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'

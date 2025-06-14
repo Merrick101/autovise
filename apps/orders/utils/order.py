@@ -3,10 +3,11 @@
 import logging
 
 from django.conf import settings
-from django.core.mail import send_mail
 from django.db import transaction
 from django.template.loader import render_to_string
+
 from apps.orders.models import Order
+from apps.orders.utils.email import send_order_confirmation_email
 
 logger = logging.getLogger(__name__)
 
@@ -31,46 +32,22 @@ def update_order_from_stripe_session(session):
         session_id = session.get("id")
         order = Order.objects.filter(stripe_session_id=session_id).first()
         if not order:
-            logger.error(
-                f"[ORDER] No Order found for stripe_session_id={session_id!r}"
-            )
+            logger.error(f"[ORDER] No Order found for stripe_session_id={session_id!r}")
             return None
 
-    # 3) Mark paid and send email if not already done
+    # 3) Mark paid
     if not order.is_paid:
         with transaction.atomic():
             order.is_paid = True
             order.stripe_payment_intent = session.get("payment_intent")
             order.save(update_fields=["is_paid", "stripe_payment_intent"])
-            logger.info(
-                "[ORDER] Marked Order #%s as paid (intent=%s)",
-                order.id,
-                order.stripe_payment_intent
-            )
-        # 4) Send confirmation email to user
-        if order.user and order.user.email:
-            subject = f"Your Autovise Order #{order.id} Confirmation"
-            context = {"user": order.user, "order": order}
-            text_body = render_to_string(
-                "emails/order_confirmation.txt", context
-            )
-            html_body = render_to_string(
-                "emails/order_confirmation.html", context
-            )
-            try:
-                send_mail(
-                    subject=subject,
-                    message=text_body,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[order.user.email],
-                    html_message=html_body,
-                    fail_silently=False,
-                )
-                logger.info(f"[EMAIL] Confirmation sent for Order #{order.id}")
-            except Exception as e:
-                logger.error(
-                    f"[EMAIL] Failed to send confirmation for Order #{order.id}: {e}"
-                )
+        logger.info(
+            "[ORDER] Marked Order #%s as paid (intent=%s)",
+            order.id, order.stripe_payment_intent
+        )
+
+        # 4) Send confirmation email
+        send_order_confirmation_email(order)
     else:
         logger.info(f"[ORDER] Order #{order.id} already marked paid, skipping")
 
