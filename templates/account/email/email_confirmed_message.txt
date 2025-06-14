@@ -1,0 +1,8 @@
+Hi {{ user.username }},
+
+Your email address has been successfully confirmed. Thanks for verifying your details.
+
+You're now all set to enjoy everything Autovise has to offer.
+
+— The Autovise Team
+hello.autovise@gmail.com

@@ -1,0 +1,11 @@
+Hi there,
+
+It looks like an Autovise account is already associated with this email address.
+
+If you've forgotten your password, you can reset it here:
+{{ password_reset_url }}
+
+If you didn't request this, feel free to ignore this message.
+
+— The Autovise Team
+hello.autovise@gmail.com

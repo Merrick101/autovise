@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Confirm your Autovise account</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px;">
+  <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; padding: 30px; border: 1px solid #ddd;">
+    <h2 style="color: #007bff;">Confirm Your Email Address</h2>
+    <p>Hi {{ user.username }},</p>
+    <p>Thanks for creating an account with <strong>Autovise</strong>.</p>
+    <p>Please click the button below to confirm your email address:</p>
+    <p style="text-align: center;">
+      <a href="{{ activate_url }}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; border-radius: 4px; text-decoration: none;">Confirm Email</a>
+    </p>
+    <p>If you didn’t create this account, you can ignore this message.</p>
+    <p>— The Autovise Team<br>hello.autovise@gmail.com</p>
+  </div>
+</body>
+</html>

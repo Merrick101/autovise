@@ -1,0 +1,12 @@
+Hi {{ user.username }},
+
+We received a request to change the email address for your Autovise account.
+
+To confirm the change, please click the link below:
+
+{{ activate_url }}
+
+If you did not request this change, please contact us immediately.
+
+— The Autovise Team
+hello.autovise@gmail.com

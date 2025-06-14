@@ -1,0 +1,10 @@
+Hi {{ user.username }},
+
+Thanks for signing up with Autovise! Please confirm your email address by clicking the link below:
+
+{{ activate_url }}
+
+If you didn’t sign up, you can safely ignore this email.
+
+— The Autovise Team
+hello.autovise@gmail.com
