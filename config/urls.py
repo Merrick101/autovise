@@ -10,7 +10,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     # Placeholder routes for each core app
     path('products/', include('apps.products.urls')),
-    path('orders/', include('apps.orders.urls')),
+    path('orders/', include('apps.orders.urls', namespace='orders')),
     path('users/', include('apps.users.urls')),
     path('', include('apps.pages.urls')),
     path('assets/', include('apps.assets.urls')),

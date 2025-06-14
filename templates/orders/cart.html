@@ -1,6 +1,7 @@
 <!-- templates/orders/cart.html -->
 
 {% extends "base.html" %}
+{% load cart_extras %}
 
 {% block content %}
   <h2>Your Cart</h2>
@@ -18,27 +19,27 @@
       </thead>
       <tbody>
         {% for item in cart_items %}
-        <tr>
-          <td>
-            {{ item.product.name }}<br>
-            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" width="60">
-          </td>
-          <td>
-            <form action="{% url 'orders:update_quantity' item.product.id %}" method="post" class="d-inline">
-              {% csrf_token %}
-              <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control d-inline w-auto">
-              <button type="submit" class="btn btn-sm btn-secondary">Update</button>
-            </form>
-          </td>
-          <td>£{{ item.product.price }}</td>
-          <td>£{{ item.subtotal }}</td>
-          <td>
-            <form action="{% url 'orders:remove_item' item.product.id %}" method="post" class="d-inline">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
-            </form>
-          </td>
-        </tr>
+          <tr>
+            <td>
+              {{ item.product.name }}<br>
+              <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" width="60">
+            </td>
+            <td>
+              <form action="{% url 'orders:update_quantity' item|item_key %}" method="post" class="d-inline">
+                {% csrf_token %}
+                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control d-inline w-auto">
+                <button type="submit" class="btn btn-sm btn-secondary">Update</button>
+              </form>
+            </td>
+            <td>£{{ item.product.price }}</td>
+            <td>£{{ item.subtotal }}</td>
+            <td>
+              <form action="{% url 'orders:remove_item' item|item_key %}" method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+              </form>
+            </td>
+          </tr>
         {% endfor %}
       </tbody>
     </table>

@@ -3,6 +3,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.contrib import messages
+from django.http import HttpResponseRedirect
 
 from apps.products.models import Product, Bundle
 from apps.orders.models import CartItem
@@ -38,7 +39,10 @@ def add_bundle_to_cart_view(request, bundle_id):
         }
 
     request.session['cart'] = cart
-    return redirect('products:bundle_detail', bundle_id=bundle.id)
+
+    messages.success(request, f"Added {bundle.name} to your cart.")
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
 def cart_view(request):
@@ -48,7 +52,7 @@ def cart_view(request):
 
 
 @require_POST
-def update_quantity(request, product_id):
+def update_quantity(request, item_key):
     quantity = int(request.POST.get('quantity', 1))
     if quantity < 1:
         messages.error(request, "Quantity must be at least 1.")
@@ -57,15 +61,15 @@ def update_quantity(request, product_id):
     cart_data, cart_type = get_active_cart(request)
 
     if cart_type == 'db':
-        cart_item = CartItem.objects.filter(cart__user=request.user, product_id=product_id).first()
+        # Only applies to products
+        cart_item = CartItem.objects.filter(cart__user=request.user, product_id=item_key).first()
         if cart_item:
             cart_item.quantity = quantity
             cart_item.save()
     else:
         cart = cart_data
-        product_code = Product.objects.get(id=product_id).product_code
-        if product_code in cart:
-            cart[product_code]['quantity'] = quantity
+        if item_key in cart:
+            cart[item_key]['quantity'] = quantity
             save_cart(request, cart)
 
     messages.success(request, "Cart updated.")
@@ -73,16 +77,16 @@ def update_quantity(request, product_id):
 
 
 @require_POST
-def remove_item(request, product_id):
+def remove_item(request, item_key):
     cart_data, cart_type = get_active_cart(request)
 
     if cart_type == 'db':
-        CartItem.objects.filter(cart__user=request.user, product_id=product_id).delete()
+        # Only applies to Product model items
+        CartItem.objects.filter(cart__user=request.user, product_id=item_key).delete()
     else:
         cart = cart_data
-        product_code = Product.objects.get(id=product_id).product_code
-        if product_code in cart:
-            del cart[product_code]
+        if item_key in cart:
+            del cart[item_key]
             save_cart(request, cart)
 
     messages.success(request, "Item removed from cart.")
