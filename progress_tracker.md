@@ -682,3 +682,26 @@ Added a secure, CSRF-exempt Stripe webhook endpoint that handles only checkout.s
 
 ---
 
+## Task 6 - Secure Environment Configuration
+
+**Status:**
+
+Complete
+
+**Summary:**
+
+Ensured all Stripe credentials are driven by environment variables, enforced presence at startup, and prevented test‐mode keys from being used in production. Updated documentation to guide developers on required settings.
+
+**Key Actions:**
+- Pulled STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, and STRIPE_WEBHOOK_SECRET from .env via config(..., cast=str)
+- Added an ImproperlyConfigured check in settings.py to fail if any key is missing or empty
+- In production mode (DEBUG=False), rejected any keys starting with sk_test_, pk_test_, or whsec_test_
+- Documented the required environment variables in README.md and provided placeholders in .env.example
+
+**Key Outcomes:**
+- Application will not start without valid Stripe credentials
+- Test keys are automatically blocked in live environments, eliminating accidental misuse
+- Developers have clear guidance on setting up and securing Stripe keys before deployment
+
+---
+
