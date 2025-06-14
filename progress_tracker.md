@@ -619,3 +619,35 @@ Successfully implemented a dynamic backend checkout flow using Stripe. The check
 
 ---
 
+## Task 4 - Handle Success & Cancel Flows
+
+**Status:**
+- Complete
+
+**Summary:**
+- Added dedicated success and cancel endpoints for Stripe Checkout. The success view reliably retrieves and verifies the Stripe session, looks up the corresponding Order, marks it paid, clears the user’s cart, and renders a branded order-confirmation page with fallbacks for missing or invalid sessions. The cancel view now cleanly redirects users back to their cart with a contextual flash message, preserving their selections.
+
+**Key Actions:**
+- Implemented checkout_success_view to:
+- Extract and validate session_id from the querystring
+- Retrieve and verify the Stripe session’s payment status
+- Look up the Order via stripe_session_id and mark it paid
+- Defer cart clearing until after order confirmation
+- Render checkout_success.html with order items, totals, and support links
+- Created checkout_cancel_view to:
+- Receive Stripe’s cancel callback
+- Flash an “Order cancelled” message
+- Redirect back to the cart without clearing it
+- Built and styled checkout_success.html and a basic checkout_cancel.html, ensuring responsiveness and brand consistency
+- Added fallback messaging and redirects to guard against missing or malformed session IDs
+- Tested both flows end-to-end using live and test Stripe sessions
+
+**Key Outcomes:**
+- Success and cancel pages are fully integrated into the checkout flow
+- Users receive clear, branded feedback whether their payment succeeds or they cancel
+- Cart state is preserved on cancellation and correctly cleared on success
+- Edge cases (page refresh, invalid session_id) are handled gracefully
+- Implementation is responsive, accessible, and matches the site’s Bootstrap styling
+
+---
+

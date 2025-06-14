@@ -1,11 +1,13 @@
 # apps/orders/views/webhook.py
 
 import logging
+
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+
 from apps.orders.utils.stripe_helpers import verify_webhook_signature
-from apps.orders.utils.order import create_order_from_stripe_session
+from apps.orders.utils.order import update_order_from_stripe_session
 
 logger = logging.getLogger(__name__)
 
@@ -13,25 +15,28 @@ logger = logging.getLogger(__name__)
 @require_POST
 @csrf_exempt
 def stripe_webhook_view(request):
+    """
+    Endpoint to receive Stripe webhooks.
+    Verifies signature, handles checkout.session.completed by updating the Order.
+    """
     logger.info("[WEBHOOK] Stripe webhook endpoint was hit.")
-    print("[WEBHOOK] Endpoint triggered")
 
-    if request.method != "POST":
-        logger.warning("[WEBHOOK] Received non-POST request.")
-        return HttpResponse(status=405)
-
+    # 1) Verify signature & payload
     event = verify_webhook_signature(request)
     if event is None:
+        logger.warning("[WEBHOOK] Invalid Stripe signature or payload.")
         return HttpResponseBadRequest("Invalid signature or payload")
 
-    if event['type'] == 'checkout.session.completed':
-        session = event['data']['object']
-        logger.info(f"Webhook: checkout.session.completed | Session ID: {session['id']}")
+    # 2) Handle the checkout.session.completed event
+    if event.get("type") == "checkout.session.completed":
+        session = event["data"]["object"]
+        logger.info(f"[WEBHOOK] checkout.session.completed | session_id={session.get('id')}")
 
         try:
-            create_order_from_stripe_session(session)
+            update_order_from_stripe_session(session)
         except Exception as e:
-            logger.error(f"Order creation failed for session {session['id']}: {e}")
+            logger.error(f"[WEBHOOK] Failed updating order for session {session.get('id')}: {e}")
             return HttpResponse(status=500)
 
+    # 3) Acknowledge receipt for all other events
     return HttpResponse(status=200)
