@@ -752,3 +752,25 @@ Customers can now sort the product grid by price (low→high, high→low) and fi
 
 ---
 
+## Task 3 – Create Server-Side Search Bar
+
+**Status:**
+
+Complete
+
+**Summary:**
+
+Users can now enter a search term in the navbar’s GET-form (name="q"), submit, and see the product grid filtered by name, variant, or product type. The term persists in the input, and if there are no matches, a clear “No results found for ‘<em>term</em>’” message appears. All existing category, sort, and tier filters remain intact and propagate through the search.
+
+**Key Actions:**
+- Added a <form method="get" name="q"> in navbar.html, preserving current category, sort, and tier via hidden inputs.
+- Extended product_list_view to read q, apply an icontains filter across name, variant, and type__name, and include search_q in the context.
+- Updated product_list.html to show the search input’s value, render “no results” when page_obj.object_list is empty, and continue to honor category/sort/tier query parameters.
+
+**Key Outcomes:**
+- Visiting /products/?q=spark surfaces only products matching “spark” (case-insensitive).
+- The search term remains in the input after page reload.
+- Users receive immediate, friendly feedback if their query returns no results—all without breaking existing filter or pagination behavior.
+
+---
+
