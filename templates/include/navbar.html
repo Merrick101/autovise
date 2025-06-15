@@ -30,8 +30,18 @@
       <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-lg-between w-100 gap-2 mt-3 mt-lg-0">
 
         <!-- Search -->
-        <form class="w-100 w-lg-50 mb-2 mb-lg-0 me-lg-3">
-          <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+        <form class="d-flex w-100 w-lg-50 mb-2 mb-lg-0 me-lg-3"
+            action="{% url 'products:product_list' %}" method="get">
+          <input type="search"
+              name="q"
+              value="{{ request.GET.q|default_if_none:'' }}"
+              class="form-control"
+              placeholder="Search products…"
+              aria-label="Search">
+          {# Preserve any existing filters when submitting #}
+          <input type="hidden" name="category" value="{{ request.GET.category }}">
+          <input type="hidden" name="sort"     value="{{ request.GET.sort }}">
+          <input type="hidden" name="tier"     value="{{ request.GET.tier }}">
         </form>
 
         <!-- Nav Items (flex row on all devices) -->
