@@ -6,6 +6,27 @@
 
 <h2 class="mb-4">Autovise Product Catalog</h2>
 
+<!-- Product Filters -->
+
+<ul class="nav nav-pills mb-4">
+  <li class="nav-item">
+    <a class="nav-link {% if not selected_category %}active{% endif %}"
+       href="{% url 'products:product_list' %}">
+      All
+    </a>
+  </li>
+  {% for cat in categories %}
+    <li class="nav-item">
+      <a class="nav-link {% if selected_category == cat.slug %}active{% endif %}"
+         href="{% url 'products:product_list' %}?category={{ cat.slug }}">
+        {{ cat.name }}
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+
+<!-- Product Grid -->
+
 <div class="row">
   {% for product in products %}
     <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
@@ -54,4 +75,49 @@
     </div>
   {% endfor %}
 </div>
+
+{# — Pagination controls — #}
+<nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">
+
+    {# Previous button #}
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link"
+           href="?{% if selected_category %}category={{ selected_category }}&{% endif %}page={{ page_obj.previous_page_number }}"
+           aria-label="Previous">
+          &laquo;
+        </a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link">&laquo;</span>
+      </li>
+    {% endif %}
+
+    {# Page numbers #}
+    {% for num in page_obj.paginator.page_range %}
+      <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+        <a class="page-link"
+           href="?{% if selected_category %}category={{ selected_category }}&{% endif %}page={{ num }}">
+          {{ num }}
+        </a>
+      </li>
+    {% endfor %}
+
+    {# Next button #}
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link"
+           href="?{% if selected_category %}category={{ selected_category }}&{% endif %}page={{ page_obj.next_page_number }}"
+           aria-label="Next">
+          &raquo;
+        </a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link">&raquo;</span>
+      </li>
+    {% endif %}
+
 {% endblock %}
