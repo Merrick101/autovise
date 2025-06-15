@@ -8,7 +8,25 @@
 
 <!-- Product Filters -->
 
-<ul class="nav nav-pills mb-4">
+{# 1 Mobile-only dropdown (visible on xs, hidden sm+) #}
+<form class="d-block d-sm-none mb-4">
+  <select class="form-select"
+          onchange="if (this.value) window.location.href=this.value">
+    <option value="{% url 'products:product_list' %}"
+            {% if not selected_category %}selected{% endif %}>
+      All
+    </option>
+    {% for cat in categories %}
+      <option value="{% url 'products:product_list' %}?category={{ cat.slug }}"
+              {% if selected_category == cat.slug %}selected{% endif %}>
+        {{ cat.name }}
+      </option>
+    {% endfor %}
+  </select>
+</form>
+
+{# 2 Desktop pills (hidden on xs, flex on sm+) #}
+<ul class="nav nav-pills mb-4 d-none d-sm-flex flex-row flex-wrap">
   <li class="nav-item">
     <a class="nav-link {% if not selected_category %}active{% endif %}"
        href="{% url 'products:product_list' %}">

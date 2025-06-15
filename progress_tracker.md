@@ -705,3 +705,27 @@ Ensured all Stripe credentials are driven by environment variables, enforced pre
 
 ---
 
+## Task 1 – Implement Category-Based Filtering
+
+**Status:**
+
+Complete
+
+**Summary:**
+
+Users can now filter the product grid by category via a ?category=<slug> URL parameter. The UI offers horizontal pills on desktop and a native <select> dropdown on mobile, with the active filter clearly highlighted. Filters persist across paginated pages.
+
+**Key Actions:**
+- Updated product_list_view to read category from the querystring and filter the Product queryset.
+- Injected all Category objects into the template context via a context processor.
+- Added Bootstrap “nav-pills” above the grid for desktop and a <select> for extra-small viewports.
+- Implemented pagination in the view and template, carrying the category parameter through page links.
+
+**Key Outcomes:**
+- /products/?category=electronics reliably shows only electronics items.
+- Clicking a category tab or selecting from the dropdown updates the URL and grid immediately.
+- The chosen category stays active when navigating between pages.
+- On mobile, the dropdown control provides a clean, accessible filter without wrapping issues.
+
+---
+
