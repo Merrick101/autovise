@@ -1,141 +1,146 @@
-<!-- templates/products/product_list.html -->
-
 {% extends "base.html" %}
 {% load static %}
-{% block content %}
 
+{% block content %}
 <h2 class="mb-4">Autovise Product Catalog</h2>
 
-<!-- Product Filters -->
-
-{# 1 Mobile-only dropdown (visible on xs, hidden sm+) #}
-<form class="d-block d-sm-none mb-4">
-  <select class="form-select"
-          onchange="if (this.value) window.location.href=this.value">
-    <option value="{% url 'products:product_list' %}"
-            {% if not selected_category %}selected{% endif %}>
-      All
-    </option>
+<!-- MOBILE: stacked selects -->
+<div class="d-block d-sm-none mb-4">
+  {# Category #}
+  <label for="mobile-category" class="visually-hidden">Category</label>
+  <select id="mobile-category" class="form-select mb-2"
+          onchange="updateFilterParam('category', this.value)">
+    <option value="" {% if not selected_category %}selected{% endif %}>All Categories</option>
     {% for cat in categories %}
-      <option value="{% url 'products:product_list' %}?category={{ cat.slug }}"
-              {% if selected_category == cat.slug %}selected{% endif %}>
+      <option value="{{ cat.slug }}" {% if selected_category == cat.slug %}selected{% endif %}>
         {{ cat.name }}
       </option>
     {% endfor %}
   </select>
-</form>
 
-{# 2 Desktop pills (hidden on xs, flex on sm+) #}
-<ul class="nav nav-pills mb-4 d-none d-sm-flex flex-row flex-wrap">
-  <li class="nav-item">
-    <a class="nav-link {% if not selected_category %}active{% endif %}"
-       href="{% url 'products:product_list' %}">
-      All
-    </a>
-  </li>
-  {% for cat in categories %}
+  {# Sort #}
+  <label for="mobile-sort" class="visually-hidden">Sort</label>
+  <select id="mobile-sort" class="form-select mb-2"
+          onchange="updateFilterParam('sort', this.value)">
+    <option value="" {% if not selected_sort %}selected{% endif %}>Default Sort</option>
+    <option value="price_asc"  {% if selected_sort == 'price_asc'  %}selected{% endif %}>Price: Low → High</option>
+    <option value="price_desc" {% if selected_sort == 'price_desc' %}selected{% endif %}>Price: High → Low</option>
+  </select>
+
+  {# Tier #}
+  <label for="mobile-tier" class="visually-hidden">Tier</label>
+  <select id="mobile-tier" class="form-select"
+          onchange="updateFilterParam('tier', this.value)">
+    <option value="" {% if not selected_tier %}selected{% endif %}>All Tiers</option>
+    <option value="Standard" {% if selected_tier == 'Standard' %}selected{% endif %}>Standard</option>
+    <option value="Pro"      {% if selected_tier == 'Pro'      %}selected{% endif %}>Pro</option>
+  </select>
+</div>
+
+<!-- DESKTOP: pills + inline selects -->
+<div class="d-none d-sm-block mb-4">
+  {# Category pills #}
+  <ul class="nav nav-pills mb-2 flex-row flex-wrap">
     <li class="nav-item">
-      <a class="nav-link {% if selected_category == cat.slug %}active{% endif %}"
-         href="{% url 'products:product_list' %}?category={{ cat.slug }}">
-        {{ cat.name }}
+      <a class="nav-link {% if not selected_category %}active{% endif %}"
+         href="?{% if selected_sort %}sort={{ selected_sort }}&{% endif %}{% if selected_tier %}tier={{ selected_tier }}&{% endif %}">
+        All Categories
       </a>
     </li>
-  {% endfor %}
-</ul>
+    {% for cat in categories %}
+      <li class="nav-item">
+        <a class="nav-link {% if selected_category == cat.slug %}active{% endif %}"
+           href="?category={{ cat.slug }}&{% if selected_sort %}sort={{ selected_sort }}&{% endif %}{% if selected_tier %}tier={{ selected_tier }}&{% endif %}">
+          {{ cat.name }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  {# Sort & Tier selects side-by-side #}
+  <div class="d-flex gap-2">
+    <select class="form-select w-auto form-select-sm"
+            onchange="updateFilterParam('sort', this.value)">
+      <option value="" {% if not selected_sort %}selected{% endif %}>Sort</option>
+      <option value="price_asc"  {% if selected_sort == 'price_asc'  %}selected{% endif %}>Low → High</option>
+      <option value="price_desc" {% if selected_sort == 'price_desc' %}selected{% endif %}>High → Low</option>
+    </select>
+
+    <select class="form-select w-auto form-select-sm"
+            onchange="updateFilterParam('tier', this.value)">
+      <option value="" {% if not selected_tier %}selected{% endif %}>Tier</option>
+      <option value="Standard" {% if selected_tier == 'Standard' %}selected{% endif %}>Standard</option>
+      <option value="Pro"      {% if selected_tier == 'Pro'      %}selected{% endif %}>Pro</option>
+    </select>
+  </div>
+</div>
 
 <!-- Product Grid -->
-
 <div class="row">
-  {% for product in products %}
+  {% for product in page_obj %}
     <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
       <div class="card h-100 shadow-sm">
-        
         {% if product.tier == "Pro" %}
-        <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Pro</span>
+          <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Pro</span>
         {% endif %}
-
         {% if product.image %}
           <img src="{{ product.image.url }}" class="card-img-top img-fluid product-list-image" alt="{{ product.name }}">
         {% else %}
           <img src="{% static 'images/placeholder.jpg' %}" class="card-img-top img-fluid" alt="Placeholder">
         {% endif %}
-
         <div class="card-body d-flex flex-column justify-content-between">
           <div>
             <h5 class="card-title product-title">{{ product.name }}</h5>
             <p class="card-text fw-semibold">£{{ product.price }}</p>
             <p class="card-text small text-muted">{{ product.description|striptags|truncatewords:12 }}</p>
           </div>
-          
           <div class="mt-auto d-grid gap-2">
-            <a href="{% url 'products:product_detail' product.id %}" class="btn btn-outline-secondary btn-sm">
-              View Product
-            </a>
-
-            <form action="{% url 'orders:add_to_cart' product.id %}" method="post">
-              {% csrf_token %}
+            <a href="{% url 'products:product_detail' product.id %}" class="btn btn-outline-secondary btn-sm">View</a>
+            <form action="{% url 'orders:add_to_cart' product.id %}" method="post">{% csrf_token %}
               <input type="hidden" name="quantity" value="1">
-              <button type="submit" class="btn btn-primary btn-sm w-100">
-                Add to Cart
-              </button>
+              <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
             </form>
-
-            <form action="{% url 'users:save_product' product.id %}" method="post">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-outline-primary btn-sm w-100">
-                Save for Later
-              </button>
+            <form action="{% url 'users:save_product' product.id %}" method="post">{% csrf_token %}
+              <button class="btn btn-outline-primary btn-sm w-100">Save</button>
             </form>
           </div>
-
         </div>
       </div>
     </div>
   {% endfor %}
 </div>
 
-{# — Pagination controls — #}
+<!-- Pagination controls -->
 <nav aria-label="Page navigation">
   <ul class="pagination justify-content-center">
-
-    {# Previous button #}
     {% if page_obj.has_previous %}
       <li class="page-item">
         <a class="page-link"
-           href="?{% if selected_category %}category={{ selected_category }}&{% endif %}page={{ page_obj.previous_page_number }}"
-           aria-label="Previous">
-          &laquo;
-        </a>
+           href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}&{% endif %}{% if selected_tier %}tier={{ selected_tier }}&{% endif %}page={{ page_obj.previous_page_number }}"
+           aria-label="Previous">&laquo;</a>
       </li>
     {% else %}
-      <li class="page-item disabled">
-        <span class="page-link">&laquo;</span>
-      </li>
+      <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
     {% endif %}
 
-    {# Page numbers #}
     {% for num in page_obj.paginator.page_range %}
       <li class="page-item {% if page_obj.number == num %}active{% endif %}">
         <a class="page-link"
-           href="?{% if selected_category %}category={{ selected_category }}&{% endif %}page={{ num }}">
+           href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}&{% endif %}{% if selected_tier %}tier={{ selected_tier }}&{% endif %}page={{ num }}">
           {{ num }}
         </a>
       </li>
     {% endfor %}
 
-    {# Next button #}
     {% if page_obj.has_next %}
       <li class="page-item">
         <a class="page-link"
-           href="?{% if selected_category %}category={{ selected_category }}&{% endif %}page={{ page_obj.next_page_number }}"
-           aria-label="Next">
-          &raquo;
-        </a>
+           href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}&{% endif %}{% if selected_tier %}tier={{ selected_tier }}&{% endif %}page={{ page_obj.next_page_number }}"
+           aria-label="Next">&raquo;</a>
       </li>
     {% else %}
-      <li class="page-item disabled">
-        <span class="page-link">&raquo;</span>
-      </li>
+      <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
     {% endif %}
-
+  </ul>
+</nav>
 {% endblock %}

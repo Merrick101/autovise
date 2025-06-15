@@ -6,35 +6,47 @@ from .models import Product, Bundle, Category
 
 
 def product_list_view(request):
-    # 1) Read filters
+    # 1) Read all query-params
     category_slug = request.GET.get("category")
+    sort_param = request.GET.get("sort")
+    tier_param = request.GET.get("tier")
     page_number = request.GET.get("page", 1)
 
-    # 2) Base queryset: only live, non-draft products
+    # 2) Base queryset
     qs = Product.objects.filter(is_draft=False)
+
+    # 3) Category filter
     if category_slug:
         qs = qs.filter(category__slug=category_slug)
 
-    # 3) Paginate: 20 items per page
+    # 4) Tier filter (single‐select)
+    if tier_param in ("Standard", "Pro"):
+        qs = qs.filter(tier=tier_param)
+
+    # 5) Price sort
+    if sort_param == "price_asc":
+        qs = qs.order_by("price")
+    elif sort_param == "price_desc":
+        qs = qs.order_by("-price")
+
+    # 6) Paginate (20 per page)
     paginator = Paginator(qs, 20)
     try:
         page_obj = paginator.page(page_number)
-    except PageNotAnInteger:
+    except (PageNotAnInteger, EmptyPage):
         page_obj = paginator.page(1)
-    except EmptyPage:
-        page_obj = paginator.page(paginator.num_pages)
 
-    # 4) Gather context
-    categories = Category.objects.all()
+    # 7) Build context
     context = {
-        "products":       page_obj.object_list,  # for backwards compatibility
-        "page_obj":       page_obj,
-        "paginator":      paginator,
-        "categories":     categories,
+        "products":         page_obj.object_list,
+        "page_obj":         page_obj,
+        "categories":       Category.objects.all(),
         "selected_category": category_slug,
+        "selected_tier":    tier_param,
+        "selected_sort":    sort_param,
     }
 
-    # 5) Render
+    # 8) Render
     return render(request, "products/product_list.html", context)
 
 
