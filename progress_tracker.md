@@ -729,3 +729,26 @@ Users can now filter the product grid by category via a ?category=<slug> URL par
 
 ---
 
+## Task 2 – Add Tier & Price Sorting Options
+
+**Status:**
+
+Complete
+
+**Summary:**
+
+Customers can now sort the product grid by price (low→high, high→low) and filter by tier (Standard vs Pro). All filter and sort selections persist when switching categories or navigating pages, and the URLs update accordingly to allow sharing or bookmarking.
+
+**Key Actions:**
+- Extended product_list_view to parse ?sort=price_asc/price_desc and ?tier=Standard/Pro parameters and apply .order_by / .filter to the queryset.
+- Moved the updateFilterParam helper into static/js/scripts.js for cleaner inline code.
+- Introduced the qs_with template tag in products.templatetags.qstring to centralize query‐string construction for category pills and pagination links.
+- Refactored product_list.html to add Price and Tier <select> controls (mobile & desktop), wired to updateFilterParam, and to use qs_with for all navigation links.
+
+**Key Outcomes:**
+- Selecting a sort order or tier immediately reorders/filters the grid and updates the browser’s URL.
+- Category tabs and pagination controls carry forward both sort and tier parameters so state is never lost.
+- The solution lays the groundwork for future alphabetical sorting without additional refactoring.
+
+---
+
