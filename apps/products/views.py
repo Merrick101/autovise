@@ -70,17 +70,35 @@ def product_detail_view(request, pk):
 
 
 def bundle_list_view(request):
-    bundle_type = request.GET.get('type')  # e.g., "Pro", "Special", etc.
+    bundle_type = request.GET.get('type')  # e.g. "Standard", "Pro", "Special"
+    sort_param = request.GET.get('sort')  # "price_asc" or "price_desc"
+    search_q = request.GET.get('q', '').strip()  # navbar search query
 
+    # 1) Base queryset & type filter
+    qs = Bundle.objects.all()
     if bundle_type in ["Standard", "Pro", "Special"]:
-        bundles = Bundle.objects.filter(bundle_type=bundle_type)
-    else:
-        bundles = Bundle.objects.all()
+        qs = qs.filter(bundle_type=bundle_type)
 
+    # 2) Global navbar search
+    if search_q:
+        qs = qs.filter(
+            Q(name__icontains=search_q) |
+            Q(description__icontains=search_q)
+        )
+
+    # 3) Price sorting
+    if sort_param == "price_asc":
+        qs = qs.order_by("price")
+    elif sort_param == "price_desc":
+        qs = qs.order_by("-price")
+
+    # 4) Build context
     context = {
-        'bundles': bundles,
+        'bundles': qs,
         'active_filter': bundle_type,
-        'promo_banner': "💡 10% Off All Bundles — Discount Applied Automatically"
+        'selected_sort': sort_param,
+        'search_q': "",   # clears the search input after submit
+        'promo_banner': "💡 10% Off All Bundles — Discount Applied Automatically",
     }
     return render(request, 'products/bundle_list.html', context)
 
