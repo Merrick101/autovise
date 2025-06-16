@@ -3,8 +3,6 @@
 from django.core.exceptions import ImproperlyConfigured
 from decouple import config
 from pathlib import Path
-from dotenv import load_dotenv
-load_dotenv()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -19,7 +17,21 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'https://autovise-99770207782d.herokuapp.com/']
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 3600
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_REFERRER_POLICY = 'same-origin'
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    CSRF_TRUSTED_ORIGINS = ['https://autovise-99770207782d.herokuapp.com']
+
+
+hosts = config("ALLOWED_HOSTS", default="")
+
+ALLOWED_HOSTS = [h.strip() for h in hosts.split(",") if h.strip()]
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
@@ -55,6 +67,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -62,7 +75,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -214,7 +226,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-SITE_ID = 2
+SITE_ID = 3
 
 
 AUTHENTICATION_BACKENDS = [
@@ -288,23 +300,27 @@ CKEDITOR_CONFIGS = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
+TIME_ZONE = 'Europe/London'
 
 USE_TZ = True
+
+USE_I18N = True
 
 
 # AWS Credentials
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
-AWS_S3_REGION_NAME = 'eu-west-2'
+AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='eu-west-2')
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = None
 AWS_QUERYSTRING_AUTH = False
 
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.eu-west-2.amazonaws.com'
+AWS_S3_CUSTOM_DOMAIN = config(
+    'AWS_S3_CUSTOM_DOMAIN',
+    default=f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
+)
+
 MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
