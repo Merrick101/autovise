@@ -1,9 +1,11 @@
 # apps/products/views.py
 
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
 from django.db.models import Q
-from .models import Product, Bundle, Category
+from .models import Product, Bundle, Category, Review
+from apps.products.forms import ReviewForm
 
 
 def product_list_view(request):
@@ -64,9 +66,33 @@ def product_list_view(request):
 
 def product_detail_view(request, pk):
     product = get_object_or_404(Product, pk=pk)
-    return render(
-        request, 'products/product_detail.html', {'product': product}
-    )
+    reviews = product.reviews.select_related('user').all()
+    user_review = None
+    review_form = None
+
+    if request.user.is_authenticated:
+        try:
+            user_review = product.reviews.get(user=request.user)
+        except Review.DoesNotExist:
+            if request.method == "POST":
+                review_form = ReviewForm(request.POST)
+                if review_form.is_valid():
+                    new_review = review_form.save(commit=False)
+                    new_review.product = product
+                    new_review.user = request.user
+                    new_review.save()
+                    messages.success(request, "Your review has been submitted.")
+                    return redirect('products:product_detail', product_id=product.id)
+            else:
+                review_form = ReviewForm()
+
+    context = {
+        'product': product,
+        'reviews': reviews,
+        'user_review': user_review,
+        'review_form': review_form,
+    }
+    return render(request, 'products/product_detail.html', context)
 
 
 def bundle_list_view(request):
@@ -105,4 +131,30 @@ def bundle_list_view(request):
 
 def bundle_detail_view(request, bundle_id):
     bundle = get_object_or_404(Bundle, id=bundle_id)
-    return render(request, 'products/bundle_detail.html', {'bundle': bundle})
+    reviews = bundle.reviews.select_related('user').all()
+    user_review = None
+    review_form = None
+
+    if request.user.is_authenticated:
+        try:
+            user_review = bundle.reviews.get(user=request.user)
+        except Review.DoesNotExist:
+            if request.method == "POST":
+                review_form = ReviewForm(request.POST)
+                if review_form.is_valid():
+                    new_review = review_form.save(commit=False)
+                    new_review.bundle = bundle
+                    new_review.user = request.user
+                    new_review.save()
+                    messages.success(request, "Your review has been submitted.")
+                    return redirect('products:bundle_detail', bundle_id=bundle.id)
+            else:
+                review_form = ReviewForm()
+
+    context = {
+        'bundle': bundle,
+        'reviews': reviews,
+        'user_review': user_review,
+        'review_form': review_form,
+    }
+    return render(request, 'products/bundle_detail.html', context)

@@ -6,7 +6,7 @@ from django.utils.html import format_html
 from django.core.exceptions import ValidationError
 from decimal import Decimal, InvalidOperation
 from .forms import BundleAdminForm, ProductAdminForm
-from .models import Product, Category, ProductType, Tag, Bundle, ProductBundle, Subcategory
+from .models import Product, Category, ProductType, Tag, Bundle, ProductBundle, Subcategory, Review
 
 
 class StockLevelFilter(SimpleListFilter):
@@ -252,3 +252,11 @@ class BundleAdmin(admin.ModelAdmin):
 @admin.register(ProductBundle)
 class ProductBundleAdmin(admin.ModelAdmin):
     list_display = ['bundle', 'product']
+
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('product', 'user', 'rating', 'created_at')
+    list_filter = ('rating', 'created_at')
+    search_fields = ('user__username', 'product__name', 'comment')
+    ordering = ('-created_at',)

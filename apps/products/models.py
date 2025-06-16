@@ -1,6 +1,8 @@
 # apps/products/models.py
 
 from django.db import models
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from django.utils import timezone
 from django.utils.timezone import now
@@ -187,3 +189,21 @@ class ProductBundle(models.Model):
 
     def __str__(self):
         return f"{self.product.name} in {self.bundle.name}"
+
+
+class Review(models.Model):
+    RATING_CHOICES = [(i, str(i)) for i in range(1, 6)]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, null=True, blank=True, related_name='reviews', on_delete=models.CASCADE)
+    bundle = models.ForeignKey(Bundle, null=True, blank=True, related_name='reviews', on_delete=models.CASCADE)
+
+    rating = models.IntegerField(choices=RATING_CHOICES)
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def clean(self):
+        if not self.product and not self.bundle:
+            raise ValidationError("Review must be linked to a product or a bundle.")
+        if self.product and self.bundle:
+            raise ValidationError("Review cannot be linked to both a product and a bundle.")

@@ -2,7 +2,7 @@
 
 from django import forms
 from decimal import Decimal
-from .models import Bundle, Product
+from .models import Bundle, Product, Review
 
 
 class ProductAdminForm(forms.ModelForm):
@@ -60,3 +60,21 @@ class BundleAdminForm(forms.ModelForm):
         if image_path:
             self.instance.image.name = image_path
         return cleaned_data
+
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['rating', 'comment']
+        widgets = {
+            'rating': forms.RadioSelect(choices=[(i, f'{i} ★') for i in range(1, 6)]),
+            'comment': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Leave a comment...',
+                'class': 'form-control'
+            }),
+        }
+        labels = {
+            'rating': 'Your Rating',
+            'comment': 'Your Review'
+        }
