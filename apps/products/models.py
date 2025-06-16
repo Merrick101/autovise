@@ -110,6 +110,12 @@ class Product(models.Model):
 
     image_tag.short_description = "Image"
 
+    def review_count(self):
+        return self.reviews.count()
+
+    def average_rating(self):
+        return self.reviews.aggregate(avg=models.Avg('rating'))['avg'] or 0
+
 
 class Bundle(models.Model):
     BUNDLE_TYPE_CHOICES = [
@@ -173,6 +179,12 @@ class Bundle(models.Model):
         discount = Decimal(self.discount_percentage) if self.discount_percentage else Decimal('10.0')
         final = total * (Decimal('1.00') - discount / Decimal('100.00'))
         return round(final, 2)
+
+    def review_count(self):
+        return self.reviews.count()
+
+    def average_rating(self):
+        return self.reviews.aggregate(avg=models.Avg('rating'))['avg'] or 0
 
 
 class ProductBundle(models.Model):

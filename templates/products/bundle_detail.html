@@ -2,6 +2,8 @@
 
 {% extends "base.html" %}
 {% load static %}
+{% load widget_tweaks %}
+
 {% block content %}
 
 <div class="container mt-4">
@@ -71,6 +73,51 @@
       </div>
     {% endfor %}
   </div>
+  <!-- Reviews Section -->
+<section class="mt-5">
+  <h4 class="mb-4"><i class="fas fa-star text-warning"></i> Customer Reviews</h4>
+
+  <!-- Existing Reviews -->
+  {% if reviews %}
+    <ul class="list-group mb-4">
+      {% for review in reviews %}
+        <li class="list-group-item">
+          <strong>{{ review.user.get_full_name|default:review.user.username }}</strong>
+          <span class="text-muted small"> – {{ review.created_at|date:"F j, Y" }}</span>
+          <p class="mb-0 mt-2">{{ review.content }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-muted">No reviews yet. Be the first to leave one!</p>
+  {% endif %}
+
+    <!-- Add Review Form -->
+    {% if user.is_authenticated %}
+      {% if user_review %}
+        <div class="alert alert-info">
+          You have already submitted a review.
+        </div>
+      {% else %}
+        <h5>Leave a Review</h5>
+        <form method="post" class="mb-4">
+          {% csrf_token %}
+          <div class="mb-3">
+            {{ review_form.content.label_tag }}
+            {{ review_form.content|add_class:"form-control" }}
+            {% if review_form.content.errors %}
+              <div class="text-danger small">{{ review_form.content.errors.0 }}</div>
+            {% endif %}
+          </div>
+          <button type="submit" class="btn btn-primary">Submit Review</button>
+        </form>
+      {% endif %}
+    {% else %}
+      <p>
+        <a href="{% url 'account_login' %}?next={{ request.path }}">Log in</a> to leave a review.
+      </p>
+    {% endif %}
+  </section>
 </div>
 
 {% endblock %}
