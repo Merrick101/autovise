@@ -28,6 +28,10 @@ h1, h2, h3, h4, h5, h6 {
   outline-offset: 2px;
 }
 
+.navbar .dropdown-toggle::after {
+  display: none !important;
+}
+
 .promo-banner {
   background-color: #4682B4; /* Steel Blue */
   color: white;

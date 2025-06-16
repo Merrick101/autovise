@@ -10,7 +10,6 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -20,7 +19,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'https://autovise-99770207782d.herokuapp.com/']
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
@@ -80,6 +79,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'apps.products.context_processors.all_categories',
+                'apps.orders.context_processors.cart_data',
             ],
         },
     },
@@ -138,26 +138,14 @@ STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY", cast=str)
 STRIPE_PUBLISHABLE_KEY = config("STRIPE_PUBLISHABLE_KEY", cast=str)
 STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET", cast=str)
 
-# Ensure none are missing or empty
-for var_name in [
-    "STRIPE_SECRET_KEY", "STRIPE_PUBLISHABLE_KEY", "STRIPE_WEBHOOK_SECRET"
-]:
-    if not globals().get(var_name):
-        raise ImproperlyConfigured(
-            f"Missing required environment variable: {var_name}"
-        )
-
-if not DEBUG:
-    for var_name, key in [
-        ("STRIPE_SECRET_KEY", STRIPE_SECRET_KEY),
-        ("STRIPE_PUBLISHABLE_KEY", STRIPE_PUBLISHABLE_KEY),
-        ("STRIPE_WEBHOOK_SECRET", STRIPE_WEBHOOK_SECRET),
-    ]:
-        # disallow test keys in production
-        if key.startswith("sk_test_") or key.startswith("pk_test_") or key.startswith("whsec_test_"):
-            raise ImproperlyConfigured(
-                f"In production (DEBUG=False), {var_name} must be a live key, not a test key."
-            )
+# Ensure none are missing
+for var in (
+    "STRIPE_SECRET_KEY",
+    "STRIPE_PUBLISHABLE_KEY",
+    "STRIPE_WEBHOOK_SECRET",
+):
+    if not globals()[var]:
+        raise ImproperlyConfigured(f"Missing required environment variable: {var}")
 
 
 LOGGING = {

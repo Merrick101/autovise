@@ -73,10 +73,52 @@
             </ul>
           </div>
 
-          <!-- Cart Link -->
-          <a class="nav-link d-flex align-items-center gap-1" href="{% url 'orders:cart' %}">
-            <i class="fas fa-shopping-cart"></i> Cart
-          </a>
+          <!-- Cart Dropdown -->
+          <div class="dropdown">
+            <a class="nav-link dropdown-toggle position-relative"
+              href="#"
+              id="cartDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false">
+              <i class="fas fa-shopping-cart"></i>
+              Cart
+              {% if cart_item_count %}
+                <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
+                  {{ cart_item_count }}
+                </span>
+              {% endif %}
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-end p-3" aria-labelledby="cartDropdown"
+                style="min-width: 280px;">
+              {% if cart_items %}
+                {% for item in cart_items|slice:":3" %}
+                  <div class="d-flex align-items-center mb-2">
+                    {% if item.product.image %}
+                      <img src="{{ item.product.image.url }}"
+                          alt="{{ item.product.name }}"
+                          style="width:40px;height:40px;object-fit:cover;"
+                          class="me-2 rounded">
+                    {% endif %}
+                    <div class="flex-grow-1">
+                      <div class="small">{{ item.product.name }}</div>
+                      <div class="small text-muted">
+                        ×{{ item.quantity }} — £{{ item.get_total_price|floatformat:2 }}
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+
+                <div class="dropdown-divider"></div>
+                <a href="{% url 'orders:cart' %}"
+                  class="btn btn-sm btn-primary w-100">
+                  View Cart ({{ cart_item_count }})
+                </a>
+              {% else %}
+                <p class="dropdown-item text-center mb-0">Your cart is empty</p>
+              {% endif %}
+            </ul>
+          </div>
 
           <!-- Profile Dropdown -->
           <div class="dropdown">
