@@ -123,6 +123,7 @@ class Bundle(models.Model):
     price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     subtotal_price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     bundle_type = models.CharField(max_length=20, choices=BUNDLE_TYPE_CHOICES, default='Standard')
+    featured = models.BooleanField(default=False)
 
     sku = models.CharField(max_length=50, unique=True, default='TEMP_SKU', help_text="Unique identifier for this bundle")
     bundle_code = models.CharField(max_length=50, unique=True, default='TEMP_BUNDLE_CODE', help_text="Internal code used for SEO and tracking")

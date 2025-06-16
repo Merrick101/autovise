@@ -1,0 +1,12 @@
+<section class="py-5">
+  <div class="container">
+    <h2 class="text-center mb-4">Featured Bundles</h2>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
+      {% for bundle in featured_bundles %}
+        <div class="col">
+          {% include "include/bundle_card.html" with bundle=bundle %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

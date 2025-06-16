@@ -149,7 +149,7 @@ class BundleAdmin(admin.ModelAdmin):
     form = BundleAdminForm
     list_display = [
         'name', 'bundle_type', 'bundle_code', 'sku',
-        'price', 'discount_percentage', 'product_count', 'tag_list',
+        'price', 'discount_percentage', 'product_count', 'tag_list', 'featured',
     ]
     search_fields = ['name', 'bundle_code', 'sku', 'tags__name']
     inlines = [ProductBundleInline]
@@ -180,6 +180,10 @@ class BundleAdmin(admin.ModelAdmin):
         ("Bundle Type", {
             'fields': ('bundle_type', 'tags'),
             'classes': ['tab-general', 'collapse'],
+        }),
+        ("Status Flags", {
+            'fields': ['featured'],
+            'classes': ['tab-status', 'collapse'],
         }),
         ("Timestamps", {
             'fields': ('created_at', 'updated_at'),

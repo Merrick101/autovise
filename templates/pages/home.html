@@ -2,6 +2,7 @@
 
 {% extends "base.html" %}
 {% load static %}
+{% load featured_tags %}
 
 {% block title %}Home | Autovise{% endblock %}
 
@@ -32,19 +33,10 @@
   </div>
 </section>
 
-<!-- Featured Bundles Grid -->
-<section class="py-5">
-  <div class="container">
-    <h2 class="mb-4 text-center">Featured Bundles</h2>
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-      {% for bundle in featured_bundles %}
-        <div class="col">
-          {% include "include/bundle_card.html" with bundle=bundle %}
-        </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
+<!-- Featured Products Section -->
+{% if featured_products %}
+  {% include "include/featured_products.html" %}
+{% endif %}
 
 <!-- Callouts -->
 <section class="py-4 bg-light">
@@ -57,19 +49,10 @@
   </div>
 </section>
 
-<!-- Popular Products Grid -->
-<section class="py-5">
-  <div class="container">
-    <h2 class="mb-4 text-center">Popular Products</h2>
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-      {% for product in popular_products %}
-        <div class="col">
-          {% include "include/product_card.html" with product=product %}
-        </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
+<!-- Featured Bundles Section -->
+{% if featured_bundles %}
+  {% include "include/featured_bundles.html" %}
+{% endif %}
 
 <!-- Testimonials -->
 <section class="bg-dark text-white py-5">

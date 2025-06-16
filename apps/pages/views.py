@@ -8,10 +8,13 @@ from .forms import NewsletterForm
 
 
 def home(request):
+    featured_products = Product.objects.filter(featured=True, is_draft=False)[:4]
+    featured_bundles = Bundle.objects.filter(featured=True)[:4]
+
     context = {
         'promo_banner': "🎁 Free Delivery on First-Time Orders | 🚚 Orders over £40 ship free",
-        'featured_bundles': Bundle.objects.all()[:4],
-        'popular_products': Product.objects.all()[:4],
+        'featured_products': featured_products,
+        'featured_bundles': featured_bundles,
     }
     return render(request, 'pages/home.html', context)
 

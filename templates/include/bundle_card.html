@@ -5,9 +5,14 @@
     <img src="{{ bundle.image.url }}" class="card-img-top" alt="{{ bundle.name }}">
     <div class="card-body">
       <h6 class="card-title fw-semibold mb-1">{{ bundle.name }}</h6>
-      <p class="small text-muted mb-1">Includes {{ bundle.products.count }} items</p>
-      <p class="fw-bold mb-0">£{{ bundle.discounted_price }} 
-        <small class="text-muted text-decoration-line-through">£{{ bundle.original_price }}</small>
+      <p class="small text-muted mb-1">{{ bundle.bundle_type }}</p>
+      <p class="card-text fw-semibold text-success">
+        £{{ bundle.price|floatformat:2 }}
+        {% if bundle.subtotal_price > bundle.price %}
+          <small class="text-muted text-decoration-line-through">
+            £{{ bundle.subtotal_price|floatformat:2 }}
+          </small>
+        {% endif %}
       </p>
     </div>
   </a>
