@@ -33,5 +33,10 @@ urlpatterns = [
     path('pages/', include('apps.pages.urls', namespace='pages')),
     path('assets/', include('apps.assets.urls')),
     path("orders/webhook/", stripe_webhook_view, name="stripe_webhook"),
+    #  Sitemap
     path("sitemap.xml", sitemap, {'sitemaps': sitemaps}, name='sitemap'),
 ]
+
+# Custom error handlers
+handler404 = "apps.pages.views.custom_404"
+handler500 = "apps.pages.views.custom_500"

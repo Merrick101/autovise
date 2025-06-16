@@ -1,11 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>404</title>
-</head>
-<body>
-  
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Page Not Found{% endblock %}
+
+{% block content %}
+<section class="text-center py-5">
+  <div class="container">
+    <h1 class="display-4">404 – Page Not Found</h1>
+    <p class="lead">Sorry, the page you were looking for doesn't exist.</p>
+    <a href="{% url 'home' %}" class="btn btn-primary mt-3">Return to Homepage</a>
+  </div>
+</section>
+{% endblock %}
