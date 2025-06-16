@@ -1,6 +1,9 @@
 # apps/users/views.py
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
+from django.contrib import messages
+from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect, get_object_or_404
 from apps.products.models import Product, Bundle
 from .models import UserProfile
@@ -29,6 +32,33 @@ def profile_view(request):
 
 
 @login_required
+def dashboard(request):
+    profile = request.user.profile
+    saved_products = profile.saved_products.all()
+    saved_bundles = profile.saved_bundles.all()
+    order_count = request.user.orders.count() if hasattr(request.user, "orders") else 0
+
+    context = {
+        'user': request.user,
+        'profile': profile,
+        'saved_products': saved_products,
+        'saved_bundles': saved_bundles,
+        'order_count': order_count,
+    }
+    return render(request, 'users/dashboard.html', context)
+
+
+@require_POST
+@login_required
+def delete_account(request):
+    user = request.user
+    logout(request)  # Log the user out first
+    user.delete()
+    messages.success(request, "Your account has been deleted.")
+    return redirect('account_login')
+
+
+@login_required
 def save_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     profile, created = UserProfile.objects.get_or_create(user=request.user)
@@ -53,8 +83,3 @@ def save_bundle(request, bundle_id):
         profile.saved_bundles.add(bundle)
 
     return redirect(request.META.get('HTTP_REFERER', 'products:bundle_list'))
-
-
-@login_required
-def dashboard(request):
-    return render(request, 'users/dashboard.html')

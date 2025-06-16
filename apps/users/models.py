@@ -10,7 +10,6 @@ class UserProfile(models.Model):
     is_first_time_buyer = models.BooleanField(default=True)
     address = models.CharField(max_length=255, blank=True)
     phone_number = models.CharField(max_length=20, blank=True)
-    preferences = models.TextField(blank=True)
     saved_products = models.ManyToManyField(Product, blank=True, related_name='saved_by_users')
     saved_bundles = models.ManyToManyField(Bundle, blank=True, related_name='saved_by_users')
 

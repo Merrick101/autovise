@@ -58,7 +58,6 @@ INSTALLED_APPS = [
     'apps.orders',
     'apps.users.apps.UsersConfig',
     'apps.pages',
-    'apps.assets',
     # External Libraries
     'storages',
     'widget_tweaks',

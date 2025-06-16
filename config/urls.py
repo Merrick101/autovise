@@ -31,7 +31,6 @@ urlpatterns = [
     path('orders/', include('apps.orders.urls', namespace='orders')),
     path('users/', include('apps.users.urls')),
     path('pages/', include('apps.pages.urls', namespace='pages')),
-    path('assets/', include('apps.assets.urls')),
     path("orders/webhook/", stripe_webhook_view, name="stripe_webhook"),
     #  Sitemap
     path("sitemap.xml", sitemap, {'sitemaps': sitemaps}, name='sitemap'),
