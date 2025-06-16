@@ -1,0 +1,12 @@
+<!-- templates/include/product_card.html -->
+
+<div class="card h-100 border-0 shadow-sm">
+  <a href="{% url 'products:product_detail' product.id %}" class="text-decoration-none text-dark">
+    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+    <div class="card-body">
+      <h6 class="card-title fw-semibold mb-1">{{ product.name }}</h6>
+      <p class="small text-muted mb-1">{{ product.variant }}</p>
+      <p class="fw-bold mb-0">£{{ product.price }}</p>
+    </div>
+  </a>
+</div>

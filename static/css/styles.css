@@ -47,6 +47,32 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
 }
 
+.hero-banner {
+  height: 80vh;
+  overflow: hidden;
+}
+
+.hero-banner img {
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+}
+
+.hero-overlay {
+  background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.6));
+}
+
+.hero-content {
+  max-width: 700px;
+  padding: 1rem;
+}
+
+.hero-content h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: #ffffff;
+  font-weight: 700;
+}
+
 /* Product List Styles */
 
 ul.nav-pills.overflow-auto::-webkit-scrollbar {

@@ -1,0 +1,14 @@
+<!-- templates/include/bundle_card.html -->
+
+<div class="card h-100 border-0 shadow-sm">
+  <a href="{% url 'products:bundle_detail' bundle.id %}" class="text-decoration-none text-dark">
+    <img src="{{ bundle.image.url }}" class="card-img-top" alt="{{ bundle.name }}">
+    <div class="card-body">
+      <h6 class="card-title fw-semibold mb-1">{{ bundle.name }}</h6>
+      <p class="small text-muted mb-1">Includes {{ bundle.products.count }} items</p>
+      <p class="fw-bold mb-0">£{{ bundle.discounted_price }} 
+        <small class="text-muted text-decoration-line-through">£{{ bundle.original_price }}</small>
+      </p>
+    </div>
+  </a>
+</div>

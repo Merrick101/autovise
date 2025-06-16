@@ -1,8 +1,103 @@
+<!-- templates/pages/home.html -->
+
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Home | Autovise{% endblock %}
 
 {% block content %}
-  <h1>Welcome to Autovise</h1>
-  <p>This is the homepage.</p>
+
+<!-- Hero Section -->
+<section class="hero-banner position-relative text-white text-center">
+  <img src="{% static 'images/hero/hero-banner-03.png' %}" alt="Hero Banner" class="img-fluid w-100">
+
+  <!-- Overlay -->
+  <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100"></div>
+
+  <!-- Text + CTA -->
+  <div class="hero-content position-absolute top-50 start-50 translate-middle z-2">
+    <h1 class="display-5 fw-bold">Drive Smarter with Autovise</h1>
+    <p class="lead">Premium accessories, built for the road ahead.</p>
+    <div class="d-flex justify-content-center gap-3 mt-3 flex-wrap">
+      <a href="{% url 'products:product_list' %}" class="btn btn-primary btn-lg">Shop Now</a>
+      <a href="{% url 'products:bundle_list' %}" class="btn btn-outline-light btn-lg">Explore Bundles</a>
+    </div>
+  </div>
+</section>
+
+<!-- Bundle Promo Banner -->
+<section class="bg-warning text-dark text-center py-2 fw-semibold">
+  <div class="container">
+    🔥 Bundle More, Save More – 10% Off All Kits!
+  </div>
+</section>
+
+<!-- Featured Bundles Grid -->
+<section class="py-5">
+  <div class="container">
+    <h2 class="mb-4 text-center">Featured Bundles</h2>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+      {% for bundle in featured_bundles %}
+        <div class="col">
+          {% include "include/bundle_card.html" with bundle=bundle %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Callouts -->
+<section class="py-4 bg-light">
+  <div class="container text-center">
+    <div class="row g-4">
+      <div class="col-md-4">🚗 Quality You Can Trust</div>
+      <div class="col-md-4">💳 Secure Payments</div>
+      <div class="col-md-4">🔄 Easy Returns</div>
+    </div>
+  </div>
+</section>
+
+<!-- Popular Products Grid -->
+<section class="py-5">
+  <div class="container">
+    <h2 class="mb-4 text-center">Popular Products</h2>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+      {% for product in popular_products %}
+        <div class="col">
+          {% include "include/product_card.html" with product=product %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="bg-dark text-white py-5">
+  <div class="container text-center">
+    <h3 class="mb-4 text-white">What Our Customers Say</h3>
+    <blockquote class="blockquote">
+      <p>"Great product!" – Verified Buyer</p>
+    </blockquote>
+    <blockquote class="blockquote">
+      <p>"Fast shipping." – Verified Buyer</p>
+    </blockquote>
+  </div>
+</section>
+
+<!-- Newsletter Signup -->
+<section class="bg-light py-5">
+  <div class="container text-center">
+    <h4>Stay Updated with Autovise!</h4>
+    <form method="post" action="{% url 'pages:newsletter_subscribe' %}" class="mt-3">
+      {% csrf_token %}
+      <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+          <input type="email" name="email" class="form-control mb-2" placeholder="Enter your email" required>
+          <button type="submit" class="btn btn-primary w-100">Subscribe</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
 {% endblock %}

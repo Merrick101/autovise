@@ -30,7 +30,6 @@ if not DEBUG:
 
 
 hosts = config("ALLOWED_HOSTS", default="")
-
 ALLOWED_HOSTS = [h.strip() for h in hosts.split(",") if h.strip()]
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
@@ -115,7 +114,7 @@ JAZZMIN_SETTINGS = {
     "hide_apps": [],
     "hide_models": [],
 
-    "order_with_respect_to": ["products", "orders", "users"],
+    "order_with_respect_to": ["products", "orders", "users", "pages"],
 
     "topmenu_links": [
         {"name": "Dashboard", "url": "admin:index", "permissions": [
@@ -131,6 +130,7 @@ JAZZMIN_SETTINGS = {
         "products.ProductType": "fas fa-tags",
         "products.Tag": "fas fa-tag",
         "orders.Order": "fas fa-receipt",
+        "pages.NewsletterSubscriber": "fas fa-envelope",
         "users.UserProfile": "fas fa-user-circle",
     },
 
@@ -227,7 +227,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-SITE_ID = 3
+SITE_ID = 2
 
 
 AUTHENTICATION_BACKENDS = [

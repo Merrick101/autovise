@@ -1,0 +1,15 @@
+<!-- templates/partials/_newsletter_signup.html -->
+<section class="bg-light py-4 mt-5 border-top">
+  <div class="container text-center">
+    <h5 class="mb-3">Stay in the Loop</h5>
+    <form method="POST" action="{% url 'pages:newsletter_signup' %}" class="row g-2 justify-content-center">
+      {% csrf_token %}
+      <div class="col-auto">
+        <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Subscribe</button>
+      </div>
+    </form>
+  </div>
+</section>
