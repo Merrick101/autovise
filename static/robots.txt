@@ -1,0 +1,12 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /accounts/
+Disallow: /checkout/
+Disallow: /cart/
+Disallow: /orders/
+Disallow: /webhook/
+Disallow: /media/
+
+Allow: /
+
+Sitemap: https://autovise-99770207782d.herokuapp.com/sitemap.xml

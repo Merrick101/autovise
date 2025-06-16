@@ -3,6 +3,20 @@
 from django.contrib import admin
 from django.urls import path, include
 from apps.orders.views.webhook import stripe_webhook_view
+from django.contrib.sitemaps.views import sitemap
+from apps.products.sitemaps import (
+    ProductSitemap,
+    CategorySitemap,
+    ProductTypeSitemap,
+    BundleSitemap,
+)
+
+sitemaps = {
+    'products': ProductSitemap,
+    'categories': CategorySitemap,
+    'product_types': ProductTypeSitemap,
+    'bundles': BundleSitemap,
+}
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -15,4 +29,5 @@ urlpatterns = [
     path('', include('apps.pages.urls')),
     path('assets/', include('apps.assets.urls')),
     path("orders/webhook/", stripe_webhook_view, name="stripe_webhook"),
+    path("sitemap.xml", sitemap, {'sitemaps': sitemaps}, name='sitemap'),
 ]
