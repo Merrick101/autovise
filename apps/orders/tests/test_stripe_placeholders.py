@@ -1,4 +1,4 @@
-# apps/orders/tests/test_cart_and_checkout.py
+# apps/orders/tests/test_stripe_placeholders.py
 
 import pytest
 
@@ -7,46 +7,56 @@ import pytest
 class TestCartLogic:
     def test_add_single_product_to_cart(self):
         """Adding a standard product to the cart should create a correct line item."""
-        pass  # Will test quantity, price, and session/cart logic
+        # Placeholder – Covered in test_cart_models.py
+        pass
 
     def test_add_bundle_to_cart(self):
         """Bundles should be added to the cart as a grouped or summarized line item."""
-        pass  # Future: Track each product or store bundle metadata
+        # Placeholder – Add bundle logic test once integrated into cart flow
+        pass
 
     def test_cart_total_matches_expected(self):
         """Cart subtotal should reflect all item prices (with bundle discounts applied)."""
-        pass  # Add multiple items and compare totals
+        # Placeholder – See test_cart_totals.py for working implementation
+        pass
 
     def test_cart_persists_across_sessions(self):
-        """Cart should persist using sessions (or cookies) before user login."""
-        pass  # Optional: simulate session behavior
+        """Cart should persist using sessions or cookies for anonymous users."""
+        # Optional – Requires session mocking or integration testing
+        pass
 
 
 @pytest.mark.django_db
 class TestStripeCheckoutFlow:
     def test_stripe_session_creation(self):
         """A checkout session should be created with correct item metadata."""
-        pass  # Validate line_items, currency, metadata passed to Stripe
+        # TODO: Use Stripe's test mode and mock line_items dictionary
+        pass
 
     def test_metadata_includes_bundle_code(self):
         """If a bundle is included, the bundle_code should be passed in Stripe metadata."""
-        pass  # Helps tracking and webhook fulfillment
+        # TODO: Mock Stripe session creation and inspect metadata
+        pass
 
     def test_cart_clears_on_payment_success(self):
         """After successful checkout, the cart should be cleared."""
-        pass  # Simulate webhook response or use mock
+        # TODO: Simulate webhook and check cart cleanup
+        pass
 
     def test_cart_persists_on_payment_cancel(self):
-        """If user cancels at Stripe, their cart should remain intact."""
-        pass  # Validate session/cart state on cancel route
+        """If the user cancels payment, the cart should remain intact."""
+        # TODO: Simulate cancel flow and assert cart remains unchanged
+        pass
 
 
 @pytest.mark.django_db
 class TestOrderConfirmation:
     def test_order_summary_displays_correct_info(self):
-        """Post-payment summary page shows correct products, prices, and bundle discounts."""
-        pass  # Requires mocked successful order
+        """Post-payment summary page shows correct items and pricing."""
+        # TODO: Mock order creation and check view context
+        pass
 
     def test_confirmation_page_totals_match_cart(self):
-        """Total shown in confirmation should exactly match pre-checkout cart total."""
-        pass  # Match Stripe amount vs local session
+        """Total on confirmation page matches pre-checkout cart total."""
+        # TODO: Compare Stripe session total with rendered order summary
+        pass
