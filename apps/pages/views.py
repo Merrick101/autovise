@@ -1,9 +1,11 @@
 # apps/pages/views.py
 
 from django.shortcuts import render
+from django.contrib import messages
 from apps.products.models import Product, Bundle
 from django.views.decorators.http import require_POST
 from django.shortcuts import redirect
+from .models import NewsletterSubscriber
 from .forms import NewsletterForm
 
 
@@ -15,6 +17,7 @@ def home(request):
         'promo_banner': "🎁 Free Delivery on First-Time Orders | 🚚 Orders over £40 ship free",
         'featured_products': featured_products,
         'featured_bundles': featured_bundles,
+        'newsletter_form': NewsletterForm(),
     }
     return render(request, 'pages/home.html', context)
 
@@ -23,7 +26,11 @@ def home(request):
 def subscribe_newsletter(request):
     form = NewsletterForm(request.POST)
     if form.is_valid():
-        form.save()
+        email = form.cleaned_data['email']
+        NewsletterSubscriber.objects.get_or_create(email=email)
+
+    messages.success(request, "Thanks for subscribing to our newsletter!")
+
     return redirect(request.META.get("HTTP_REFERER", "/"))
 
 
