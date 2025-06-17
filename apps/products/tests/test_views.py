@@ -60,3 +60,26 @@ def test_bundle_detail_displays_correct_prices(client):
     content = response.content.decode()
     assert f"£{bundle.price:.2f}" in content
     assert f"£{bundle.subtotal_price:.2f}" in content
+
+
+@pytest.mark.django_db
+def test_product_list_view_renders(client):
+    url = reverse("products:product_list")
+    response = client.get(url)
+    assert response.status_code == 200
+    assert "products" in response.context
+
+
+@pytest.mark.django_db
+def test_product_detail_view_renders(client):
+    category = Category.objects.create(name="Cat", slug="cat")
+    ptype = ProductType.objects.create(name="Type")
+    product = Product.objects.create(
+        name="Test", variant="A", price=10, stock=5,
+        tier="Standard", sku="SKU999", product_code="PC999",
+        type=ptype, category=category
+    )
+    url = reverse("products:product_detail", args=[product.pk])
+    response = client.get(url)
+    assert response.status_code == 200
+    assert "product" in response.context

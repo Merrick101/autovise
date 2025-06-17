@@ -3,7 +3,7 @@
 import pytest
 from decimal import Decimal
 from django.core.exceptions import ValidationError
-from apps.products.models import Bundle, Product, ProductType, Category
+from apps.products.models import Bundle, Product, ProductType, Category, Review
 
 
 @pytest.mark.django_db
@@ -72,3 +72,15 @@ def test_bundle_price_calculation():
     expected = round(subtotal * Decimal('0.90'), 2)
 
     assert b.calculated_price() == expected
+
+
+def test_review_requires_product_or_bundle(user):
+    with pytest.raises(ValidationError):
+        review = Review(user=user, rating=4, comment="Test only")
+        review.full_clean()  # triggers .clean()
+
+
+def test_review_disallows_both_product_and_bundle(user, product, bundle):
+    with pytest.raises(ValidationError):
+        review = Review(user=user, rating=4, product=product, bundle=bundle, comment="Conflicting")
+        review.full_clean()
