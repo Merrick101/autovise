@@ -27,11 +27,15 @@ def checkout_view(request):
 
     # 2) build summary & Stripe line_items
     summary = calculate_cart_summary(request, cart_data, cart_type)
+
+    def to_minor_units(dec):
+        # quantize to 2dp then to whole pennies to avoid float-ish rounding quirks
+        return int((dec.quantize(Decimal("0.01")) * 100).to_integral_value())
+
     line_items = []
     for ci in summary["cart_items"]:
-        # pick the right display name
         display_name = ci["bundle"].name if ci["is_bundle"] else ci["product"].name
-        unit_amount = int(ci["discounted_price"] * 100)
+        unit_amount = to_minor_units(ci["discounted_price"])
         line_items.append({
             "price_data": {
                 "currency": "gbp",
@@ -47,16 +51,19 @@ def checkout_view(request):
             "price_data": {
                 "currency": "gbp",
                 "product_data": {"name": "Delivery Fee"},
-                "unit_amount": int(summary["delivery_fee"] * 100),
+                "unit_amount": to_minor_units(summary["delivery_fee"]),
             },
             "quantity": 1,
         })
 
-    # 4) create our Order record
+    # 4) create our Order record (persist all figures from summary)
     order = Order.objects.create(
         user=request.user if request.user.is_authenticated else None,
-        total_price=Decimal(summary["grand_total"]),
-        delivery_fee=Decimal(summary["delivery_fee"]),
+        total_amount=summary["total_before_discount"],
+        discount_total=summary["bundle_discount"] + summary["cart_discount"],
+        delivery_fee=summary["delivery_fee"],
+        total_price=summary["grand_total"],                # amount to be charged
+        is_first_order=summary["first_time_discount"],
     )
 
     # 5) prepare Stripe session
@@ -81,11 +88,10 @@ def checkout_view(request):
         messages.error(request, "Checkout failed. Please try again or contact support.")
         return redirect("orders:cart")
 
-    # save the Stripe session ID for lookup on success
     order.stripe_session_id = session.id
     order.save(update_fields=["stripe_session_id"])
 
-    # 6) persist OrderItems
+    # 6) persist OrderItems with the *discounted* unit price for both types
     for ci in summary["cart_items"]:
         if ci["is_bundle"]:
             OrderItem.objects.create(
@@ -99,10 +105,10 @@ def checkout_view(request):
                 order=order,
                 product=ci["product"],
                 quantity=ci["quantity"],
-                unit_price=ci["unit_price"],
+                unit_price=ci["discounted_price"],  # <-- changed
             )
 
-    # 7) clear the cart (defer session vs. db)
+    # 7) clear the cart
     if request.user.is_authenticated:
         clear_cart(request)
     else:

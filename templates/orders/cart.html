@@ -37,23 +37,19 @@
               </form>
             </td>
             <td>
-              {% if item.is_bundle and item.discounted_price < item.unit_price %}
+              {% if item.discounted_price < item.unit_price %}
                 <div class="d-flex flex-column align-items-start">
                   <span class="text-success fw-semibold">£{{ item.discounted_price|floatformat:2 }}</span>
                   <small class="text-muted text-decoration-line-through">£{{ item.unit_price|floatformat:2 }}</small>
-                  {% with pct=100|floatformat:2 %}
-                    {% with savings=item.unit_price|floatformat:2|floatformat:"2" %}
-                      {% if item.discount_percent > 0 %}
-                        <span class="badge bg-success mt-1">-{{ item.discount_percent|floatformat:0 }}%</span>
-                      {% endif %}
-                    {% endwith %}
-                  {% endwith %}
+                  {% if item.discount_percent > 0 %}
+                    <span class="badge bg-success mt-1">-{{ item.discount_percent|floatformat:0 }}%</span>
+                  {% endif %}
                 </div>
               {% else %}
                 £{{ item.unit_price|floatformat:2 }}
               {% endif %}
             </td>
-            <td>£{{ item.subtotal|floatformat:2 }}</td>
+            <td>£{{ total_before_discount|floatformat:2 }}</td>
             <td>
               <form action="{% url 'orders:remove_item' item|item_key %}" method="post" class="d-inline">
                 {% csrf_token %}

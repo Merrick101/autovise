@@ -70,31 +70,40 @@ def calculate_cart_summary(request, cart_data, cart_type):
     """
 
     items = []
-    total = Decimal("0.00")
-    bundle_discount_total = Decimal("0.00")
+    pre_total = Decimal("0.00")
+    post_total = Decimal("0.00")
+
+    bundle_discount_total = Decimal("0.00")  # only for display
     cart_discount_total = Decimal("0.00")
     first_time_discount = False
 
     def is_bundle_product(product):
         return product.type and product.type.name.lower() == "bundle"
 
-    # 1) DB-backed cart: same as before, but record both product/bundle keys
+    # 1) DB-backed cart
     if cart_type == "db":
         for ci in cart_data.items.select_related("product"):
             product = ci.product
-            quantity = ci.quantity
-            unit_price = product.price
-            subtotal = unit_price * quantity
+            quantity = int(ci.quantity or 0)
+            if quantity <= 0:
+                continue
 
-            # accumulate raw bundle discount (10% of line subtotal)
+            unit_price = Decimal(product.price)
             if is_bundle_product(product):
-                bundle_discount_total += subtotal * Decimal("0.10")
+                discounted_unit = (unit_price * Decimal("0.90")).quantize(Decimal("0.01"))
+            else:
+                discounted_unit = unit_price
 
-            # compute any per-line discounted price (e.g. bundle/subtotal logic)
-            discounted_price = subtotal / quantity if quantity > 0 else unit_price
+            line_unit_total = unit_price * quantity
+            line_disc_total = discounted_unit * quantity
+
+            # track bundle discount (difference between unit and discounted)
+            if discounted_unit < unit_price:
+                bundle_discount_total += (unit_price - discounted_unit) * quantity
+
             discount_percent = (
-                (unit_price - discounted_price) / unit_price * Decimal("100.00")
-                if unit_price > 0 and discounted_price < unit_price
+                ((unit_price - discounted_unit) / unit_price * Decimal("100.00"))
+                if unit_price > 0 and discounted_unit < unit_price
                 else Decimal("0.00")
             )
 
@@ -104,48 +113,57 @@ def calculate_cart_summary(request, cart_data, cart_type):
                 "bundle":  product if is_bundle else None,
                 "quantity": quantity,
                 "unit_price": unit_price,
-                "discounted_price": discounted_price,
+                "discounted_price": discounted_unit,
                 "discount_percent": discount_percent,
-                "subtotal": subtotal,
+                "subtotal": line_disc_total,
                 "tier": product.tier,
                 "is_bundle": is_bundle,
             })
-            total += subtotal
 
-    # 2) Session-backed cart: detect bundles by key prefix "bundle_<id>"
+            pre_total += line_unit_total
+            post_total += line_disc_total
+
+    # 2) Session-backed cart
     else:
-        for key, entry in cart_data.items():
-            # --- bundle entry if key starts with "bundle_" ---
-            if key.startswith("bundle_"):
+        for key, entry in (cart_data or {}).items():
+            # --- bundle entry if key starts with "bundle_"
+            if isinstance(key, str) and key.startswith("bundle_"):
                 try:
                     bundle_id = int(key.split("_", 1)[1])
                     bundle = Bundle.objects.get(pk=bundle_id)
                 except (ValueError, Bundle.DoesNotExist):
                     continue
 
-                quantity = int(entry.get("quantity", 0) or 0)
+                try:
+                    quantity = int(entry.get("quantity", 0) or 0)
+                except (TypeError, ValueError):
+                    quantity = 0
                 if quantity <= 0:
                     continue
 
-                # Fallback: if subtotal_price isn't present, use bundle.price
+                # Fallback
                 raw_base = getattr(bundle, "subtotal_price", None)
                 try:
                     base_price = Decimal(raw_base) if raw_base is not None else Decimal(bundle.price)
                 except Exception:
                     base_price = Decimal(bundle.price)
-
-                # entry["price"] may be a string; convert robustly, default to base_price
                 try:
-                    discounted_price = Decimal(entry.get("price", base_price))
+                    discounted_unit = Decimal(entry.get("price", "")) if entry.get("price") is not None else (base_price * Decimal("0.90"))
                 except Exception:
-                    discounted_price = base_price
+                    discounted_unit = base_price * Decimal("0.90")
 
-                subtotal = discounted_price * quantity
+                discounted_unit = discounted_unit.quantize(Decimal("0.01"))
+                base_price = base_price.quantize(Decimal("0.01"))
 
-                bundle_discount_total += base_price * quantity * Decimal("0.10")
+                line_unit_total = base_price * quantity
+                line_disc_total = discounted_unit * quantity
+
+                if discounted_unit < base_price:
+                    bundle_discount_total += (base_price - discounted_unit) * quantity
+
                 discount_percent = (
-                    (base_price - discounted_price) / base_price * Decimal("100.00")
-                    if base_price > 0 and discounted_price < base_price
+                    ((base_price - discounted_unit) / base_price * Decimal("100.00"))
+                    if base_price > 0 and discounted_unit < base_price
                     else Decimal("0.00")
                 )
 
@@ -154,36 +172,52 @@ def calculate_cart_summary(request, cart_data, cart_type):
                     "bundle":  bundle,
                     "quantity": quantity,
                     "unit_price": base_price,
-                    "discounted_price": discounted_price,
+                    "discounted_price": discounted_unit,
                     "discount_percent": discount_percent,
-                    "subtotal": subtotal,
+                    "subtotal": line_disc_total,
                     "tier": getattr(bundle, "bundle_type", None),
                     "is_bundle": True,
                 })
-                total += subtotal
+
+                pre_total += line_unit_total
+                post_total += line_disc_total
                 continue
-            # --- otherwise treat as a normal Product entry ---
+
             prod_id = entry.get("product_id")
-            if not prod_id:
+            try:
+                quantity = int(entry.get("quantity", 0) or 0)
+            except (TypeError, ValueError):
+                quantity = 0
+            if not prod_id or quantity <= 0:
                 continue
+
             try:
                 product = Product.objects.get(pk=prod_id)
             except Product.DoesNotExist:
                 continue
 
-            quantity = entry.get("quantity", 0)
-            unit_price = product.price
-            discounted_price = Decimal(entry.get("price", unit_price))
-            subtotal = discounted_price * quantity
+            unit_price = Decimal(product.price)
 
-            # accumulate bundle discount if this ProductType is actually a bundle
-            is_bundle = is_bundle_product(product)
-            if is_bundle:
-                bundle_discount_total += unit_price * quantity * Decimal("0.10")
+            try:
+                discounted_unit = Decimal(entry.get("price", unit_price))
+            except Exception:
+                discounted_unit = unit_price
+
+            discounted_unit = discounted_unit.quantize(Decimal("0.01"))
+            unit_price = unit_price.quantize(Decimal("0.01"))
+
+            line_unit_total = unit_price * quantity
+            line_disc_total = discounted_unit * quantity
+
+            if is_bundle_product(product) and discounted_unit >= unit_price:
+                tmp_disc = (unit_price * Decimal("0.90")).quantize(Decimal("0.01"))
+                bundle_discount_total += (unit_price - tmp_disc) * quantity
+                discounted_unit = tmp_disc
+                line_disc_total = discounted_unit * quantity
 
             discount_percent = (
-                (unit_price - discounted_price) / unit_price * Decimal("100.00")
-                if unit_price > 0 and discounted_price < unit_price
+                ((unit_price - discounted_unit) / unit_price * Decimal("100.00"))
+                if unit_price > 0 and discounted_unit < unit_price
                 else Decimal("0.00")
             )
 
@@ -192,21 +226,23 @@ def calculate_cart_summary(request, cart_data, cart_type):
                 "bundle": None,
                 "quantity": quantity,
                 "unit_price": unit_price,
-                "discounted_price": discounted_price,
+                "discounted_price": discounted_unit,
                 "discount_percent": discount_percent,
-                "subtotal": subtotal,
+                "subtotal": line_disc_total,
                 "tier": product.tier,
-                "is_bundle": is_bundle,
+                "is_bundle": is_bundle_product(product),
             })
-            total += subtotal
 
-    # 3) apply bundle & first-time discounts
-    total_before_discount = total
-    total -= bundle_discount_total
+            pre_total += line_unit_total
+            post_total += line_disc_total
+
+    # 3) totals & discounts
+    total_before_discount = pre_total
+    total = post_total
 
     if request.user.is_authenticated and is_first_time_user(request.user):
         first_time_discount = True
-        cart_discount_total = total * Decimal("0.10")
+        cart_discount_total = (total * Decimal("0.10")).quantize(Decimal("0.01"))
         total -= cart_discount_total
 
     # 4) delivery fee & grand total
@@ -214,9 +250,9 @@ def calculate_cart_summary(request, cart_data, cart_type):
         first_time_discount or total_before_discount >= Decimal("40.00")
     ) else Decimal("4.99")
 
-    grand_total = total + delivery_fee
+    grand_total = (total + delivery_fee).quantize(Decimal("0.01"))
     estimated_delivery = date.today() + timedelta(days=2)
-    total_saved = bundle_discount_total + cart_discount_total
+    total_saved = (bundle_discount_total + cart_discount_total).quantize(Decimal("0.01"))
 
     logger.debug(
         f"[CART] Items:{len(items)} Sub:{total_before_discount:.2f} "

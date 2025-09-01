@@ -1,3 +1,5 @@
+<!-- templates/orders/checkout_success.html -->
+
 {% extends "base.html" %}
 {% block content %}
   <div class="container mt-5">
@@ -24,15 +26,26 @@
         {% endfor %}
       </ul>
 
-      <p><strong>Subtotal:</strong> £{{ order.total_price|floatformat:2 }}</p>
-      {% if order.delivery_fee %}
-        <p><strong>Delivery Fee:</strong> £{{ order.delivery_fee|floatformat:2 }}</p>
+      <p><strong>Subtotal:</strong> £{{ order.total_amount|floatformat:2 }}</p>
+
+      {% if order.discount_total and order.discount_total > 0 %}
+        <p><strong>Discount Applied:</strong> -£{{ order.discount_total|floatformat:2 }}</p>
       {% endif %}
-      {% if order.discount_total %}
-        <p><strong>Discount Applied:</strong> £{{ order.discount_total|floatformat:2 }}</p>
+
+      {% if order.delivery_fee is not None %}
+        <p>
+          <strong>Delivery Fee:</strong>
+          {% if order.delivery_fee|floatformat:2 == "0.00" %}
+            <span class="text-success">Free</span>
+          {% else %}
+            £{{ order.delivery_fee|floatformat:2 }}
+          {% endif %}
+        </p>
       {% endif %}
+
       <p><strong>Paid Total:</strong> £{{ order.total_price|floatformat:2 }}</p>
-    {% else %}
+    
+      {% else %}
       <p>
         Your order has been received, but no details could be loaded.
         If you believe this is an error, please contact support.
