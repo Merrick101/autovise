@@ -21,12 +21,19 @@ def add_to_cart_view(request, product_id):
     return redirect(request.META.get('HTTP_REFERER', 'products:product_list'))
 
 
+@require_POST
 def add_bundle_to_cart_view(request, bundle_id):
     bundle = get_object_or_404(Bundle, id=bundle_id)
     cart = request.session.get('cart', {})
 
+    try:
+        quantity = int(request.POST.get('quantity', 1))
+    except (TypeError, ValueError):
+        quantity = 1
+    if quantity < 1:
+        quantity = 1
+
     item_key = f"bundle_{bundle.id}"
-    quantity = int(request.POST.get('quantity', 1))
 
     if item_key in cart:
         cart[item_key]['quantity'] += quantity
@@ -38,10 +45,9 @@ def add_bundle_to_cart_view(request, bundle_id):
             'quantity': quantity,
         }
 
-    request.session['cart'] = cart
+    save_cart(request, cart)
 
     messages.success(request, f"Added {bundle.name} to your cart.")
-
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 

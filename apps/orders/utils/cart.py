@@ -123,13 +123,25 @@ def calculate_cart_summary(request, cart_data, cart_type):
                 except (ValueError, Bundle.DoesNotExist):
                     continue
 
-                quantity = entry.get("quantity", 0)
-                # assume bundle.subtotal_price is pre-discount total
-                base_price = Decimal(bundle.subtotal_price)
-                discounted_price = Decimal(entry.get("price", base_price))
+                quantity = int(entry.get("quantity", 0) or 0)
+                if quantity <= 0:
+                    continue
+
+                # Fallback: if subtotal_price isn't present, use bundle.price
+                raw_base = getattr(bundle, "subtotal_price", None)
+                try:
+                    base_price = Decimal(raw_base) if raw_base is not None else Decimal(bundle.price)
+                except Exception:
+                    base_price = Decimal(bundle.price)
+
+                # entry["price"] may be a string; convert robustly, default to base_price
+                try:
+                    discounted_price = Decimal(entry.get("price", base_price))
+                except Exception:
+                    discounted_price = base_price
+
                 subtotal = discounted_price * quantity
 
-                # accumulate bundle discount (10% of raw price * qty)
                 bundle_discount_total += base_price * quantity * Decimal("0.10")
                 discount_percent = (
                     (base_price - discounted_price) / base_price * Decimal("100.00")
@@ -145,12 +157,11 @@ def calculate_cart_summary(request, cart_data, cart_type):
                     "discounted_price": discounted_price,
                     "discount_percent": discount_percent,
                     "subtotal": subtotal,
-                    "tier": bundle.bundle_type,
+                    "tier": getattr(bundle, "bundle_type", None),
                     "is_bundle": True,
                 })
                 total += subtotal
                 continue
-
             # --- otherwise treat as a normal Product entry ---
             prod_id = entry.get("product_id")
             if not prod_id:

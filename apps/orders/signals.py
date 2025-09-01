@@ -11,17 +11,26 @@ from orders.utils.cart import get_or_create_cart
 logger = logging.getLogger(__name__)
 
 
+# apps/orders/signals.py
+
 @receiver(user_logged_in)
 def merge_session_cart(sender, request, user, **kwargs):
-    session_cart = request.session.get('cart', {})
+    session_cart = request.session.get('cart', {}) or {}
     if not session_cart:
         return
 
     db_cart = get_or_create_cart(user)
 
-    for product_code, item in session_cart.items():
+    for key, item in session_cart.items():
+        # Skip bundles and any non-product entries
+        if isinstance(key, str) and key.startswith("bundle_"):
+            continue
+
         product_id = item.get('product_id')
-        quantity = item.get('quantity', 1)
+        quantity = int(item.get('quantity', 1) or 1)
+
+        if not product_id or quantity <= 0:
+            continue
 
         existing_item = db_cart.items.filter(product_id=product_id).first()
         if existing_item:
