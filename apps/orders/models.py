@@ -68,12 +68,12 @@ class OrderItem(models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                check=(
+                condition=(
                     models.Q(product__isnull=False, bundle__isnull=True) |
                     models.Q(product__isnull=True,  bundle__isnull=False)
                 ),
-                name="orderitem_product_xor_bundle"
-            )
+                name="orderitem_product_xor_bundle",
+            ),
         ]
 
     def __str__(self):
