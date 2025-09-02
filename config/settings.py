@@ -87,6 +87,7 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'apps.products.context_processors.all_categories',
@@ -241,6 +242,8 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+SUPPORT_EMAIL = config('SUPPORT_EMAIL', default='')
+ORDERS_NOTIFICATION_EMAIL = config('ORDERS_NOTIFICATION_EMAIL', default='')
 
 SEND_ORDER_CONFIRMATION_EMAIL = config(
     'SEND_ORDER_CONFIRMATION_EMAIL',

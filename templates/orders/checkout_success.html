@@ -9,6 +9,7 @@
       <p>
         Thank you for your purchase{% if order.user %}, {{ order.user.username }}{% endif %}!
       </p>
+      <p>Order <strong>#{{ order.id }}</strong> has been confirmed.</p>
 
       <h4>Order Summary:</h4>
       <ul class="list-unstyled">
@@ -43,7 +44,7 @@
         </p>
       {% endif %}
 
-      <p><strong>Paid Total:</strong> £{{ order.total_price|floatformat:2 }}</p>
+      <p><strong>Total Paid:</strong> £{{ order.total_price|floatformat:2 }}</p>
     
       {% else %}
       <p>
@@ -54,8 +55,9 @@
 
     <p>
       If you have any questions, please
-      <a href="{{ contact_page_url }}">contact support</a>
-      or email us at <a href="mailto:{{ support_email }}">{{ support_email }}</a>.
+      <a href="{{ contact_page_url|default:'#contact' }}">contact support</a>
+      or email us at
+      <a href="mailto:{{ support_email|default:settings.SUPPORT_EMAIL }}">{{ support_email|default:settings.SUPPORT_EMAIL }}</a>.
     </p>
 
     <a href="{% url 'products:product_list' %}" class="btn btn-primary mt-3">

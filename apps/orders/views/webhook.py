@@ -15,28 +15,16 @@ logger = logging.getLogger(__name__)
 @require_POST
 @csrf_exempt
 def stripe_webhook_view(request):
-    """
-    Endpoint to receive Stripe webhooks.
-    Verifies signature, handles checkout.session.completed by updating the Order.
-    """
     logger.info("[WEBHOOK] Stripe webhook endpoint was hit.")
-
-    # 1) Verify signature & payload
     event = verify_webhook_signature(request)
     if event is None:
         logger.warning("[WEBHOOK] Invalid Stripe signature or payload.")
         return HttpResponseBadRequest("Invalid signature or payload")
 
-    # 2) Handle the checkout.session.completed event
     if event.get("type") == "checkout.session.completed":
         session = event["data"]["object"]
-        logger.info(f"[WEBHOOK] checkout.session.completed | session_id={session.get('id')}")
+        logger.info("[WEBHOOK] checkout.session.completed | session_id=%s", session.get("id"))
+        # Any exceptions are handled inside update_order_from_stripe_session
+        update_order_from_stripe_session(session)
 
-        try:
-            update_order_from_stripe_session(session)
-        except Exception as e:
-            logger.error(f"[WEBHOOK] Failed updating order for session {session.get('id')}: {e}")
-            return HttpResponse(status=500)
-
-    # 3) Acknowledge receipt for all other events
     return HttpResponse(status=200)

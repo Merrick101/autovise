@@ -1,5 +1,6 @@
 # apps/orders/views/general.py
 
+from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -59,11 +60,12 @@ def checkout_success_view(request):
         clear_session_cart(request)
 
     # 6) Render the confirmation template
-    return render(request, "orders/checkout_success.html", {
+    context = {
         "order": order,
-        "support_email": "hello.autovise@gmail.com",
+        "support_email": getattr(settings, "SUPPORT_EMAIL", "support@example.com"),
         "contact_page_url": "/contact/",
-    })
+    }
+    return render(request, "orders/checkout_success.html", context)
 
 
 def checkout_cancel_view(request):

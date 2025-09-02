@@ -8,33 +8,52 @@ from django.template.loader import render_to_string
 logger = logging.getLogger(__name__)
 
 
-def send_order_confirmation_email(order):
+def send_order_confirmation_email(order, to_email=None):
     """
-    Sends an order confirmation email if enabled in settings.
+    Send order confirmation to the customer (if we have an email) and an admin copy.
+    Honors SEND_ORDER_CONFIRMATION_EMAIL. Failures are logged, not raised.
     """
-    # Feature flag to turn emails on/off
     if not getattr(settings, "SEND_ORDER_CONFIRMATION_EMAIL", True):
-        logger.info(f"[EMAIL] Confirmation emails are disabled. Skipping Order #{order.id}")
+        logger.info("[EMAIL] Confirmation emails disabled. Skipping Order #%s", order.id)
         return
 
-    if not (order.user and order.user.email):
-        logger.warning(f"[EMAIL] No user/email for Order #{order.id}. Skipping.")
-        return
+    # Resolve recipients
+    customer_email = to_email or (order.user.email if getattr(order.user, "email", None) else None)
+    admin_email = getattr(settings, "ORDERS_NOTIFICATION_EMAIL", None) or getattr(settings, "DEFAULT_FROM_EMAIL", None)
 
     subject = f"Your Autovise Order #{order.id} Confirmation"
-    context = {"user": order.user, "order": order}
+    context = {"user": getattr(order, "user", None), "order": order}
     text_body = render_to_string("emails/order_confirmation.txt", context)
     html_body = render_to_string("emails/order_confirmation.html", context)
 
-    try:
-        send_mail(
-            subject=subject,
-            message=text_body,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[order.user.email],
-            html_message=html_body,
-            fail_silently=False,
-        )
-        logger.info(f"[EMAIL] Sent confirmation email for Order #{order.id}")
-    except Exception as e:
-        logger.error(f"[EMAIL] Failed to send confirmation for Order #{order.id}: {e}")
+    # Send to customer (if address is provided)
+    if customer_email:
+        try:
+            send_mail(
+                subject=subject,
+                message=text_body,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[customer_email],
+                html_message=html_body,
+                fail_silently=False,
+            )
+            logger.info("[EMAIL] Sent confirmation email to %s for Order #%s", customer_email, order.id)
+        except Exception as e:
+            logger.exception("[EMAIL] Customer email failed for Order #%s: %s", order.id, e)
+    else:
+        logger.warning("[EMAIL] No customer email for Order #%s; skipping customer send", order.id)
+
+    # Send admin copy
+    if admin_email:
+        try:
+            send_mail(
+                subject=f"[Admin Copy] {subject}",
+                message=text_body,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[admin_email],
+                html_message=html_body,
+                fail_silently=False,
+            )
+            logger.info("[EMAIL] Sent admin copy to %s for Order #%s", admin_email, order.id)
+        except Exception as e:
+            logger.exception("[EMAIL] Admin copy failed for Order #%s: %s", order.id, e)

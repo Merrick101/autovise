@@ -12,6 +12,8 @@ from apps.orders.utils.email import send_order_confirmation_email
 logger = logging.getLogger(__name__)
 
 
+# apps/orders/utils/order.py
+
 def update_order_from_stripe_session(session):
     """
     Idempotently mark the existing Order paid and send confirmation email.
@@ -35,7 +37,17 @@ def update_order_from_stripe_session(session):
             logger.error(f"[ORDER] No Order found for stripe_session_id={session_id!r}")
             return None
 
-    # 3) Mark paid
+    # -- NEW: resolve customer email (guest-safe) --
+    customer_email = None
+    try:
+        details = session.get("customer_details") or {}
+        customer_email = details.get("email")
+    except Exception:
+        pass
+    if not customer_email and order.user and getattr(order.user, "email", None):
+        customer_email = order.user.email
+
+    # 3) Mark paid (idempotent)
     if not order.is_paid:
         with transaction.atomic():
             order.is_paid = True
@@ -46,9 +58,12 @@ def update_order_from_stripe_session(session):
             order.id, order.stripe_payment_intent
         )
 
-        # 4) Send confirmation email
-        send_order_confirmation_email(order)
+        # 4) Send confirmation email (do NOT block on failure)
+        try:
+            send_order_confirmation_email(order, to_email=customer_email)  # <-- pass email
+        except Exception as e:
+            logger.exception("[EMAIL] Failed to send confirmation for Order #%s: %s", order.id, e)
     else:
-        logger.info(f"[ORDER] Order #{order.id} already marked paid, skipping")
+        logger.info("&#91;ORDER] Order #%s already marked paid, skipping", order.id)
 
     return order

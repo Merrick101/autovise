@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+  <body style="font-family:Arial,sans-serif;color:#222;">
+    <h2>Thanks for your order{% if order.user %}, {{ order.user.username }}{% endif %}!</h2>
+    <p>Order <strong>#{{ order.id }}</strong> has been confirmed.</p>
+
+    <h3>Items</h3>
+    <ul>
+      {% for item in order.items.all %}
+        <li>
+          {% if item.bundle %}
+            {{ item.quantity }} × <strong>{{ item.bundle.name }}</strong> (Bundle) – £{{ item.unit_price|floatformat:2 }}
+          {% else %}
+            {{ item.quantity }} × {{ item.product.name }} – £{{ item.unit_price|floatformat:2 }}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+
+    <p><strong>Subtotal:</strong> £{{ order.total_amount|floatformat:2 }}</p>
+    {% if order.discount_total and order.discount_total > 0 %}
+      <p><strong>Discount:</strong> -£{{ order.discount_total|floatformat:2 }}</p>
+    {% endif %}
+    <p><strong>Delivery:</strong>
+      {% if order.delivery_fee|floatformat:2 == "0.00" %}Free{% else %}£{{ order.delivery_fee|floatformat:2 }}{% endif %}
+    </p>
+    <p><strong>Total Paid:</strong> £{{ order.total_price|floatformat:2 }}</p>
+
+    <p>If you have any questions, reply to this email or contact {{ support_email|default:settings.SUPPORT_EMAIL|default:"support@example.com" }}.</p>
+  </body>
+</html>
