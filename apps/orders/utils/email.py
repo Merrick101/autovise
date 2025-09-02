@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 def send_order_confirmation_email(order, to_email=None):
     """
-    Send order confirmation to the customer (if we have an email) and an admin copy.
+    Send order confirmation to the customer (if an email is provided) and an admin copy.
     Honors SEND_ORDER_CONFIRMATION_EMAIL. Failures are logged, not raised.
     """
     if not getattr(settings, "SEND_ORDER_CONFIRMATION_EMAIL", True):

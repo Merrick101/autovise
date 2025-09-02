@@ -11,23 +11,53 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 stripe.api_version = getattr(settings, "STRIPE_API_VERSION", None)
 
 
-def create_checkout_session(user, line_items, metadata=None, success_url=None, cancel_url=None):
+def create_checkout_session(
+    user,
+    line_items,
+    metadata=None,
+    success_url=None,
+    cancel_url=None,
+    customer_email=None,
+    allow_promotion_codes=False,
+):
     """
     Create a Stripe Checkout Session.
+    - Sends customer_email when provided (guest-friendly).
+    - Ensures a customer is created (so webhook has customer_details.email).
+    - Uses idempotency_key to guard against double submits.
     """
     try:
-        # 2) Use idempotency_key in metadata or kwargs to guard against double-clicks
-        return stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            mode='payment',
-            line_items=line_items,
-            success_url=success_url or settings.DEFAULT_SUCCESS_URL,
-            cancel_url=cancel_url or settings.DEFAULT_CANCEL_URL,
-            metadata=metadata or {},
-            # idempotency_key=f"checkout_{user.id}_{timestamp}"  # optional
+        # Build params for the Session
+        params = {
+            "mode": "payment",
+            "line_items": line_items,
+            "metadata": metadata or {},
+            "success_url": success_url or settings.DEFAULT_SUCCESS_URL,
+            "cancel_url": cancel_url or settings.DEFAULT_CANCEL_URL,
+            # ensure the completed session includes customer_details.email
+            "customer_creation": "always",
+            # if provided, prefill email and skip Stripe email step
+            "customer_email": customer_email or None,
+            # optional polish
+            "allow_promotion_codes": allow_promotion_codes or None,
+        }
+        # Remove Nones
+        params = {k: v for k, v in params.items() if v is not None}
+
+        # Idempotency: prevents double-charges if user double-clicks
+        # (Note: idempotency_key is a request option, not a param)
+        user_key = getattr(user, "id", None) or "guest"
+        order_key = (metadata or {}).get("order_id", "")
+        idempotency_key = f"checkout_{user_key}_{order_key}" if order_key else f"checkout_{user_key}"
+
+        session = stripe.checkout.Session.create(
+            **params,
+            idempotency_key=idempotency_key,
         )
+        return session
+
     except stripe.error.StripeError as e:
-        logger.error(f"[STRIPE] Checkout session creation failed: {e.user_message or e}")
+        logger.error(f"[STRIPE] Checkout session creation failed: {getattr(e, 'user_message', None) or e}")
         return None
     except Exception as e:
         logger.exception(f"[STRIPE] Unexpected error creating checkout session: {e}")

@@ -66,6 +66,8 @@ def checkout_view(request):
         is_first_order=summary["first_time_discount"],
     )
 
+    guest_email = (request.POST.get("guest_email") or "").strip() if not request.user.is_authenticated else None
+
     # 5) prepare Stripe session
     metadata = {
         "order_id": str(order.pk),
@@ -83,6 +85,7 @@ def checkout_view(request):
         metadata=metadata,
         success_url=success_url,
         cancel_url=cancel_url,
+        customer_email=guest_email if guest_email else (request.user.email if request.user.is_authenticated else None),
     )
     if not session:
         messages.error(request, "Checkout failed. Please try again or contact support.")

@@ -47,6 +47,9 @@ def checkout_success_view(request):
         )
         return redirect("products:product_list")
 
+    # Log successful order
+    logger.info("[ORDER] Success page for Order #%s (session=%s)", order.id, session_id)
+
     # 4) Mark the order as paid and store payment intent
     if not order.is_paid:
         order.is_paid = True
