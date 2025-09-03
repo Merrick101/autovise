@@ -26,6 +26,6 @@
     </p>
     <p><strong>Total Paid:</strong> £{{ order.total_price|floatformat:2 }}</p>
 
-    <p>If you have any questions, reply to this email or contact {{ support_email|default:settings.SUPPORT_EMAIL|default:"support@example.com" }}.</p>
+    <p>If you have any questions, reply to this email or contact {{ support_email|default:"support@example.com" }}.</p>
   </body>
 </html>

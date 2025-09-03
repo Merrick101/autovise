@@ -2,7 +2,7 @@
 
 import logging
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core import mail
 from django.template.loader import render_to_string
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ def send_order_confirmation_email(order, to_email=None):
     # Send to customer (if address is provided)
     if customer_email:
         try:
-            send_mail(
+            mail.send_mail(
                 subject=subject,
                 message=text_body,
                 from_email=settings.DEFAULT_FROM_EMAIL,
@@ -46,7 +46,7 @@ def send_order_confirmation_email(order, to_email=None):
     # Send admin copy
     if admin_email:
         try:
-            send_mail(
+            mail.send_mail(
                 subject=f"[Admin Copy] {subject}",
                 message=text_body,
                 from_email=settings.DEFAULT_FROM_EMAIL,

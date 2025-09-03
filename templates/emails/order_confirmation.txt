@@ -13,7 +13,7 @@ Order Summary:
 Total: £{{ order.total_price }}
 
 We’ll keep you updated when it’s ready for delivery.
-If you have any questions, reply to this email or contact us at support@autovise.co.uk.
+If you have any questions, reply to this email or contact us at {{ support_email|default:"support@example.com" }}.
 
 Thanks again,
 The Autovise Team
