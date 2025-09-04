@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h2>Secure Checkout</h2>
+
+  <!-- Scoped config lives on this root element -->
+  <div id="inline-checkout"
+       data-pk="{{ stripe_publishable_key }}"
+       data-create-url="{% url 'orders:create_payment_intent' %}"
+       data-success-url="{{ success_url }}">
+
+    <form id="payment-form">
+      <div id="payment-element"><!-- Stripe mounts here --></div>
+      <button id="submit" class="btn btn-primary mt-3" type="submit">Pay Now</button>
+      <div id="error-message" class="text-danger mt-2"></div>
+    </form>
+
+  </div>
+</div>
+
+<!-- Load Stripe.js (once, here or in base.html) -->
+<script src="https://js.stripe.com/v3/"></script>
+{% endblock %}

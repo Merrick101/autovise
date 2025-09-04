@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from apps.orders.models import Order
 from apps.orders.utils.stripe_helpers import retrieve_checkout_session
@@ -11,6 +12,16 @@ from apps.orders.views.cart_views import clear_cart
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def inline_checkout_view(request):
+    """
+    Display the inline checkout page with Stripe Payment Element.
+    """
+    return render(request, "orders/inline_checkout.html", {
+        "stripe_publishable_key": settings.STRIPE_PUBLISHABLE_KEY,
+        "success_url": request.build_absolute_uri(reverse("orders:checkout_success")),
+    })
 
 
 def checkout_success_view(request):

@@ -5,6 +5,7 @@ from apps.orders.views.cart_views import (
     add_to_cart_view, add_bundle_to_cart_view, cart_view, update_quantity, remove_item, clear_cart
 )
 from apps.orders.views.checkout import checkout_view
+from apps.orders.views import payment
 from apps.orders.views.general import checkout_success_view, order_history_view, checkout_cancel_view
 
 app_name = 'orders'
@@ -16,6 +17,7 @@ urlpatterns = [
     path("update/<str:item_key>/", update_quantity, name="update_quantity"),
     path("remove/<str:item_key>/", remove_item, name="remove_item"),
     path('cart/clear/', clear_cart, name='clear_cart'),
+    path("payments/create-intent/", payment.create_payment_intent, name="create_payment_intent"),
     path('checkout/', checkout_view, name='checkout'),
     path('checkout/success/', checkout_success_view, name='checkout_success'),
     path("checkout/cancel/", checkout_cancel_view, name="checkout_cancel"),
