@@ -65,6 +65,7 @@ def checkout_success_view(request):
         "order": order,
         "support_email": getattr(settings, "SUPPORT_EMAIL", "support@example.com"),
         "contact_page_url": "/contact/",
+        "settings": settings,
     }
     return render(request, "orders/checkout_success.html", context)
 

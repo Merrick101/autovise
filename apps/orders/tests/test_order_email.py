@@ -38,6 +38,7 @@ def _new_order(**overrides):
 
 def _session_for(order, **overrides):
     base = {
+        "object": "checkout.session",
         "id": order.stripe_session_id,
         "payment_intent": "pi_test_123",
         "customer_details": {"email": "guest@example.com"},

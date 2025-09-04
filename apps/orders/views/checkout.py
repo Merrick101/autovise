@@ -74,7 +74,7 @@ def checkout_view(request):
         "user_id": str(request.user.id) if request.user.is_authenticated else "guest",
     }
     success_url = (
-        request.build_absolute_uri(reverse("orders:checkout_success"))
+        request.build_absolute_uri(reverse("orders:success"))
         + "?session_id={CHECKOUT_SESSION_ID}"
     )
     cancel_url = request.build_absolute_uri(reverse("orders:checkout_cancel"))
