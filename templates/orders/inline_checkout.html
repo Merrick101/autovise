@@ -1,5 +1,9 @@
+<!-- templates/orders/inline_checkout.html -->
+
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
+
 <div class="container mt-5">
   <h2>Secure Checkout</h2>
 
@@ -10,14 +14,27 @@
        data-success-url="{{ success_url }}">
 
     <form id="payment-form">
-      <div id="payment-element"><!-- Stripe mounts here --></div>
-      <button id="submit" class="btn btn-primary mt-3" type="submit">Pay Now</button>
-      <div id="error-message" class="text-danger mt-2"></div>
-    </form>
+      {% csrf_token %}
+      {% if not request.user.is_authenticated %}
+        <div class="mb-3">
+          <label for="guest_email" class="form-label">Email for receipt (optional)</label>
+          <input id="guest_email" name="guest_email" type="email" class="form-control" placeholder="you@example.com">
+        </div>
+      {% endif %}
 
+      <div id="payment-element"><!-- Stripe mounts here --></div>
+
+      <button id="submit" class="btn btn-primary mt-3" type="submit" disabled>
+        Pay Now
+        <span id="spinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+      </button>
+
+      <div id="error-message" class="text-danger mt-2" role="alert"></div>
+    </form>
   </div>
 </div>
 
-<!-- Load Stripe.js (once, here or in base.html) -->
+<!-- Stripe.js -->
 <script src="https://js.stripe.com/v3/"></script>
+
 {% endblock %}

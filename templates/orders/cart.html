@@ -49,7 +49,7 @@
                 £{{ item.unit_price|floatformat:2 }}
               {% endif %}
             </td>
-            <td>£{{ total_before_discount|floatformat:2 }}</td>
+            <td>£{{ item.subtotal|floatformat:2 }}</td>
             <td>
               <form action="{% url 'orders:remove_item' item|item_key %}" method="post" class="d-inline">
                 {% csrf_token %}
@@ -115,22 +115,9 @@
       </div>
     {% endif %}
 
-    <form action="{% url 'orders:checkout' %}" method="post" class="mt-3">
-      {% csrf_token %}
-
-      {% if not request.user.is_authenticated %}
-        <div class="mb-2">
-          <label for="guest_email" class="form-label">Email for order confirmation (optional)</label>
-          <input id="guest_email" type="email" name="guest_email" class="form-control" placeholder="you@example.com">
-          <small class="text-muted">We’ll use this to send your receipt and order updates.</small>
-        </div>
-      {% endif %}
-
-      <button type="submit" class="btn btn-success" id="checkout-btn">
-        Proceed to Checkout
-        <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true" id="checkout-spinner"></span>
-      </button>
-    </form>
+    <a href="{% url 'orders:inline_checkout' %}" class="btn btn-success mt-3">
+      Proceed to Checkout
+    </a>
 
   {% else %}
     <p>Your cart is empty.</p>

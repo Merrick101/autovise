@@ -7,7 +7,7 @@ from apps.orders.views.cart_views import (
 from apps.orders.views.checkout import checkout_view
 from apps.orders.views import payment
 from apps.orders.views import webhook as webhook_views
-from apps.orders.views.general import checkout_success_view, order_history_view, checkout_cancel_view
+from apps.orders.views.general import checkout_success_view, order_history_view, checkout_cancel_view, inline_checkout_view
 
 app_name = 'orders'
 
@@ -20,6 +20,7 @@ urlpatterns = [
     path('cart/clear/', clear_cart, name='clear_cart'),
     path("payments/create-intent/", payment.create_payment_intent, name="create_payment_intent"),
     path('checkout/', checkout_view, name='checkout'),
+    path("checkout/inline/", inline_checkout_view, name="inline_checkout"),
     path('orders/success/', checkout_success_view, name='success'),
     path("checkout/cancel/", checkout_cancel_view, name="checkout_cancel"),
     path('order-history/', order_history_view, name='order_history'),

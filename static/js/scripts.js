@@ -37,76 +37,95 @@ function getCookie(name) {
 }
 
 async function initInlineCheckout() {
-  // Only run on pages that have the inline checkout component
   const root = document.getElementById("inline-checkout");
   const form = document.getElementById("payment-form");
   const container = document.getElementById("payment-element");
+  const errBox = document.getElementById("error-message");
   if (!root || !form || !container) return;
 
-  // Read scoped config from data-* attributes
   const pk = root.dataset.pk;
   const createUrl = root.dataset.createUrl;
   const successUrl = root.dataset.successUrl;
 
-  if (!pk || !createUrl || !successUrl) {
-    console.error("[Checkout] Missing data-* config");
-    return;
-  }
-  if (typeof Stripe !== "function") {
-    console.error("[Checkout] Stripe.js not loaded");
-    return;
-  }
+  const fail = (msg) => {
+    if (errBox) errBox.textContent = msg;
+    console.error("[Checkout]", msg);
+  };
+
+  if (!pk || !createUrl || !successUrl) return fail("Missing data-* config");
+  if (typeof Stripe !== "function") return fail("Stripe.js not loaded");
 
   const stripe = Stripe(pk);
 
-  // Create PaymentIntent and get clientSecret
-  const resp = await fetch(createUrl, {
-    method: "POST",
-    headers: {
-      "X-CSRFToken": getCookie("csrftoken") || "",
-      "Accept": "application/json",
-    },
-  });
-  if (!resp.ok) {
-    const msg = await resp.text();
-    document.getElementById("error-message")?.insertAdjacentText(
-      "beforeend",
-      msg || "Error creating payment"
-    );
-    return;
-  }
+  try {
+    // Build POST body (guest email optional)
+    const fd = new FormData();
+    const guestEmailInput = form.querySelector("#guest_email");
+    if (guestEmailInput && guestEmailInput.value) {
+      fd.append("guest_email", guestEmailInput.value.trim());
+    }
 
-  const { clientSecret } = await resp.json();
-  if (!clientSecret) {
-    document.getElementById("error-message")?.insertAdjacentText(
-      "beforeend",
-      "Missing client secret"
-    );
-    return;
-  }
-
-  // Mount Payment Element
-  const elements = stripe.elements({ clientSecret });
-  const paymentElement = elements.create("payment");
-  paymentElement.mount("#payment-element");
-
-  // Submit
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const submitBtn = form.querySelector('button[type="submit"]');
-    if (submitBtn) submitBtn.disabled = true;
-
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: { return_url: successUrl },
+    // Create PaymentIntent
+    const resp = await fetch(createUrl, {
+      method: "POST",
+      credentials: "same-origin", // <- ensure session/CSRF cookies are sent
+      headers: {
+        "X-CSRFToken": getCookie("csrftoken") || "",
+        "Accept": "application/json",
+      },
+      body: fd,
     });
 
-    if (error) {
-      document.getElementById("error-message").textContent =
-        error.message || "Payment failed";
-      if (submitBtn) submitBtn.disabled = false;
+    if (!resp.ok) {
+      const text = await resp.text();
+      return fail(text || "Error creating payment intent");
     }
-  });
+
+    // Backend returns { client_secret, payment_intent_id, order_id }
+    const contentType = resp.headers.get("content-type") || "";
+    const data = contentType.includes("application/json") ? await resp.json() : {};
+    const clientSecret = data.client_secret || data.clientSecret; // tolerate old shape
+
+    if (!clientSecret) return fail("Missing client secret");
+
+    // Mount Payment Element
+    const elements = stripe.elements({ clientSecret });
+    const paymentElement = elements.create("payment");
+    paymentElement.mount("#payment-element");
+
+    // Enable submit after mount
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const spinner = document.getElementById("spinner");
+    if (submitBtn) submitBtn.disabled = false;
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (submitBtn) submitBtn.disabled = true;
+      if (spinner) spinner.classList.remove("d-none");
+
+      const result = await stripe.confirmPayment({
+        elements,
+        redirect: "if_required",
+      });
+
+      if (result.error) {
+        fail(result.error.message || "Payment failed");
+        if (submitBtn) submitBtn.disabled = false;
+        if (spinner) spinner.classList.add("d-none");
+        return;
+      }
+
+      const pi = result.paymentIntent;
+      if (pi && pi.status === "succeeded") {
+        window.location.href = `${successUrl}?pi=${encodeURIComponent(pi.id)}`;
+        return;
+      }
+
+      fail("Payment is processing. You’ll be redirected once it completes.");
+    });
+  } catch (e) {
+    fail(e?.message || "Unexpected error");
+  }
 }
 
 document.addEventListener("DOMContentLoaded", initInlineCheckout);

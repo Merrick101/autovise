@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block content %}
+
 <div class="container mt-5">
   <h2>🧾 Your Order History</h2>
 
-  {% if request.user.orders.exists %}
-    {% for order in request.user.orders.all %}
+  {% if request.user.is_authenticated and request.user.order_set.exists %}
+    {% for order in request.user.order_set.all|dictsortreversed:"created_at" %}
       <div class="card mb-4">
         <div class="card-header">
           <strong>Order #{{ order.id }}</strong> — {{ order.created_at|date:"F j, Y" }}
@@ -13,7 +14,13 @@
         <div class="card-body">
           <ul class="list-unstyled">
             {% for item in order.items.all %}
-              <li>{{ item.quantity }} × {{ item.product.name }} — £{{ item.subtotal|floatformat:2 }}</li>
+              <li>
+                {% if item.bundle %}
+                  {{ item.quantity }} × {{ item.bundle.name }} — £{{ item.subtotal|floatformat:2 }}
+                {% else %}
+                  {{ item.quantity }} × {{ item.product.name }} — £{{ item.subtotal|floatformat:2 }}
+                {% endif %}
+              </li>
             {% endfor %}
           </ul>
           <p class="mt-2"><strong>Total:</strong> £{{ order.total_price|floatformat:2 }}</p>

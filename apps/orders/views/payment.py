@@ -13,7 +13,7 @@ from apps.orders.utils.cart import get_active_cart, calculate_cart_summary
 
 logger = logging.getLogger(__name__)
 stripe.api_key = settings.STRIPE_SECRET_KEY
-stripe.api_version = getattr(settings, "STRIPE_API_VERSION", None)
+stripe.api_version = getattr(settings, "STRIPE_API_VERSION", "2024-06-20")
 
 
 def _to_pence(amount_gbp: Decimal) -> int:
@@ -68,6 +68,7 @@ def create_payment_intent(request):
             intent = stripe.PaymentIntent.create(
                 amount=amount_pence,
                 currency="gbp",
+                payment_method_types=["card"],  # Restrict to card
                 metadata={
                     "order_id": str(order.id),
                     "user_id": str(getattr(request.user, "id", "guest")),
@@ -75,7 +76,6 @@ def create_payment_intent(request):
                 receipt_email=(
                     request.user.email if request.user.is_authenticated else guest_email
                 ),
-                automatic_payment_methods={"enabled": True},
                 idempotency_key=idempotency_key,  # request option
             )
 
