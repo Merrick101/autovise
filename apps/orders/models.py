@@ -34,7 +34,7 @@ class Order(models.Model):
         max_length=255, blank=True, null=True, unique=True
     )
     stripe_payment_intent = models.CharField(
-        max_length=255, blank=True, null=True
+        max_length=255, blank=True, null=True, db_index=True, unique=True
     )
     is_paid = models.BooleanField(
         default=False

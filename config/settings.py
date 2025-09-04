@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     # Apps
     'apps.products',
-    'apps.orders',
+    'apps.orders.apps.OrdersConfig',
     'apps.users.apps.UsersConfig',
     'apps.pages',
     # External Libraries

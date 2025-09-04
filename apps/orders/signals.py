@@ -5,13 +5,11 @@ from django.contrib.auth.signals import user_logged_in
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.timezone import now  # noqa: F401
-from orders.models import Cart, CartItem
-from orders.utils.cart import get_or_create_cart
+from apps.orders.models import Cart, CartItem
+from apps.orders.utils.cart import get_or_create_cart
 
 logger = logging.getLogger(__name__)
 
-
-# apps/orders/signals.py
 
 @receiver(user_logged_in)
 def merge_session_cart(sender, request, user, **kwargs):

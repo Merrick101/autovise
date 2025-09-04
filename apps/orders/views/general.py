@@ -1,15 +1,15 @@
 # apps/orders/views/general.py
 
+import logging
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.contrib.auth.decorators import login_required
+
 from apps.orders.models import Order
-from apps.orders.utils.stripe_helpers import retrieve_checkout_session
 from apps.orders.utils.cart import clear_session_cart
 from apps.orders.views.cart_views import clear_cart
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -20,60 +20,47 @@ def inline_checkout_view(request):
     """
     return render(request, "orders/inline_checkout.html", {
         "stripe_publishable_key": settings.STRIPE_PUBLISHABLE_KEY,
-        "success_url": request.build_absolute_uri(reverse("orders:checkout_success")),
+        "success_url": request.build_absolute_uri(reverse("orders:success")),
     })
 
 
 def checkout_success_view(request):
     """
-    Display the order confirmation page after a successful Stripe checkout.
-    Expects ?session_id=<SESSION_ID> in the URL.
+    Unified success page for both flows.
+
+    - Inline Payment Element: /orders/success/?pi=pi_...
+    - Hosted Checkout:        /orders/success/?session_id=cs_...
+
+    This view is read-only: it does not mark orders paid (webhook handles that).
     """
-    # 1) Extract and validate the session_id
+    pi = request.GET.get("pi")
     session_id = request.GET.get("session_id")
-    logger.info(f"[ORDER] checkout_success called with session_id={session_id}")
 
-    if not session_id or session_id == "{CHECKOUT_SESSION_ID}":
-        messages.warning(
-            request,
-            "Invalid session ID. Please check your email or contact support."
-        )
+    order = None
+    source_label = ""
+
+    if pi:
+        order = Order.objects.filter(stripe_payment_intent=pi).first()
+        source_label = f"pi={pi}"
+    elif session_id and session_id != "{CHECKOUT_SESSION_ID}":
+        order = Order.objects.filter(stripe_session_id=session_id).first()
+        source_label = f"session_id={session_id}"
+    else:
+        messages.warning(request, "Missing or invalid payment reference.")
         return redirect("products:product_list")
 
-    # 2) Retrieve the Stripe session to verify payment
-    session = retrieve_checkout_session(session_id)
-    if not session or session.payment_status != "paid":
-        messages.error(
-            request,
-            "Unable to verify your payment. Please contact support if your card was charged."
-        )
-        return redirect("products:product_list")
-
-    # 3) Find Order by stripe_session_id
-    order = Order.objects.filter(stripe_session_id=session_id).first()
     if not order:
-        messages.warning(
-            request,
-            "Order not found for this session. Please contact support."
-        )
+        messages.warning(request, "Order not found for this payment reference.")
         return redirect("products:product_list")
 
-    # Log successful order
-    logger.info("[ORDER] Success page for Order #%s (session=%s)", order.id, session_id)
+    logger.info("[ORDER] Success page for Order #%s (%s)", order.id, source_label)
 
-    # 4) Mark the order as paid and store payment intent
-    if not order.is_paid:
-        order.is_paid = True
-        order.stripe_payment_intent = session.payment_intent
-        order.save(update_fields=["is_paid", "stripe_payment_intent"])
-
-    # 5) Clear the cart after a confirmed order
+    # Clear the cart safely (idempotent)
     if request.user.is_authenticated:
         clear_cart(request)
     else:
         clear_session_cart(request)
 
-    # 6) Render the confirmation template
     context = {
         "order": order,
         "support_email": getattr(settings, "SUPPORT_EMAIL", "support@example.com"),
