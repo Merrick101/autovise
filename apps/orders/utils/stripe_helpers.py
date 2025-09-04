@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 # 1) Set API key and lock in a consistent API version
 stripe.api_key = settings.STRIPE_SECRET_KEY
-stripe.api_version = getattr(settings, "STRIPE_API_VERSION", None)
+stripe.api_version = getattr(settings, "STRIPE_API_VERSION", "2024-06-20")
 
 
 def create_checkout_session(

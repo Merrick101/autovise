@@ -150,6 +150,7 @@ JAZZMIN_SETTINGS = {
 STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY", cast=str)
 STRIPE_PUBLISHABLE_KEY = config("STRIPE_PUBLISHABLE_KEY", cast=str)
 STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET", cast=str)
+STRIPE_API_VERSION = config("STRIPE_API_VERSION", default="2024-06-20", cast=str)
 
 # Ensure none are missing
 for var in (
