@@ -93,6 +93,9 @@ def calculate_cart_summary(request, cart_data, cart_type):
 
             line_unit_total = unit_price * quantity
             line_disc_total = discounted_unit * quantity
+            line_discount_amount = (
+               (line_unit_total - line_disc_total) if line_disc_total < line_unit_total else Decimal("0.00")
+            )
 
             discount_percent = Decimal("0.00")
             is_bundle = False  # DB cart contains Products, not Bundles
@@ -105,6 +108,9 @@ def calculate_cart_summary(request, cart_data, cart_type):
                 "discounted_price": discounted_unit,
                 "discount_percent": discount_percent,
                 "subtotal": line_disc_total,
+                "line_subtotal_before_discount": line_unit_total,
+                "line_subtotal_after_discount": line_disc_total,
+                "line_discount_amount": line_discount_amount,
                 "tier": product.tier,
                 "is_bundle": is_bundle,
             })
@@ -163,6 +169,9 @@ def calculate_cart_summary(request, cart_data, cart_type):
 
                 line_unit_total = base_price * quantity
                 line_disc_total = discounted_unit * quantity
+                line_discount_amount = (
+                   (line_unit_total - line_disc_total) if line_disc_total < line_unit_total else Decimal("0.00")
+                )
 
                 # track discount for display/evidence
                 if discounted_unit < base_price:
@@ -182,6 +191,9 @@ def calculate_cart_summary(request, cart_data, cart_type):
                     "discounted_price": discounted_unit,
                     "discount_percent": discount_percent,
                     "subtotal": line_disc_total,
+                    "line_subtotal_before_discount": line_unit_total,
+                    "line_subtotal_after_discount": line_disc_total,
+                    "line_discount_amount": line_discount_amount,
                     "tier": getattr(bundle, "bundle_type", None),
                     "is_bundle": True,
                 })
@@ -215,6 +227,9 @@ def calculate_cart_summary(request, cart_data, cart_type):
 
             line_unit_total = unit_price * quantity
             line_disc_total = discounted_unit * quantity
+            line_discount_amount = (
+                (line_unit_total - line_disc_total) if line_disc_total < line_unit_total else Decimal("0.00")
+            )
 
             discount_percent = (
                 ((unit_price - discounted_unit) / unit_price * Decimal("100.00"))
@@ -230,6 +245,9 @@ def calculate_cart_summary(request, cart_data, cart_type):
                 "discounted_price": discounted_unit,
                 "discount_percent": discount_percent,
                 "subtotal": line_disc_total,
+                "line_subtotal_before_discount": line_unit_total,
+                "line_subtotal_after_discount": line_disc_total,
+                "line_discount_amount": line_discount_amount,
                 "tier": product.tier,
                 "is_bundle": False,
             })
