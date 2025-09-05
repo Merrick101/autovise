@@ -1,10 +1,25 @@
-# apps/orders/tests/test_webhook.py
+"""
+Stripe webhook integration tests for the Orders app.
 
-import json
+This module verifies the webhook endpoint (`orders:webhook`) correctly:
+- Marks an Order as paid on `payment_intent.succeeded`.
+- Handles `checkout.session.completed` (hosted Checkout back-compat).
+- Remains idempotent when Stripe replays the same event.
+
+Implementation notes:
+- External verification is isolated by monkey-patching
+  `apps.orders.utils.stripe_helpers.verify_webhook_signature` to return a
+  provided event payload, avoiding signature checks and network calls.
+- A pending `Order` fixture is used to assert state transitions only
+  (emails and ancillary side effects are out of scope here).
+
+Located at: apps/orders/tests/test_webhook.py
+"""
+
+import json  # noqa: F401
 import pytest
 from decimal import Decimal
 from django.urls import reverse
-
 from apps.orders.models import Order
 
 

@@ -1,9 +1,25 @@
-# apps/orders/tests/test_success_view.py
+"""
+Order success page tests for the Orders app.
+
+This module exercises the confirmation view (`orders:success`) and verifies:
+- Inline flow: `?pi=<payment_intent_id>` loads
+an already-paid order (HTTP 200).
+- Legacy/hosted flow: `?session_id=<checkout_session_id>`
+also renders (HTTP 200).
+- Missing query params result in a safe redirect (HTTP 302/301).
+
+Implementation notes:
+- Uses lightweight fixtures with `is_paid=True` and either
+  `stripe_payment_intent` or `stripe_session_id` set—no Stripe calls.
+- Assertions are smoke-level (status code and basic content) to ensure the
+  template renders without coupling to copy.
+
+Located at: apps/orders/tests/test_success_view.py
+"""
 
 import pytest
 from decimal import Decimal
 from django.urls import reverse
-
 from apps.orders.models import Order
 
 

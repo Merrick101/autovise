@@ -1,13 +1,27 @@
-# apps/orders/tests/test_guest_checkout.py
+"""
+Guest checkout flow tests for the Orders app.
+
+This module exercises the anonymous (session-based) cart → checkout path and
+verifies that:
+- Cart math matches `calculate_cart_summary` (pre-discount subtotal, bundle
+  discount, delivery fee threshold, and grand total).
+- A pending `Order` and `OrderItem`s are persisted with the correct discounted
+  unit prices for both bundles and products.
+- The checkout view redirects to Stripe (Checkout Session is monkey-patched).
+
+Scenarios covered:
+1) Single discounted bundle.
+2) Bundle + product mix (free delivery threshold).
+
+Located at: apps/orders/tests/test_guest_checkout.py
+"""
 
 import types
 from decimal import Decimal
-
 import pytest
 from django.urls import reverse
 from django.test import Client, RequestFactory
 from django.contrib.sessions.backends.db import SessionStore
-
 from apps.orders.models import Order, OrderItem
 from apps.orders.utils.cart import calculate_cart_summary
 

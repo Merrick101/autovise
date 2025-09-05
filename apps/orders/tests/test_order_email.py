@@ -1,4 +1,22 @@
-# apps/orders/tests/test_order_email.py
+"""
+Order confirmation email tests for the Orders app.
+
+This module validates email behavior triggered by
+`update_order_from_stripe_session(...)`:
+
+- Sends a customer confirmation email when Stripe provides an email via
+  `customer_details.email`, otherwise falls back to the authenticated user's
+  email if available.
+- Always sends an admin copy (`ORDERS_NOTIFICATION_EMAIL`), when configured.
+- Is resilient to email send failures (order is still marked paid).
+- Is idempotent: when an order is already paid, no duplicate emails are sent.
+
+Implementation notes:
+- Uses Django’s in-memory email backend via a settings fixture.
+- Orders are created locally; no Stripe/network calls occur in these tests.
+
+Located at: apps/orders/tests/test_order_email.py
+"""
 
 import pytest
 from decimal import Decimal
