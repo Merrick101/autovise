@@ -94,26 +94,64 @@
               {% if cart_items %}
                 {% for item in cart_items|slice:":3" %}
                   <div class="d-flex align-items-center mb-2">
-                    {% if item.product.image %}
-                      <img src="{{ item.product.image.url }}"
-                          alt="{{ item.product.name }}"
-                          style="width:40px;height:40px;object-fit:cover;"
-                          class="me-2 rounded">
+
+                    {% if item.bundle %}
+                      {# Bundle line (session cart) #}
+                      {% with obj=item.bundle %}
+                        {% if obj.image %}
+                          <img src="{{ obj.image.url }}" alt="{{ obj.name }}"
+                              style="width:40px;height:40px;object-fit:cover;" class="me-2 rounded">
+                        {% endif %}
+                        <div class="flex-grow-1">
+                          <div class="small"><strong>{{ obj.name }}</strong></div>
+                          <div class="small text-muted">
+                            ×{{ item.quantity }} —
+                            {% if item.get_total_price %}
+                              £{{ item.get_total_price|floatformat:2 }}
+                            {% else %}
+                              £{{ item.subtotal|floatformat:2 }}
+                            {% endif %}
+                          </div>
+                        </div>
+                      {% endwith %}
+                    {% else %}
+                      {# Product line (session or DB cart) #}
+                      {% with obj=item.product %}
+                        {% if obj and obj.image %}
+                          <img src="{{ obj.image.url }}" alt="{{ obj.name }}"
+                              style="width:40px;height:40px;object-fit:cover;" class="me-2 rounded">
+                        {% endif %}
+                        <div class="flex-grow-1">
+                          <div class="small"><strong>{{ obj.name }}</strong></div>
+                          <div class="small text-muted">
+                            ×{{ item.quantity }} —
+                            {% if item.get_total_price %}
+                              £{{ item.get_total_price|floatformat:2 }}
+                            {% else %}
+                              £{{ item.subtotal|floatformat:2 }}
+                            {% endif %}
+                          </div>
+                        </div>
+                      {% endwith %}
                     {% endif %}
-                    <div class="flex-grow-1">
-                      <div class="small">{{ item.product.name }}</div>
-                      <div class="small text-muted">
-                        ×{{ item.quantity }} — £{{ item.get_total_price|floatformat:2 }}
-                      </div>
-                    </div>
+
                   </div>
                 {% endfor %}
 
                 <div class="dropdown-divider"></div>
-                <a href="{% url 'orders:cart' %}"
-                  class="btn btn-sm btn-primary w-100">
-                  View Cart ({{ cart_item_count }})
-                </a>
+                  <a href="{% url 'orders:cart' %}" class="btn btn-sm btn-primary w-100">
+                    View Cart ({{ cart_item_count }})
+                  </a>
+
+                  <div class="dropdown-divider"></div>
+                  <form action="{% url 'orders:clear_cart' %}" method="post" class="mt-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    <button type="submit" class="btn btn-sm btn-danger w-100"
+                            onclick="return confirm('Clear your cart?')">
+                      Clear Cart
+                    </button>
+                  </form>
               {% else %}
                 <p class="dropdown-item text-center mb-0">Your cart is empty</p>
               {% endif %}
