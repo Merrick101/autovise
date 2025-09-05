@@ -11,6 +11,7 @@
   <div id="inline-checkout"
        data-pk="{{ stripe_publishable_key }}"
        data-create-url="{% url 'orders:create_payment_intent' %}"
+       data-update-url="{% url 'orders:update_payment_intent' %}"
        data-success-url="{{ success_url }}">
 
     <form id="payment-form">

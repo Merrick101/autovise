@@ -55,7 +55,7 @@
 
     <p>
       If you have any questions, please
-      <a href="{{ contact_page_url|default:'#contact' }}">contact support</a>
+      <a href="{% url 'pages:contact' %}">contact support</a>
       or email us at
       <a href="mailto:{{ support_email|default:settings.SUPPORT_EMAIL }}">{{ support_email|default:settings.SUPPORT_EMAIL }}</a>.
     </p>

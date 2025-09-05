@@ -48,9 +48,21 @@ def update_order_from_stripe_session(payload):
 
     elif obj_type == "payment_intent":
         pi_id = payload.get("id")
-        # PaymentIntent can carry receipt_email directly
         customer_email = payload.get("receipt_email")
-        # Fallback
+
+        # Try charge billing_details
+        if not customer_email:
+            try:
+                charges = (payload.get("charges") or {}).get("data") or []
+                if charges:
+                    customer_email = (charges[0].get("billing_details") or {}).get("email")
+            except Exception:
+                pass
+
+        # try metadata echo from update-intent
+        if not customer_email:
+            customer_email = (payload.get("metadata") or {}).get("customer_email")
+
         if order is None and pi_id:
             order = Order.objects.filter(stripe_payment_intent=pi_id).first()
             if not order:

@@ -45,6 +45,7 @@ async function initInlineCheckout() {
 
   const pk = root.dataset.pk;
   const createUrl = root.dataset.createUrl;
+  const updateUrl = root.dataset.updateUrl;
   const successUrl = root.dataset.successUrl;
 
   const fail = (msg) => {
@@ -58,22 +59,23 @@ async function initInlineCheckout() {
   const stripe = Stripe(pk);
 
   try {
-    // Build POST body (guest email optional)
-    const fd = new FormData();
+    // Build JSON payload (guest email optional)
     const guestEmailInput = form.querySelector("#guest_email");
-    if (guestEmailInput && guestEmailInput.value) {
-      fd.append("guest_email", guestEmailInput.value.trim());
+    const payload = {};
+    if (guestEmailInput && guestEmailInput.value.trim()) {
+      payload.guest_email = guestEmailInput.value.trim();
     }
 
     // Create PaymentIntent
     const resp = await fetch(createUrl, {
       method: "POST",
-      credentials: "same-origin", // <- ensure session/CSRF cookies are sent
+      credentials: "same-origin", // ensure cookies (CSRF/session) are sent
       headers: {
         "X-CSRFToken": getCookie("csrftoken") || "",
         "Accept": "application/json",
+        "Content-Type": "application/json",
       },
-      body: fd,
+      body: JSON.stringify(payload),
     });
 
     if (!resp.ok) {
@@ -82,10 +84,9 @@ async function initInlineCheckout() {
     }
 
     // Backend returns { client_secret, payment_intent_id, order_id }
-    const contentType = resp.headers.get("content-type") || "";
-    const data = contentType.includes("application/json") ? await resp.json() : {};
+    const data = await resp.json();
     const clientSecret = data.client_secret || data.clientSecret; // tolerate old shape
-
+    const paymentIntentId = data.payment_intent_id || data.paymentIntentId;
     if (!clientSecret) return fail("Missing client secret");
 
     // Mount Payment Element
@@ -103,9 +104,28 @@ async function initInlineCheckout() {
       if (submitBtn) submitBtn.disabled = true;
       if (spinner) spinner.classList.remove("d-none");
 
+      try {
+        const latestEmail = guestEmailInput && guestEmailInput.value.trim();
+        if (latestEmail && paymentIntentId && updateUrl) {
+          console.debug("[Checkout] Updating PI with guest email…", latestEmail);
+          await fetch(updateUrl, {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+              "X-CSRFToken": getCookie("csrftoken") || "",
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ pi_id: paymentIntentId, guest_email: latestEmail }),
+          });
+        }
+      } catch (e) {
+        console.warn("[Checkout] update-intent failed:", e);
+      }
+
       const result = await stripe.confirmPayment({
         elements,
-        redirect: "if_required",
+        redirect: "if_required", // Stripe handles 3DS inline if needed
       });
 
       if (result.error) {
@@ -117,10 +137,12 @@ async function initInlineCheckout() {
 
       const pi = result.paymentIntent;
       if (pi && pi.status === "succeeded") {
+        // JS redirect to success page with the PI id
         window.location.href = `${successUrl}?pi=${encodeURIComponent(pi.id)}`;
         return;
       }
 
+      // PI requires additional processing on Stripe’s side (rare with test cards)
       fail("Payment is processing. You’ll be redirected once it completes.");
     });
   } catch (e) {

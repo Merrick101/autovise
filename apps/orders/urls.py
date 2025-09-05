@@ -19,6 +19,7 @@ urlpatterns = [
     path("remove/<str:item_key>/", remove_item, name="remove_item"),
     path('cart/clear/', clear_cart, name='clear_cart'),
     path("payments/create-intent/", payment.create_payment_intent, name="create_payment_intent"),
+    path("payments/update-intent/", payment.update_payment_intent, name="update_payment_intent"),
     path('checkout/', checkout_view, name='checkout'),
     path("checkout/inline/", inline_checkout_view, name="inline_checkout"),
     path('orders/success/', checkout_success_view, name='success'),
