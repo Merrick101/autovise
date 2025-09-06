@@ -39,6 +39,68 @@ class Order(models.Model):
     is_paid = models.BooleanField(
         default=False
     )
+    # Shipping (one address per order)
+    shipping_name = models.CharField(
+        "Recipient name", max_length=255, blank=True, default=""
+    )
+    shipping_line1 = models.CharField(
+        "Address line 1", max_length=255, blank=True, default=""
+    )
+    shipping_line2 = models.CharField(
+        "Address line 2", max_length=255, blank=True, default=""
+    )
+    shipping_city = models.CharField(
+        "City / Town", max_length=100, blank=True, default=""
+    )
+    shipping_postcode = models.CharField(
+        "Postcode", max_length=20, blank=True, default=""
+    )
+    shipping_country = models.CharField(
+        "Country (ISO-2)", max_length=2, blank=True, default="GB",
+        help_text="Two-letter country code, e.g. GB, US."
+    )
+    shipping_phone = models.CharField(
+        "Contact phone", max_length=30, blank=True, default=""
+    )
+
+    # (optional) store guest email on the order for reference
+    contact_email = models.EmailField(
+        blank=True, default=""
+    )
+
+    def has_shipping(self) -> bool:
+        return bool(self.shipping_line1)
+
+    def shipping_for_stripe(self):
+        """Shape the address for Stripe's PaymentIntent.shipping."""
+        if not self.shipping_line1:
+            return None
+        return {
+            "name": self.shipping_name or None,
+            "phone": self.shipping_phone or None,
+            "address": {
+                "line1": self.shipping_line1,
+                "line2": self.shipping_line2 or None,
+                "city": self.shipping_city or None,
+                "postal_code": self.shipping_postcode or None,
+                "country": (self.shipping_country or "GB"),
+            },
+        }
+
+    def formatted_shipping(self) -> str:
+        parts = [
+            self.shipping_name,
+            self.shipping_line1,
+            self.shipping_line2,
+            f"{self.shipping_city} {self.shipping_postcode}".strip(),
+            self.shipping_country,
+        ]
+        return ", ".join([p for p in parts if p])
+
+    def save(self, *args, **kwargs):
+        if self.shipping_country:
+            self.shipping_country = self.shipping_country.upper()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         who = self.user.username if self.user else "Guest"
