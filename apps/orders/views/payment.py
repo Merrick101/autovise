@@ -11,6 +11,7 @@ from django.conf import settings
 import stripe
 from apps.orders.models import Order, OrderItem
 from apps.orders.utils.cart import get_active_cart, calculate_cart_summary
+from apps.users.models import ShippingAddress
 
 logger = logging.getLogger(__name__)
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -58,6 +59,8 @@ def create_payment_intent(request):
         if country:
             shipping_fields["shipping_country"] = country.upper()
 
+        save_address = str((source.get("save_address") or "")).lower() in {"1", "true", "on", "yes"}
+
         with transaction.atomic():
             # 1) Create Order (pending)
             order = Order.objects.create(
@@ -74,6 +77,24 @@ def create_payment_intent(request):
                 **shipping_fields,
                 is_paid=False,
             )
+
+            # Save shipping address if requested (and user is authenticated)
+            if request.user.is_authenticated and save_address and shipping_fields.get(
+                "shipping_line1"
+            ):
+                ShippingAddress.objects.update_or_create(
+                    user=request.user,
+                    is_default=True,
+                    defaults={
+                        "name":     shipping_fields["shipping_name"],
+                        "line1":    shipping_fields["shipping_line1"],
+                        "line2":    shipping_fields["shipping_line2"],
+                        "city":     shipping_fields["shipping_city"],
+                        "postcode": shipping_fields["shipping_postcode"],
+                        "country":  shipping_fields["shipping_country"] or "GB",
+                        "phone":    shipping_fields["shipping_phone"],
+                    },
+                )
 
             # 2) Persist items (discounted unit prices)
             OrderItem.objects.bulk_create([

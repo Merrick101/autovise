@@ -66,6 +66,15 @@
         </div>
       </div>
 
+      {% if request.user.is_authenticated %}
+        <div class="form-check mt-2">
+          <input class="form-check-input" type="checkbox" id="save_address" name="save_address" value="1" checked>
+          <label class="form-check-label" for="save_address">
+            Save this address to my account
+          </label>
+        </div>
+      {% endif %}
+
       <div id="payment-element"><!-- Stripe mounts here --></div>
 
       <button id="submit" class="btn btn-primary mt-3" type="submit" disabled>
