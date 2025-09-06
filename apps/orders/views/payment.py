@@ -35,6 +35,7 @@ def create_payment_intent(request):
                 payload = json.loads(request.body.decode() or "{}")
             except json.JSONDecodeError:
                 payload = {}
+
         guest_email = None
         if not request.user.is_authenticated:
             guest_email = (payload.get("guest_email")
@@ -46,6 +47,17 @@ def create_payment_intent(request):
         if not summary["cart_items"]:
             return HttpResponseBadRequest("Cart empty")
 
+        source = payload if payload else request.POST
+        shipping_fields = {k: (source.get(k) or "").strip() for k in [
+            "shipping_name", "shipping_line1", "shipping_line2", "shipping_city",
+            "shipping_postcode", "shipping_country", "shipping_phone"
+        ]}
+
+        # Normalize country code before persisting/using it
+        country = (shipping_fields.get("shipping_country") or "").strip()
+        if country:
+            shipping_fields["shipping_country"] = country.upper()
+
         with transaction.atomic():
             # 1) Create Order (pending)
             order = Order.objects.create(
@@ -54,6 +66,12 @@ def create_payment_intent(request):
                 discount_total=summary["bundle_discount"] + summary["cart_discount"],
                 delivery_fee=summary["delivery_fee"],
                 total_price=summary["grand_total"],
+                contact_email=(
+                    request.user.email if request.user.is_authenticated else (
+                        guest_email or ""
+                    )
+                ),
+                **shipping_fields,
                 is_paid=False,
             )
 
@@ -80,7 +98,10 @@ def create_payment_intent(request):
                     "order_id": str(order.id),
                     "user_id": str(getattr(request.user, "id", "guest")),
                 },
-                receipt_email=(request.user.email if request.user.is_authenticated else guest_email),
+                receipt_email=(
+                    request.user.email if request.user.is_authenticated else guest_email
+                ),
+                shipping=order.shipping_for_stripe(),
                 idempotency_key=idemp,
             )
 

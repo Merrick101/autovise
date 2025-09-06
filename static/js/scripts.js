@@ -49,7 +49,7 @@ async function initInlineCheckout() {
   const successUrl = root.dataset.successUrl;
 
   const fail = (msg) => {
-    if (errBox) errBox.textContent = msg;
+    if (errBox) errBox.textContent = msg || "";
     console.error("[Checkout]", msg);
   };
 
@@ -58,96 +58,148 @@ async function initInlineCheckout() {
 
   const stripe = Stripe(pk);
 
-  try {
-    // Build JSON payload (guest email optional)
-    const guestEmailInput = form.querySelector("#guest_email");
+  // Submit gating & state
+  const submitBtn = form.querySelector("#submit");
+  const spinner = document.getElementById("spinner");
+  let elementReady = false;  // flips true after Payment Element mounts
+  let mounted = false;       // prevent multiple mounts
+  let paymentIntentId = null;
+  let elements = null;       // will be set after client_secret is received
+
+  function updateSubmitState() {
+    const ok = form.checkValidity() && elementReady;
+    if (submitBtn) submitBtn.disabled = !ok;
+  }
+
+  form.addEventListener("input", updateSubmitState);
+  form.addEventListener("change", updateSubmitState);
+
+  // Build payload from current form values
+  function buildPayload() {
     const payload = {};
+    const guestEmailInput = form.querySelector("#guest_email");
     if (guestEmailInput && guestEmailInput.value.trim()) {
       payload.guest_email = guestEmailInput.value.trim();
     }
 
-    // Create PaymentIntent
-    const resp = await fetch(createUrl, {
-      method: "POST",
-      credentials: "same-origin", // ensure cookies (CSRF/session) are sent
-      headers: {
-        "X-CSRFToken": getCookie("csrftoken") || "",
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
+    [
+      "shipping_name",
+      "shipping_line1",
+      "shipping_line2",
+      "shipping_city",
+      "shipping_postcode",
+      "shipping_country",
+      "shipping_phone",
+    ].forEach((name) => {
+      const el = form.querySelector(`#${name}`);
+      if (!el) return;
+      const val = el.value.trim();
+      if (!val) return;
+      payload[name] = name === "shipping_country" ? val.toUpperCase() : val;
     });
 
-    if (!resp.ok) {
-      const text = await resp.text();
-      return fail(text || "Error creating payment intent");
-    }
+    return payload;
+  }
 
-    // Backend returns { client_secret, payment_intent_id, order_id }
-    const data = await resp.json();
-    const clientSecret = data.client_secret || data.clientSecret; // tolerate old shape
-    const paymentIntentId = data.payment_intent_id || data.paymentIntentId;
-    if (!clientSecret) return fail("Missing client secret");
+  // Create PI + mount Stripe Element once address is valid
+  async function maybeCreateAndMount() {
+    if (mounted) return;
+    if (!form.checkValidity()) { updateSubmitState(); return; }
 
-    // Mount Payment Element
-    const elements = stripe.elements({ clientSecret });
-    const paymentElement = elements.create("payment");
-    paymentElement.mount("#payment-element");
-
-    // Enable submit after mount
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const spinner = document.getElementById("spinner");
-    if (submitBtn) submitBtn.disabled = false;
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (submitBtn) submitBtn.disabled = true;
-      if (spinner) spinner.classList.remove("d-none");
-
-      try {
-        const latestEmail = guestEmailInput && guestEmailInput.value.trim();
-        if (latestEmail && paymentIntentId && updateUrl) {
-          console.debug("[Checkout] Updating PI with guest email…", latestEmail);
-          await fetch(updateUrl, {
-            method: "POST",
-            credentials: "same-origin",
-            headers: {
-              "X-CSRFToken": getCookie("csrftoken") || "",
-              "Accept": "application/json",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ pi_id: paymentIntentId, guest_email: latestEmail }),
-          });
-        }
-      } catch (e) {
-        console.warn("[Checkout] update-intent failed:", e);
-      }
-
-      const result = await stripe.confirmPayment({
-        elements,
-        redirect: "if_required", // Stripe handles 3DS inline if needed
+    try {
+      const resp = await fetch(createUrl, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "X-CSRFToken": getCookie("csrftoken") || "",
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(buildPayload()),
       });
 
-      if (result.error) {
-        fail(result.error.message || "Payment failed");
-        if (submitBtn) submitBtn.disabled = false;
-        if (spinner) spinner.classList.add("d-none");
+      if (!resp.ok) {
+        const text = await resp.text();
+        fail(text || "Error creating payment intent");
         return;
       }
 
-      const pi = result.paymentIntent;
-      if (pi && pi.status === "succeeded") {
-        // JS redirect to success page with the PI id
-        window.location.href = `${successUrl}?pi=${encodeURIComponent(pi.id)}`;
-        return;
-      }
+      const data = await resp.json();
+      const clientSecret = data.client_secret || data.clientSecret;
+      paymentIntentId = data.payment_intent_id || data.paymentIntentId || null;
+      if (!clientSecret) { fail("Missing client secret"); return; }
 
-      // PI requires additional processing on Stripe’s side (rare with test cards)
-      fail("Payment is processing. You’ll be redirected once it completes.");
-    });
-  } catch (e) {
-    fail(e?.message || "Unexpected error");
+      elements = stripe.elements({ clientSecret });
+      const paymentElement = elements.create("payment");
+      paymentElement.mount("#payment-element");
+
+      elementReady = true;
+      mounted = true;
+      updateSubmitState();
+
+      // Submit handler (added only once, after mount)
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          updateSubmitState();
+          return;
+        }
+
+        if (submitBtn) submitBtn.disabled = true;
+        if (spinner) spinner.classList.remove("d-none");
+
+        // Optionally update receipt_email on PI right before confirm
+        try {
+          const ge = form.querySelector("#guest_email");
+          const latestEmail = ge && ge.value.trim();
+          if (latestEmail && paymentIntentId && updateUrl) {
+            await fetch(updateUrl, {
+              method: "POST",
+              credentials: "same-origin",
+              headers: {
+                "X-CSRFToken": getCookie("csrftoken") || "",
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ pi_id: paymentIntentId, guest_email: latestEmail }),
+            });
+          }
+        } catch (e) {
+          console.warn("[Checkout] update-intent failed:", e);
+        }
+
+        const result = await stripe.confirmPayment({
+          elements,
+          redirect: "if_required",
+        });
+
+        if (result.error) {
+          fail(result.error.message || "Payment failed");
+          if (submitBtn) submitBtn.disabled = false;
+          if (spinner) spinner.classList.add("d-none");
+          return;
+        }
+
+        const pi = result.paymentIntent;
+        if (pi && pi.status === "succeeded") {
+          window.location.href = `${successUrl}?pi=${encodeURIComponent(pi.id)}`;
+          return;
+        }
+
+        fail("Payment is processing. You’ll be redirected once it completes.");
+      });
+    } catch (err) {
+      fail(err?.message || "Unexpected error");
+    }
   }
+
+  // Initial state (handles autofill), and re-attempt on any input/change
+  updateSubmitState();
+  maybeCreateAndMount();
+  form.addEventListener("input", maybeCreateAndMount);
+  form.addEventListener("change", maybeCreateAndMount);
 }
 
 document.addEventListener("DOMContentLoaded", initInlineCheckout);

@@ -23,6 +23,49 @@
         </div>
       {% endif %}
 
+      <!-- Shipping Address -->
+      <div class="card mt-3">
+        <div class="card-header">Shipping address</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="shipping_name" class="form-label">Full name</label>
+              <input id="shipping_name" name="shipping_name" type="text" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label for="shipping_phone" class="form-label">Phone (optional)</label>
+              <input id="shipping_phone" name="shipping_phone" type="tel" class="form-control">
+            </div>
+
+            <div class="col-12">
+              <label for="shipping_line1" class="form-label">Address line 1</label>
+              <input id="shipping_line1" name="shipping_line1" type="text" class="form-control" required>
+            </div>
+            <div class="col-12">
+              <label for="shipping_line2" class="form-label">Address line 2 (optional)</label>
+              <input id="shipping_line2" name="shipping_line2" type="text" class="form-control">
+            </div>
+
+            <div class="col-md-6">
+              <label for="shipping_city" class="form-label">City / Town</label>
+              <input id="shipping_city" name="shipping_city" type="text" class="form-control" required>
+            </div>
+            <div class="col-md-3">
+              <label for="shipping_postcode" class="form-label">Postcode</label>
+              <input id="shipping_postcode" name="shipping_postcode" type="text" class="form-control" required>
+            </div>
+            <div class="col-md-3">
+              <label for="shipping_country" class="form-label">Country</label>
+              <select id="shipping_country" name="shipping_country" class="form-select" required>
+                <option value="GB" selected>United Kingdom</option>
+                <option value="IE">Ireland</option>
+                <!-- Optional: add others as needed -->
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div id="payment-element"><!-- Stripe mounts here --></div>
 
       <button id="submit" class="btn btn-primary mt-3" type="submit" disabled>
