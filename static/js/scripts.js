@@ -82,6 +82,11 @@ async function initInlineCheckout() {
       payload.guest_email = guestEmailInput.value.trim();
     }
 
+    const saveBox = form.querySelector("#save_shipping");
+    if (saveBox && saveBox.checked) {
+      payload.save_shipping = "1";
+    }
+
     [
       "shipping_name",
       "shipping_line1",

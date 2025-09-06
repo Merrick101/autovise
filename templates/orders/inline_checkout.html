@@ -28,37 +28,48 @@
         <div class="card-header">Shipping address</div>
         <div class="card-body">
           <div class="row g-3">
+            
             <div class="col-md-6">
               <label for="shipping_name" class="form-label">Full name</label>
-              <input id="shipping_name" name="shipping_name" type="text" class="form-control" required>
+              <input id="shipping_name" name="shipping_name" required class="form-control"
+                    value="{{ saved_address.name|default_if_none:'' }}">
             </div>
+            
             <div class="col-md-6">
               <label for="shipping_phone" class="form-label">Phone (optional)</label>
-              <input id="shipping_phone" name="shipping_phone" type="tel" class="form-control">
+              <input id="shipping_phone" name="shipping_phone" class="form-control"
+                    value="{{ saved_address.phone|default_if_none:'' }}">
             </div>
-
+            
             <div class="col-12">
               <label for="shipping_line1" class="form-label">Address line 1</label>
-              <input id="shipping_line1" name="shipping_line1" type="text" class="form-control" required>
+              <input id="shipping_line1" name="shipping_line1" required class="form-control"
+                    value="{{ saved_address.line1|default_if_none:'' }}">
             </div>
+            
             <div class="col-12">
               <label for="shipping_line2" class="form-label">Address line 2 (optional)</label>
-              <input id="shipping_line2" name="shipping_line2" type="text" class="form-control">
+              <input id="shipping_line2" name="shipping_line2" class="form-control"
+                    value="{{ saved_address.line2|default_if_none:'' }}">
             </div>
 
             <div class="col-md-6">
               <label for="shipping_city" class="form-label">City / Town</label>
-              <input id="shipping_city" name="shipping_city" type="text" class="form-control" required>
+              <input id="shipping_city" name="shipping_city" required class="form-control"
+                    value="{{ saved_address.city|default_if_none:'' }}">
             </div>
+            
             <div class="col-md-3">
               <label for="shipping_postcode" class="form-label">Postcode</label>
-              <input id="shipping_postcode" name="shipping_postcode" type="text" class="form-control" required>
+              <input id="shipping_postcode" name="shipping_postcode" required class="form-control"
+                    value="{{ saved_address.postcode|default_if_none:'' }}">
             </div>
+            
             <div class="col-md-3">
               <label for="shipping_country" class="form-label">Country</label>
-              <select id="shipping_country" name="shipping_country" class="form-select" required>
-                <option value="GB" selected>United Kingdom</option>
-                <option value="IE">Ireland</option>
+              <select id="shipping_country" name="shipping_country" required class="form-select">
+                <option value="GB" {% if saved_address and saved_address.country == "GB" %}selected{% endif %}>United Kingdom</option>
+                <option value="IE" {% if saved_address and saved_address.country == "IE" %}selected{% endif %}>Ireland</option>
                 <!-- Optional: add others as needed -->
               </select>
             </div>
@@ -68,10 +79,8 @@
 
       {% if request.user.is_authenticated %}
         <div class="form-check mt-2">
-          <input class="form-check-input" type="checkbox" id="save_address" name="save_address" value="1" checked>
-          <label class="form-check-label" for="save_address">
-            Save this address to my account
-          </label>
+          <input class="form-check-input" type="checkbox" id="save_shipping" name="save_shipping" value="1">
+          <label class="form-check-label" for="save_shipping">Save this address for next time</label>
         </div>
       {% endif %}
 

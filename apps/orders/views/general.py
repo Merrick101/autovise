@@ -10,6 +10,7 @@ from django.urls import reverse
 from apps.orders.models import Order
 from apps.orders.utils.cart import clear_session_cart
 from apps.orders.views.cart_views import clear_cart
+from apps.users.models import ShippingAddress
 
 logger = logging.getLogger(__name__)
 
@@ -18,9 +19,16 @@ def inline_checkout_view(request):
     """
     Display the inline checkout page with Stripe Payment Element.
     """
+    saved = None
+    if request.user.is_authenticated:
+        saved = ShippingAddress.objects.filter(
+            user=request.user, is_default=True
+        ).first()
+
     return render(request, "orders/inline_checkout.html", {
         "stripe_publishable_key": settings.STRIPE_PUBLISHABLE_KEY,
         "success_url": request.build_absolute_uri(reverse("orders:success")),
+        "saved_address": saved,
     })
 
 

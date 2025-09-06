@@ -1,8 +1,11 @@
-# apps/users/admin.py
+"""
+Admin configuration for user-related models and social accounts.
+Located at: apps/users/admin.py
+"""
 
 from django.contrib import admin
 from allauth.socialaccount.models import SocialAccount
-from apps.users.models import UserProfile
+from apps.users.models import UserProfile, ShippingAddress
 
 # Unregister the default SocialAccount admin
 admin.site.unregister(SocialAccount)
@@ -19,4 +22,10 @@ class CustomSocialAccountAdmin(admin.ModelAdmin):
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'is_first_time_buyer')
-    search_fields = ('user__username',)
+
+
+@admin.register(ShippingAddress)
+class ShippingAddressAdmin(admin.ModelAdmin):
+    list_display = ("user", "name", "postcode", "country", "is_default")
+    list_filter = ("is_default", "country")
+    search_fields = ("user__username", "name", "postcode")

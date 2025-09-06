@@ -61,6 +61,32 @@ def create_payment_intent(request):
 
         save_address = str((source.get("save_address") or "")).lower() in {"1", "true", "on", "yes"}
 
+        # Optionally save/overwrite default address for logged-in users
+        save_flag = str((payload or request.POST).get("save_shipping", "")).lower() in ("1", "true", "on", "yes")
+        if request.user.is_authenticated and save_flag:
+            addr_kwargs = {
+                "user": request.user,
+                "name": shipping_fields.get("shipping_name", ""),
+                "line1": shipping_fields.get("shipping_line1", ""),
+                "line2": shipping_fields.get("shipping_line2", ""),
+                "city": shipping_fields.get("shipping_city", ""),
+                "postcode": shipping_fields.get("shipping_postcode", ""),
+                "country": shipping_fields.get("shipping_country", "GB"),
+                "phone": shipping_fields.get("shipping_phone", ""),
+                "is_default": True,
+            }
+            existing = ShippingAddress.objects.filter(
+                user=request.user, is_default=True
+            ).first()
+            if existing:
+                for k, v in addr_kwargs.items():
+                    if k != "user":
+                        setattr(existing, k, v)
+                existing.is_default = True
+                existing.save()
+            else:
+                ShippingAddress.objects.create(**addr_kwargs)
+
         with transaction.atomic():
             # 1) Create Order (pending)
             order = Order.objects.create(
@@ -86,13 +112,13 @@ def create_payment_intent(request):
                     user=request.user,
                     is_default=True,
                     defaults={
-                        "name":     shipping_fields["shipping_name"],
-                        "line1":    shipping_fields["shipping_line1"],
-                        "line2":    shipping_fields["shipping_line2"],
-                        "city":     shipping_fields["shipping_city"],
+                        "name": shipping_fields["shipping_name"],
+                        "line1": shipping_fields["shipping_line1"],
+                        "line2": shipping_fields["shipping_line2"],
+                        "city": shipping_fields["shipping_city"],
                         "postcode": shipping_fields["shipping_postcode"],
-                        "country":  shipping_fields["shipping_country"] or "GB",
-                        "phone":    shipping_fields["shipping_phone"],
+                        "country": shipping_fields["shipping_country"] or "GB",
+                        "phone": shipping_fields["shipping_phone"],
                     },
                 )
 
