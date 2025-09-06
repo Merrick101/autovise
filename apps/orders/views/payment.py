@@ -14,6 +14,7 @@ from apps.orders.utils.cart import get_active_cart, calculate_cart_summary
 from apps.users.models import ShippingAddress
 
 logger = logging.getLogger(__name__)
+
 stripe.api_key = settings.STRIPE_SECRET_KEY
 stripe.api_version = getattr(settings, "STRIPE_API_VERSION", None)
 
