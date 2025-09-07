@@ -1,30 +1,42 @@
-# apps/orders/templatetags/cart_extras.py
+"""
+Custom template filters for cart-related functionality.
+Located at apps/orders/templatetags/cart_extras.py
+"""
 
 from django import template
+
 register = template.Library()
 
 
 @register.filter
 def item_key(item):
     """
-    Return a stable key for this cart item, whether it's a product or a bundle.
-    Used for building update/remove URLs in the cart template.
+    Return the canonical key for a cart line, matching how we store it:
+      - Bundles (session cart):   "bundle_<id>"
+      - Products (session cart):  product.product_code (fallback to product.id)
+      - CartItem (DB cart):       product.product_code (fallback to product.id)
+
+    This ensures update/remove URLs target the correct key for both guests and
+    authenticated users.
     """
-    # 1) If it's a dict coming from calculate_cart_summary()
+    # Dict coming from calculate_cart_summary()
     if isinstance(item, dict):
-        # bundles carry a 'bundle' key
-        bundle = item.get('bundle')
+        bundle = item.get("bundle")
         if bundle is not None:
             return f"bundle_{bundle.id}"
-        # otherwise it's a product
-        product = item.get('product')
-        if product is not None:
-            return str(product.id)
-        # fallback if 'key' field is added
-        return item.get('key', "")
 
-    # 2) If it's a CartItem model instance
-    #    (the DB-backed cart before summary conversion)
-    if hasattr(item, "product") and item.product:
-        return str(item.product.id)
+        product = item.get("product")
+        if product is not None:
+            key = getattr(product, "product_code", None) or product.id
+            return str(key)
+
+        # If you ever add raw 'key' into the summary dicts
+        return str(item.get("key", ""))
+
+    # CartItem model instance (DB cart before summary conversion)
+    product = getattr(item, "product", None)
+    if product is not None:
+        key = getattr(product, "product_code", None) or product.id
+        return str(key)
+
     return ""

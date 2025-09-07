@@ -1,4 +1,9 @@
-# apps/orders/urls.py
+"""
+URL configurations for the orders app.
+Includes routes for cart management, checkout,
+payment processing, and order history.
+Located at apps/orders/urls.py
+"""
 
 from django.urls import include, path
 from apps.orders.views.cart_views import (

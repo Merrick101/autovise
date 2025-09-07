@@ -51,7 +51,7 @@
             </td>
             <td>£{{ item.line_subtotal_before_discount|floatformat:2 }}</td>
             <td>
-              <form action="{% url 'orders:remove_item' item|item_key %}" method="post" class="d-inline">
+              <form action="{% url 'orders:remove_item' item|item_key %}" method="post" class="d-inline" onsubmit="return confirm('Remove {{ item_name|escapejs }} from your cart?')">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
               </form>
