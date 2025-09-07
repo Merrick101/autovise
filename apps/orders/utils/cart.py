@@ -1,4 +1,8 @@
-# apps/orders/utils/cart.py
+"""
+Cart utility functions for adding items, retrieving cart contents,
+and calculating totals including discounts and delivery fees.
+Located at apps/orders/utils/cart.py
+"""
 
 from apps.orders.models import Cart, CartItem
 from apps.products.models import Product, Bundle
@@ -59,6 +63,17 @@ def clear_session_cart(request):
     request.session.modified = True
 
 
+def clear_db_cart(user):
+    """
+    Remove all items from the active DB cart for this user.
+    Safe to call if no cart exists.
+    """
+    from apps.orders.models import Cart  # local import to avoid circularity
+    cart = Cart.objects.filter(user=user, is_active=True).first()
+    if cart:
+        cart.items.all().delete()
+
+
 def calculate_cart_summary(request, cart_data, cart_type):
     """
     Calculate full cart breakdown including:
@@ -75,10 +90,6 @@ def calculate_cart_summary(request, cart_data, cart_type):
 
     bundle_discount_total = Decimal("0.00")  # only for display
     cart_discount_total = Decimal("0.00")
-    first_time_discount = False
-
-    def is_bundle_product(product):
-        return product.type and product.type.name.lower() == "bundle"
 
     # 1) DB-backed cart
     if cart_type == "db":
@@ -113,6 +124,88 @@ def calculate_cart_summary(request, cart_data, cart_type):
                 "line_discount_amount": line_discount_amount,
                 "tier": product.tier,
                 "is_bundle": is_bundle,
+            })
+
+            pre_total += line_unit_total
+            post_total += line_disc_total
+
+        # Check for any bundle entries in session cart to merge
+        session_cart = getattr(request, "session", {}).get("cart", {}) or {}
+        for key, entry in session_cart.items():
+            if not (isinstance(key, str) and key.startswith("bundle_")):
+                continue
+
+            try:
+                bundle_id = int(key.split("_", 1)[1])
+                bundle = Bundle.objects.get(pk=bundle_id)
+            except (ValueError, Bundle.DoesNotExist):
+                continue
+
+            try:
+                quantity = int(entry.get("quantity", 0) or 0)
+            except (TypeError, ValueError):
+                quantity = 0
+            if quantity <= 0:
+                continue
+
+            # base & discount
+            raw_base = getattr(bundle, "subtotal_price", None)
+            raw_disc_pct = getattr(bundle, "discount_percentage", Decimal("10.00"))
+
+            try:
+                base_price = Decimal(raw_base) if raw_base is not None else Decimal(bundle.price)
+            except Exception:
+                base_price = Decimal(bundle.price)
+
+            try:
+                disc_pct = (Decimal(raw_disc_pct) / Decimal("100")).quantize(Decimal("0.0001"))
+            except Exception:
+                disc_pct = Decimal("0.10")
+
+            # discounted unit: prefer session value,
+            # else model, else base*(1-disc)
+            if entry.get("price") is not None:
+                try:
+                    discounted_unit = Decimal(entry["price"])
+                except Exception:
+                    discounted_unit = base_price * (Decimal("1.00") - disc_pct)
+            else:
+                try:
+                    discounted_unit = Decimal(bundle.price)
+                except Exception:
+                    discounted_unit = base_price * (Decimal("1.00") - disc_pct)
+
+            base_price = base_price.quantize(Decimal("0.01"))
+            discounted_unit = discounted_unit.quantize(Decimal("0.01"))
+
+            line_unit_total = base_price * quantity
+            line_disc_total = discounted_unit * quantity
+            line_discount_amount = (
+                (line_unit_total - line_disc_total) if line_disc_total < line_unit_total else Decimal("0.00")
+            )
+
+            if discounted_unit < base_price:
+                bundle_discount_total += (base_price - discounted_unit) * quantity
+
+            discount_percent = (
+                ((base_price - discounted_unit) / base_price * Decimal("100.00"))
+                if base_price > 0 and discounted_unit < base_price
+                else Decimal("0.00")
+            )
+
+            items.append({
+                "product": None,
+                "bundle":  bundle,
+                "quantity": quantity,
+                "unit_price": base_price,
+                "discounted_price": discounted_unit,
+                "discount_percent": discount_percent,
+                "subtotal": line_disc_total,
+                "line_subtotal_before_discount": line_unit_total,
+                "line_subtotal_after_discount": line_disc_total,
+                "line_discount_amount": line_discount_amount,
+                "tier": getattr(bundle, "bundle_type", None),
+                "is_bundle": True,
             })
 
             pre_total += line_unit_total
@@ -255,18 +348,18 @@ def calculate_cart_summary(request, cart_data, cart_type):
             pre_total += line_unit_total
             post_total += line_disc_total
 
-    # 3) totals & discounts
+    # 3) Totals
     total_before_discount = pre_total
     total = post_total
 
-    if request.user.is_authenticated and is_first_time_user(request.user):
-        first_time_discount = True
-        cart_discount_total = (total * Decimal("0.10")).quantize(Decimal("0.01"))
-        total -= cart_discount_total
+    first_time_customer = (
+        request.user.is_authenticated and is_first_time_user(request.user)
+    )
+    cart_discount_total = Decimal("0.00")
 
-    # 4) delivery fee & grand total
+    # 4) Delivery fee & grand total
     delivery_fee = Decimal("0.00") if (
-        first_time_discount or total_before_discount >= Decimal("40.00")
+        first_time_customer or total_before_discount >= Decimal("40.00")
     ) else Decimal("4.99")
 
     grand_total = (total + delivery_fee).quantize(Decimal("0.01"))
@@ -288,7 +381,7 @@ def calculate_cart_summary(request, cart_data, cart_type):
         "total_before_discount": total_before_discount,
         "bundle_discount": bundle_discount_total,
         "cart_discount": cart_discount_total,
-        "first_time_discount": first_time_discount,
+        "first_time_discount": False,
         "free_delivery": delivery_fee == 0,
         "delivery_fee": delivery_fee,
         "grand_total": grand_total,

@@ -13,8 +13,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 
 from apps.orders.models import Order
-from apps.orders.utils.cart import clear_session_cart
-from apps.orders.views.cart_views import clear_cart
+from apps.orders.utils.cart import clear_session_cart, clear_db_cart
 from apps.users.models import ShippingAddress
 from apps.orders.utils.stripe_helpers import retrieve_checkout_session
 
@@ -118,11 +117,16 @@ def checkout_success_view(request):
             )
 
     # Clear the cart only if payment is confirmed
-    if paid:
+    try:
         if request.user.is_authenticated:
-            clear_cart(request)
+            # remove DB-backed product lines
+            clear_db_cart(request.user)
+            # remove merged session bundles
+            clear_session_cart(request)
         else:
             clear_session_cart(request)
+    except Exception as e:
+        logger.warning("[ORDER] Cart clear skipped due to error: %s", e)
 
     context = {
         "order": order,

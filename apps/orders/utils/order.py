@@ -1,11 +1,11 @@
-# apps/orders/utils/order.py
+"""
+Utilities for order processing and fulfillment.
+Contains logic to idempotently mark orders paid.
+Located at apps/orders/utils/order.py
+"""
 
 import logging
-
-from django.conf import settings
 from django.db import transaction
-from django.template.loader import render_to_string
-
 from apps.orders.models import Order
 from apps.orders.utils.email import send_order_confirmation_email
 
@@ -15,7 +15,8 @@ logger = logging.getLogger(__name__)
 def update_order_from_stripe_session(payload):
     """
     Handle *either* a Checkout Session object or a PaymentIntent object.
-    Idempotently marks the Order paid and sends the confirmation email (webhook-only).
+    Idempotently marks the Order paid and
+    sends the confirmation email (webhook-only).
     """
     # Stripe sends dict-like objects; normalize accessors
     obj_type = payload.get("object")  # "checkout.session" or "payment_intent"
@@ -80,15 +81,21 @@ def update_order_from_stripe_session(payload):
     if not order.is_paid:
         with transaction.atomic():
             order.is_paid = True
-            # Always persist PI id when known
+            update_fields = ["is_paid"]
+
+            # Persist PI id if we learned it (or it changed)
             if pi_id and order.stripe_payment_intent != pi_id:
                 order.stripe_payment_intent = pi_id
-                order.save(update_fields=["is_paid", "stripe_payment_intent"])
-            else:
-                order.save(update_fields=["is_paid"])
-        logger.info("[ORDER] Marked Order #%s paid (pi=%s)", order.id, order.stripe_payment_intent)
+                update_fields.append("stripe_payment_intent")
 
-        # 4) Fire-and-forget email
+            order.save(update_fields=update_fields)
+
+            # Always mark user as no longer first-time once a paid order exists
+            mark_user_not_first_time(order.user)
+
+        logger.info("[ORDER] Marked Order #%s paid (pi=%s)",
+                    order.id, order.stripe_payment_intent)
+
         try:
             send_order_confirmation_email(order, to_email=customer_email)
         except Exception as e:
@@ -97,3 +104,19 @@ def update_order_from_stripe_session(payload):
         logger.info("[ORDER] Order #%s already paid; skipping", order.id)
 
     return order
+
+
+def mark_user_not_first_time(user):
+    """
+    Disable the first-time flag safely once a user has a paid order.
+    """
+    if not user:
+        return
+    try:
+        prof = getattr(user, "profile", None)
+        if prof and prof.is_first_time_buyer:
+            prof.is_first_time_buyer = False
+            prof.save(update_fields=["is_first_time_buyer"])
+    except Exception:
+        # keep webhook idempotent; do not raise
+        pass

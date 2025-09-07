@@ -1,4 +1,8 @@
-# apps/orders/views/cart_views.py
+"""
+Cart views for adding, updating, and removing items.
+Handles both authenticated users (DB cart) and guest users (session cart).
+Located at apps/orders/views/cart_views.py
+"""
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
@@ -61,6 +65,8 @@ def cart_view(request):
 def update_quantity(request, item_key):
     """
     Update quantity for a cart line (guest session or DB cart).
+    Products for authed users live in the DB cart;
+    bundles always live in session.
     """
     try:
         quantity = int(request.POST.get('quantity', 1))
@@ -71,11 +77,19 @@ def update_quantity(request, item_key):
         messages.error(request, "Quantity must be at least 1.")
         return redirect('orders:cart')
 
-    cart_data, cart_type = get_active_cart(request)
+    # If this is a session bundle key, always update the session cart
+    if isinstance(item_key, str) and item_key.startswith("bundle_"):
+        cart = request.session.get('cart', {}) or {}
+        if item_key in cart:
+            cart[item_key]['quantity'] = quantity
+            save_cart(request, cart)
+            messages.success(request, "Quantity updated.")
+        else:
+            messages.warning(request, "Could not find that item in your cart.")
+        return redirect('orders:cart')
 
-    # Authenticated users: DB cart (products only)
-    if cart_type == 'db':
-        # Accept either numeric product_id or product_code
+    # Logged-in users: update DB cart product line
+    if request.user.is_authenticated:
         cart_item = None
         if item_key.isdigit():
             cart_item = CartItem.objects.filter(
@@ -94,11 +108,23 @@ def update_quantity(request, item_key):
             messages.warning(request, "Could not find that item in your cart.")
         return redirect('orders:cart')
 
-    # Guest users: session cart
-    cart = cart_data or {}
+    # Guests: update session cart product line
+    cart = request.session.get('cart', {}) or {}
+
+    # If the template passed a numeric id,
+    # map it to the session cart key (product_code)
+    if item_key.isdigit():
+        pid = int(item_key)
+        for k, v in cart.items():
+            if k.startswith("bundle_"):
+                continue
+            if str(v.get("product_id")) == str(pid):
+                item_key = k
+                break
+
     if item_key in cart:
         cart[item_key]['quantity'] = quantity
-        save_cart(request, cart)  # persists and marks session modified
+        save_cart(request, cart)
         messages.success(request, "Quantity updated.")
     else:
         messages.warning(request, "Could not find that item in your cart.")
@@ -108,12 +134,22 @@ def update_quantity(request, item_key):
 @require_POST
 def remove_item(request, item_key):
     """
-    Remove a cart line for guest session or DB cart.
+    Remove a cart line.
+    Products for authed users live in the DB cart;
+    bundles always live in session.
     """
-    cart_data, cart_type = get_active_cart(request)
+    # Session bundle? Always remove from session.
+    if isinstance(item_key, str) and item_key.startswith("bundle_"):
+        cart = request.session.get('cart', {}) or {}
+        if cart.pop(item_key, None) is not None:
+            save_cart(request, cart)
+            messages.success(request, "Item removed from cart.")
+        else:
+            messages.warning(request, "Could not find that item in your cart.")
+        return redirect('orders:cart')
 
-    if cart_type == 'db':
-        # Accept either numeric product_id or product_code
+    # Logged-in users: remove DB cart product line
+    if request.user.is_authenticated:
         deleted = 0
         if item_key.isdigit():
             deleted = CartItem.objects.filter(
@@ -130,8 +166,19 @@ def remove_item(request, item_key):
             messages.warning(request, "Could not find that item in your cart.")
         return redirect('orders:cart')
 
-    # Guest: session cart
-    cart = cart_data or {}
+    # Guests: remove session product
+    cart = request.session.get('cart', {}) or {}
+
+    # If numeric id, map to session key (product_code)
+    if item_key.isdigit():
+        pid = int(item_key)
+        for k, v in list(cart.items()):
+            if k.startswith("bundle_"):
+                continue
+            if str(v.get("product_id")) == str(pid):
+                item_key = k
+                break
+
     if cart.pop(item_key, None) is not None:
         save_cart(request, cart)
         messages.success(request, "Item removed from cart.")
@@ -142,10 +189,17 @@ def remove_item(request, item_key):
 
 @require_POST
 def clear_cart(request):
-    cart_data, cart_type = get_active_cart(request)
-
-    if cart_type == 'db':
-        cart_data.items.all().delete()
+    """
+    Clear the cart.
+    For logged-in users, clear BOTH the DB cart (products) and any
+    session cart entries (bundles) to avoid leftovers.
+    """
+    if request.user.is_authenticated:
+        db_cart, _ = get_active_cart(request)  # DB cart
+        db_cart.items.all().delete()
+        # also nuke any session leftovers (e.g., bundles)
+        request.session['cart'] = {}
+        request.session.modified = True
     else:
         request.session['cart'] = {}
         request.session.modified = True

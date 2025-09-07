@@ -61,10 +61,11 @@ async function initInlineCheckout() {
   // Submit gating & state
   const submitBtn = form.querySelector("#submit");
   const spinner = document.getElementById("spinner");
-  let elementReady = false;  // flips true after Payment Element mounts
-  let mounted = false;       // prevent multiple mounts
-  let paymentIntentId = null;
-  let elements = null;       // will be set after client_secret is received
+  const guestEmailInput = form.querySelector("#guest_email");
+  let elementReady = false;   // flips true after Payment Element mounts
+  let mounted = false;        // prevent multiple mounts
+  let paymentIntentId = null; // captured from backend
+  let elements = null;        // outer variable used by confirmPayment
 
   function updateSubmitState() {
     const ok = form.checkValidity() && elementReady;
@@ -76,16 +77,14 @@ async function initInlineCheckout() {
 
   // Build payload from current form values
   function buildPayload() {
-    const payload = {};
-    const guestEmailInput = form.querySelector("#guest_email");
+    const p = {};
+
     if (guestEmailInput && guestEmailInput.value.trim()) {
-      payload.guest_email = guestEmailInput.value.trim();
+      p.guest_email = guestEmailInput.value.trim();
     }
 
     const saveBox = form.querySelector("#save_shipping");
-    if (saveBox && saveBox.checked) {
-      payload.save_shipping = "1";
-    }
+    if (saveBox && saveBox.checked) p.save_shipping = "1";
 
     [
       "shipping_name",
@@ -100,10 +99,10 @@ async function initInlineCheckout() {
       if (!el) return;
       const val = el.value.trim();
       if (!val) return;
-      payload[name] = name === "shipping_country" ? val.toUpperCase() : val;
+      p[name] = name === "shipping_country" ? val.toUpperCase() : val;
     });
 
-    return payload;
+    return p;
   }
 
   // Create PI + mount Stripe Element once address is valid
@@ -134,7 +133,26 @@ async function initInlineCheckout() {
       paymentIntentId = data.payment_intent_id || data.paymentIntentId || null;
       if (!clientSecret) { fail("Missing client secret"); return; }
 
-      elements = stripe.elements({ clientSecret });
+      // Hide Link and the extra billing fields
+      const latestEmail =
+        (guestEmailInput?.value || "").trim() || undefined;
+
+      elements = stripe.elements({
+        clientSecret,
+        wallets: { link: "never" },
+        fields: {
+          billingDetails: {
+            address: "never",
+            name: "never",
+            email: "never",
+            phone: "never",
+          },
+        },
+        defaultValues: {
+          billingDetails: { email: latestEmail },
+        },
+      });
+
       const paymentElement = elements.create("payment");
       paymentElement.mount("#payment-element");
 
@@ -155,11 +173,11 @@ async function initInlineCheckout() {
         if (submitBtn) submitBtn.disabled = true;
         if (spinner) spinner.classList.remove("d-none");
 
-        // Optionally update receipt_email on PI right before confirm
         try {
-          const ge = form.querySelector("#guest_email");
-          const latestEmail = ge && ge.value.trim();
-          if (latestEmail && paymentIntentId && updateUrl) {
+          const latestEmailNow = guestEmailInput && guestEmailInput.value.trim();
+
+          // Update PI with latest email before confirmation
+          if (updateUrl && paymentIntentId && latestEmailNow) {
             await fetch(updateUrl, {
               method: "POST",
               credentials: "same-origin",
@@ -168,7 +186,10 @@ async function initInlineCheckout() {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ pi_id: paymentIntentId, guest_email: latestEmail }),
+              body: JSON.stringify({
+                pi_id: paymentIntentId,
+                guest_email: latestEmailNow,
+              }),
             });
           }
         } catch (e) {

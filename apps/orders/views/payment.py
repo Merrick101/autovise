@@ -1,4 +1,8 @@
-# apps/orders/views/payment.py
+"""
+Views for handling payment intents with Stripe.
+Covers both creating a new PaymentIntent and updating an existing one.
+Located at apps/orders/views/payment.py
+"""
 
 import json
 import logging
@@ -30,63 +34,45 @@ def create_payment_intent(request):
     Returns: { client_secret, payment_intent_id, order_id }
     """
     try:
-        # read JSON body first; fall back to POST
+        # Read JSON body first; fall back to POST.
         payload = {}
-        if request.META.get("CONTENT_TYPE", "").startswith("application/json"):
+        if (request.META.get("CONTENT_TYPE") or "").startswith("application/json"):
             try:
-                payload = json.loads(request.body.decode() or "{}")
+                payload = json.loads((request.body or b"").decode() or "{}")
             except json.JSONDecodeError:
                 payload = {}
+        source = payload if payload else request.POST
 
+        # Guest email (for receipt)
         guest_email = None
         if not request.user.is_authenticated:
-            guest_email = (payload.get("guest_email")
-                           or request.POST.get("guest_email")
-                           or "").strip() or None
+            guest_email = (source.get("guest_email") or "").strip() or None
 
+        # Build cart summary
         cart_data, cart_type = get_active_cart(request)
         summary = calculate_cart_summary(request, cart_data, cart_type)
         if not summary["cart_items"]:
             return HttpResponseBadRequest("Cart empty")
 
-        source = payload if payload else request.POST
-        shipping_fields = {k: (source.get(k) or "").strip() for k in [
-            "shipping_name", "shipping_line1", "shipping_line2", "shipping_city",
-            "shipping_postcode", "shipping_country", "shipping_phone"
-        ]}
+        # Shipping fields from form/JSON
+        shipping_fields = {
+            k: (source.get(k) or "").strip()
+            for k in [
+                "shipping_name",
+                "shipping_line1",
+                "shipping_line2",
+                "shipping_city",
+                "shipping_postcode",
+                "shipping_country",
+                "shipping_phone",
+            ]
+        }
+        # Normalize country code
+        if shipping_fields["shipping_country"]:
+            shipping_fields["shipping_country"] = shipping_fields["shipping_country"].upper()
 
-        # Normalize country code before persisting/using it
-        country = (shipping_fields.get("shipping_country") or "").strip()
-        if country:
-            shipping_fields["shipping_country"] = country.upper()
-
-        save_address = str((source.get("save_address") or "")).lower() in {"1", "true", "on", "yes"}
-
-        # Optionally save/overwrite default address for logged-in users
-        save_flag = str((payload or request.POST).get("save_shipping", "")).lower() in ("1", "true", "on", "yes")
-        if request.user.is_authenticated and save_flag:
-            addr_kwargs = {
-                "user": request.user,
-                "name": shipping_fields.get("shipping_name", ""),
-                "line1": shipping_fields.get("shipping_line1", ""),
-                "line2": shipping_fields.get("shipping_line2", ""),
-                "city": shipping_fields.get("shipping_city", ""),
-                "postcode": shipping_fields.get("shipping_postcode", ""),
-                "country": shipping_fields.get("shipping_country", "GB"),
-                "phone": shipping_fields.get("shipping_phone", ""),
-                "is_default": True,
-            }
-            existing = ShippingAddress.objects.filter(
-                user=request.user, is_default=True
-            ).first()
-            if existing:
-                for k, v in addr_kwargs.items():
-                    if k != "user":
-                        setattr(existing, k, v)
-                existing.is_default = True
-                existing.save()
-            else:
-                ShippingAddress.objects.create(**addr_kwargs)
+        # Save default address for logged-in users
+        save_shipping = str(source.get("save_shipping", "")).lower() in {"1", "true", "on", "yes"}
 
         with transaction.atomic():
             # 1) Create Order (pending)
@@ -97,45 +83,50 @@ def create_payment_intent(request):
                 delivery_fee=summary["delivery_fee"],
                 total_price=summary["grand_total"],
                 contact_email=(
-                    request.user.email if request.user.is_authenticated else (
-                        guest_email or ""
-                    )
+                    request.user.email if request.user.is_authenticated else (guest_email or "")
                 ),
                 **shipping_fields,
                 is_paid=False,
             )
 
-            # Save shipping address if requested (and user is authenticated)
-            if request.user.is_authenticated and save_address and shipping_fields.get(
-                "shipping_line1"
-            ):
-                ShippingAddress.objects.update_or_create(
-                    user=request.user,
-                    is_default=True,
-                    defaults={
+            # 2) Optionally persist/update default ShippingAddress (logged-in only)
+            if request.user.is_authenticated and save_shipping and shipping_fields.get("shipping_line1"):
+                try:
+                    data = {
                         "name": shipping_fields["shipping_name"],
                         "line1": shipping_fields["shipping_line1"],
-                        "line2": shipping_fields["shipping_line2"],
-                        "city": shipping_fields["shipping_city"],
-                        "postcode": shipping_fields["shipping_postcode"],
-                        "country": shipping_fields["shipping_country"] or "GB",
-                        "phone": shipping_fields["shipping_phone"],
-                    },
-                )
+                        "line2": shipping_fields.get("shipping_line2", ""),
+                        "city": shipping_fields.get("shipping_city", ""),
+                        "postcode": shipping_fields.get("shipping_postcode", ""),
+                        "country": shipping_fields.get("shipping_country") or "GB",
+                        "phone": shipping_fields.get("shipping_phone", ""),
+                        "is_default": True,
+                    }
+                    addr = ShippingAddress.objects.filter(user=request.user, is_default=True).first()
+                    if addr:
+                        for k, v in data.items():
+                            setattr(addr, k, v)
+                        addr.save()
+                    else:
+                        ShippingAddress.objects.create(user=request.user, **data)
+                except Exception as e:
+                    logger.warning("[CHECKOUT] Could not save default shipping address: %s", e)
 
-            # 2) Persist items (discounted unit prices)
-            OrderItem.objects.bulk_create([
-                OrderItem(
-                    order=order,
-                    product=item["product"],
-                    bundle=item["bundle"],
-                    quantity=item["quantity"],
-                    unit_price=item["discounted_price"],
-                )
-                for item in summary["cart_items"]
-            ])
+            # 3) Persist items (discounted unit prices)
+            OrderItem.objects.bulk_create(
+                [
+                    OrderItem(
+                        order=order,
+                        product=item["product"],
+                        bundle=item["bundle"],
+                        quantity=item["quantity"],
+                        unit_price=item["discounted_price"],
+                    )
+                    for item in summary["cart_items"]
+                ]
+            )
 
-            # 3) Create PI (card only)
+            # 4) Create PaymentIntent (card-only)
             amount_pence = _to_pence(summary["grand_total"])
             idemp = f"pi_{order.id}_{getattr(request.user, 'id', 'guest')}"
             intent = stripe.PaymentIntent.create(
@@ -146,9 +137,7 @@ def create_payment_intent(request):
                     "order_id": str(order.id),
                     "user_id": str(getattr(request.user, "id", "guest")),
                 },
-                receipt_email=(
-                    request.user.email if request.user.is_authenticated else guest_email
-                ),
+                receipt_email=(request.user.email if request.user.is_authenticated else guest_email),
                 shipping=order.shipping_for_stripe(),
                 idempotency_key=idemp,
             )
@@ -156,11 +145,13 @@ def create_payment_intent(request):
             order.stripe_payment_intent = intent.id
             order.save(update_fields=["stripe_payment_intent"])
 
-        return JsonResponse({
-            "client_secret": intent.client_secret,
-            "payment_intent_id": intent.id,
-            "order_id": order.id,
-        })
+        return JsonResponse(
+            {
+                "client_secret": intent.client_secret,
+                "payment_intent_id": intent.id,
+                "order_id": order.id,
+            }
+        )
 
     except Exception as e:
         logger.exception("[CHECKOUT] Failed creating payment intent: %s", e)
@@ -173,7 +164,7 @@ def update_payment_intent(request):
     Set/overwrite receipt_email (and metadata) on an existing PaymentIntent.
     """
     try:
-        if request.META.get("CONTENT_TYPE", "").startswith("application/json"):
+        if (request.META.get("CONTENT_TYPE") or "").startswith("application/json"):
             data = json.loads((request.body or b"").decode() or "{}")
         else:
             data = request.POST
