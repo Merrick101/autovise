@@ -1,4 +1,7 @@
-# config/settings.py
+"""
+Django settings for autovise project.
+Located at config/settings.py
+"""
 
 from django.core.exceptions import ImproperlyConfigured
 from decouple import config
@@ -7,9 +10,6 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
@@ -35,7 +35,6 @@ ALLOWED_HOSTS = [h.strip() for h in hosts.split(",") if h.strip()]
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # Application Definition
-
 INSTALLED_APPS = [
     # Core
     'jazzmin',
@@ -100,7 +99,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
 JAZZMIN_SETTINGS = {
     "site_title": "Autovise Admin",
     "site_header": "Autovise Admin Panel",
@@ -144,7 +142,6 @@ JAZZMIN_SETTINGS = {
     "theme": "flatly",
     "show_bookmarks": True,
 }
-
 
 # Stripe Credentials
 STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY", cast=str)
@@ -228,7 +225,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-SITE_ID = 3
+SITE_ID = config("SITE_ID", default=3, cast=int)
 
 
 AUTHENTICATION_BACKENDS = [
@@ -257,16 +254,20 @@ USE_CELERY_FOR_EMAIL = config(
     cast=bool,
 )
 
+SOCIALACCOUNT_ADAPTER = "apps.users.adapters.AutoviseSocialAdapter"
+
 ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_RATE_LIMITS = {
     "login_failed": "5/m",
 }
-
 
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
@@ -289,6 +290,7 @@ SOCIALACCOUNT_PROVIDERS = {
         "OAUTH_PKCE_ENABLED": True
     }
 }
+
 
 CKEDITOR_CONFIGS = {
     'default': {
