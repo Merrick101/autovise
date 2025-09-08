@@ -4,9 +4,12 @@ from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.utils.html import format_html
 from django.core.exceptions import ValidationError
+from django.forms.models import BaseInlineFormSet
 from decimal import Decimal, InvalidOperation
 from .forms import BundleAdminForm, ProductAdminForm
-from .models import Product, Category, ProductType, Tag, Bundle, ProductBundle, Subcategory, Review
+from .models import (
+    Product, Category, ProductType, Tag, Bundle, ProductBundle, Subcategory, Review
+)
 
 
 class StockLevelFilter(SimpleListFilter):
@@ -29,9 +32,27 @@ class StockLevelFilter(SimpleListFilter):
             return queryset.filter(stock__gte=50)
 
 
+class ProductBundleInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        included = [
+            f.cleaned_data.get('product')
+            for f in self.forms
+            if f.cleaned_data and not f.cleaned_data.get('DELETE', False)
+        ]
+        if len(included) < 3:
+            raise ValidationError("A bundle must include at least 3 products.")
+        if len(set(included)) != len(included):
+            raise ValidationError("A bundle cannot contain duplicate products.")
+        parent = self.instance
+        if parent.bundle_type == "Pro" and not any(p and p.tier == "Pro" for p in included):
+            raise ValidationError("Pro-tier bundles must include at least one Pro product.")
+
+
 # Inline for managing bundle-product relationships within the Bundle admin
 class ProductBundleInline(admin.TabularInline):
     model = ProductBundle
+    formset = ProductBundleInlineFormSet
     extra = 1
     autocomplete_fields = ['product']
     classes = ['tab-general']
@@ -49,28 +70,31 @@ class ProductBundleInline(admin.TabularInline):
         return "-"
     product_tier.short_description = "Tier"
 
-    def clean(self):
-        super().clean()
-        included = [
-            form.cleaned_data['product']
-            for form in self.forms
-            if form.cleaned_data and not form.cleaned_data.get('DELETE', False)
-        ]
 
-        if len(included) < 3:
-            raise ValidationError("A bundle must include at least 3 products.")
+class ProductReviewInline(admin.TabularInline):
+    model = Review
+    fk_name = "product"
+    extra = 0
+    fields = ("user", "rating", "comment", "created_at")
+    readonly_fields = ("created_at",)
+    autocomplete_fields = ("user",)
+    show_change_link = True
 
-        if len(set(included)) != len(included):
-            raise ValidationError("A bundle cannot contain duplicate products.")
 
-        parent = self.instance
-        if parent.bundle_type == "Pro" and not any(p.tier == "Pro" for p in included):
-            raise ValidationError("Pro-tier bundles must include at least one Pro product.")
+class BundleReviewInline(admin.TabularInline):
+    model = Review
+    fk_name = "bundle"
+    extra = 0
+    fields = ("user", "rating", "comment", "created_at")
+    readonly_fields = ("created_at",)
+    autocomplete_fields = ("user",)
+    show_change_link = True
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     form = ProductAdminForm
+    inlines = [ProductReviewInline]
     list_display = [
         'name', 'variant', 'product_code', 'price', 'tier',
         'image_type', 'category', 'subcategory', 'type', 'stock', 'image_tag',
@@ -152,7 +176,7 @@ class BundleAdmin(admin.ModelAdmin):
         'price', 'discount_percentage', 'product_count', 'tag_list', 'featured',
     ]
     search_fields = ['name', 'bundle_code', 'sku', 'tags__name']
-    inlines = [ProductBundleInline]
+    inlines = [ProductBundleInline, BundleReviewInline]
     readonly_fields = [
         'slug', 'created_at', 'updated_at',
         'subtotal_price', 'calculated_price',
@@ -256,7 +280,15 @@ class ProductBundleAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('product', 'user', 'rating', 'created_at')
-    list_filter = ('rating', 'created_at')
-    search_fields = ('user__username', 'product__name', 'comment')
-    ordering = ('-created_at',)
+    list_display = ("id", "user", "rating", "target", "created_at")
+    list_filter = ("rating", "created_at")
+    search_fields = ("comment", "user__username", "product__name", "bundle__name")
+    list_select_related = ("user", "product", "bundle")
+    date_hierarchy = "created_at"
+    autocomplete_fields = ("user", "product", "bundle")
+    readonly_fields = ("created_at",)
+    ordering = ("-created_at",)
+
+    def target(self, obj):
+        return obj.product or obj.bundle
+    target.short_description = "Product/Bundle"
