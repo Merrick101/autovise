@@ -1,4 +1,8 @@
-# apps/orders/models.py
+"""
+Models for the orders app.
+Contains Order, OrderItem, Cart, and CartItem models.
+Located at apps/orders/models.py
+"""
 
 from django.conf import settings
 from django.db import models
@@ -65,6 +69,28 @@ class Order(models.Model):
 
     # (optional) store guest email on the order for reference
     contact_email = models.EmailField(
+        blank=True, default=""
+    )
+
+    PAYMENT_STATUS_CHOICES = (
+        ("pending", "Pending"),
+        ("succeeded", "Succeeded"),
+        ("failed", "Failed"),
+        ("canceled", "Canceled"),
+        ("requires_action", "Requires Action"),
+    )
+
+    payment_status = models.CharField(
+        max_length=32, choices=PAYMENT_STATUS_CHOICES,
+        default="pending", db_index=True
+    )
+    paid_at = models.DateTimeField(
+        blank=True, null=True
+    )
+    stripe_latest_event = models.CharField(
+        max_length=64, blank=True, default=""
+    )
+    stripe_last_error = models.TextField(
         blank=True, default=""
     )
 
