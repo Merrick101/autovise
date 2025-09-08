@@ -76,18 +76,21 @@ def product_detail_view(request, pk):
     review_form = None
 
     if request.user.is_authenticated:
-        try:
-            user_review = product.reviews.get(user=request.user)
-        except Review.DoesNotExist:
+        # .get() can raise MultipleObjectsReturned if duplicates ever slip in; safer:
+        user_review = product.reviews.filter(user=request.user).first()
+
+        if not user_review:
             if request.method == "POST":
-                review_form = ReviewForm(request.POST)
+                # Pre-bind instance so Model.clean sees product+user
+                instance = Review(product=product, user=request.user)
+                review_form = ReviewForm(request.POST, instance=instance)
                 if review_form.is_valid():
-                    new_review = review_form.save(commit=False)
-                    new_review.product = product
-                    new_review.user = request.user
-                    new_review.save()
+                    review_form.save()
                     messages.success(request, "Your review has been submitted.")
-                    return redirect('products:product_detail', pk=product.id)
+                    from django.urls import reverse
+                    return redirect(reverse('products:product_detail', kwargs={'pk': product.id}) + '#reviews')
+                else:
+                    messages.error(request, f"Could not submit review: {review_form.errors.as_text()}")
             else:
                 review_form = ReviewForm()
 
@@ -141,18 +144,19 @@ def bundle_detail_view(request, bundle_id):
     review_form = None
 
     if request.user.is_authenticated:
-        try:
-            user_review = bundle.reviews.get(user=request.user)
-        except Review.DoesNotExist:
+        user_review = bundle.reviews.filter(user=request.user).first()
+
+        if not user_review:
             if request.method == "POST":
-                review_form = ReviewForm(request.POST)
+                instance = Review(bundle=bundle, user=request.user)
+                review_form = ReviewForm(request.POST, instance=instance)
                 if review_form.is_valid():
-                    new_review = review_form.save(commit=False)
-                    new_review.bundle = bundle
-                    new_review.user = request.user
-                    new_review.save()
+                    review_form.save()
                     messages.success(request, "Your review has been submitted.")
-                    return redirect('products:bundle_detail', bundle_id=bundle.id)
+                    from django.urls import reverse
+                    return redirect(reverse('products:bundle_detail', kwargs={'bundle_id': bundle.id}) + '#reviews')
+                else:
+                    messages.error(request, f"Could not submit review: {review_form.errors.as_text()}")
             else:
                 review_form = ReviewForm()
 

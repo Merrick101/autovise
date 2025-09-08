@@ -109,7 +109,9 @@ class Product(models.Model):
 
     def image_tag(self):
         if self.image:
-            return mark_safe(f'<img src="{self.image.url}" width="60" height="60" style="object-fit: cover; border-radius: 4px;" />')
+            return mark_safe(
+                f'<img src="{self.image.url}" width="60" height="60" style="object-fit: cover; border-radius: 4px;" />'
+            )
         return "No Image"
 
     image_tag.short_description = "Image"
@@ -128,17 +130,37 @@ class Bundle(models.Model):
         ('Special', 'Special'),
     ]
 
-    name = models.CharField(max_length=100)
-    description = RichTextField(blank=True)
-    slug = models.SlugField(unique=True, blank=True)
-    discount_percentage = models.DecimalField(max_digits=6, decimal_places=2, default=10.00)
-    price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
-    subtotal_price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
-    bundle_type = models.CharField(max_length=20, choices=BUNDLE_TYPE_CHOICES, default='Standard')
-    featured = models.BooleanField(default=False)
+    name = models.CharField(
+        max_length=100
+    )
+    description = RichTextField(
+        blank=True
+    )
+    slug = models.SlugField(
+        unique=True, blank=True
+    )
+    discount_percentage = models.DecimalField(
+        max_digits=6, decimal_places=2, default=10.00
+    )
+    price = models.DecimalField(
+        max_digits=8, decimal_places=2, default=0.00
+    )
+    subtotal_price = models.DecimalField(
+        max_digits=8, decimal_places=2, default=0.00
+    )
+    bundle_type = models.CharField(
+        max_length=20, choices=BUNDLE_TYPE_CHOICES, default='Standard'
+    )
+    featured = models.BooleanField(
+        default=False
+    )
 
-    sku = models.CharField(max_length=50, unique=True, default='TEMP_SKU', help_text="Unique identifier for this bundle")
-    bundle_code = models.CharField(max_length=50, unique=True, default='TEMP_BUNDLE_CODE', help_text="Internal code used for SEO and tracking")
+    sku = models.CharField(
+        max_length=50, unique=True, default='TEMP_SKU', help_text="Unique identifier for this bundle"
+    )
+    bundle_code = models.CharField(
+        max_length=50, unique=True, default='TEMP_BUNDLE_CODE', help_text="Internal code used for SEO and tracking"
+    )
 
     image = models.ImageField(
         upload_to='bundles/',
@@ -173,7 +195,9 @@ class Bundle(models.Model):
 
     def image_tag(self):
         if self.image:
-            return mark_safe(f'<img src="{self.image.url}" width="60" height="60" style="object-fit: cover; border-radius: 4px;" />')
+            return mark_safe(
+                f'<img src="{self.image.url}" width="60" height="60" style="object-fit: cover; border-radius: 4px;" />'
+            )
         return "No Image"
 
     image_tag.short_description = "Preview"
@@ -211,8 +235,12 @@ class Review(models.Model):
     RATING_CHOICES = [(i, str(i)) for i in range(1, 6)]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, null=True, blank=True, related_name='reviews', on_delete=models.CASCADE)
-    bundle = models.ForeignKey(Bundle, null=True, blank=True, related_name='reviews', on_delete=models.CASCADE)
+    product = models.ForeignKey(
+        Product, null=True, blank=True, related_name='reviews', on_delete=models.CASCADE
+    )
+    bundle = models.ForeignKey(
+        Bundle, null=True, blank=True, related_name='reviews', on_delete=models.CASCADE
+    )
 
     rating = models.IntegerField(choices=RATING_CHOICES)
     comment = models.TextField(blank=True)
@@ -220,6 +248,20 @@ class Review(models.Model):
 
     def clean(self):
         if not self.product and not self.bundle:
-            raise ValidationError("Review must be linked to a product or a bundle.")
+            raise ValidationError(
+                "Review must be linked to a product or a bundle."
+            )
         if self.product and self.bundle:
-            raise ValidationError("Review cannot be linked to both a product and a bundle.")
+            raise ValidationError(
+                "Review cannot be linked to both a product and a bundle."
+            )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "product"], name="uniq_user_product_review"
+            ),
+            models.UniqueConstraint(
+                fields=["user", "bundle"],  name="uniq_user_bundle_review"
+            ),
+        ]

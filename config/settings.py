@@ -4,6 +4,7 @@ Located at config/settings.py
 """
 
 from django.core.exceptions import ImproperlyConfigured
+from django.contrib.messages import constants as messages
 from decouple import config
 from pathlib import Path
 
@@ -96,6 +97,12 @@ TEMPLATES = [
     },
 ]
 
+MESSAGE_TAGS = {
+    messages.ERROR: "danger",
+    messages.INFO: "info",
+    messages.SUCCESS: "success",
+    messages.WARNING: "warning",
+}
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
