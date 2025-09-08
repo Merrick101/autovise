@@ -26,6 +26,39 @@ document.addEventListener('DOMContentLoaded', function () {
       btn.innerText = 'Adding…';
     });
   });
+
+  // Review form: scroll to reviews section if errors
+  (function scrollToReviewsIfErrors() {
+    const reviews = document.getElementById('reviews');
+    if (!reviews) return;
+
+    // Look for typical Django error markers inside the reviews section
+    const hasErrors = reviews.querySelector('.text-danger, .invalid-feedback, .is-invalid');
+    if (!hasErrors) return;
+
+    // Scroll the section into view (stays on page; no jump to top)
+    reviews.scrollIntoView({ behavior: 'auto', block: 'start' });
+
+    // Brief highlight so eyes land there
+    reviews.classList.add('review-error-highlight');
+    setTimeout(() => reviews.classList.remove('review-error-highlight'), 1500);
+  })();
+
+  document.querySelectorAll('form.review-form').forEach(formEl => {
+    formEl.addEventListener('submit', e => {
+      const hasRating = !!formEl.querySelector('input[name="rating"]:checked');
+      if (!hasRating) {
+        e.preventDefault();
+        const err = formEl.querySelector('[data-rating-error]');
+        if (err) {
+          err.textContent = 'Please select a star rating (1–5) before submitting.';
+          err.classList.remove('d-none');
+        }
+        const stars = formEl.querySelector('.rating-stars');
+        if (stars) stars.classList.add('border','border-danger','rounded','px-2');
+      }
+    });
+  });
 });
 
 // Stripe Payment Element

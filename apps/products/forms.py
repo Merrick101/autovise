@@ -82,3 +82,8 @@ class ReviewForm(forms.ModelForm):
             'rating': 'Your Rating',
             'comment': 'Your Review'
         }
+        error_messages = {
+            'rating': {
+                'required': 'Please select a star rating (1–5) before submitting.'
+            }
+        }

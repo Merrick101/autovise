@@ -119,7 +119,7 @@
           </div>
         {% else %}
           <h5>Leave a Review</h5>
-          <form method="post" class="mb-4">
+          <form method="post" class="mb-4 review-form" novalidate>
             {% csrf_token %}
 
             <div class="mb-3">

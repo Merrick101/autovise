@@ -89,8 +89,6 @@ def product_detail_view(request, pk):
                     messages.success(request, "Your review has been submitted.")
                     from django.urls import reverse
                     return redirect(reverse('products:product_detail', kwargs={'pk': product.id}) + '#reviews')
-                else:
-                    messages.error(request, f"Could not submit review: {review_form.errors.as_text()}")
             else:
                 review_form = ReviewForm()
 
@@ -155,8 +153,6 @@ def bundle_detail_view(request, bundle_id):
                     messages.success(request, "Your review has been submitted.")
                     from django.urls import reverse
                     return redirect(reverse('products:bundle_detail', kwargs={'bundle_id': bundle.id}) + '#reviews')
-                else:
-                    messages.error(request, f"Could not submit review: {review_form.errors.as_text()}")
             else:
                 review_form = ReviewForm()
 
