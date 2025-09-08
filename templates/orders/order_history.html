@@ -26,8 +26,12 @@
           <p class="mt-2"><strong>Total:</strong> £{{ order.total_price|floatformat:2 }}</p>
           {% if order.is_paid %}
             <span class="badge bg-success">Paid</span>
+          {% elif order.payment_status == "failed" %}
+            <span class="badge bg-danger">Failed</span>
+          {% elif order.payment_status == "requires_action" %}
+            <span class="badge bg-warning text-dark">Action required</span>
           {% else %}
-            <span class="badge bg-warning text-dark">Pending</span>
+            <span class="badge bg-secondary">Processing</span>
           {% endif %}
         </div>
       </div>

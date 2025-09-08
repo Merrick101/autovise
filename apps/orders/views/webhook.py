@@ -1,4 +1,7 @@
-# apps/orders/views/webhook.py
+"""
+Views for handling Stripe webhooks.
+Located at apps/orders/views/webhook.py
+"""
 
 import logging
 
@@ -30,25 +33,37 @@ def stripe_webhook_view(request):
     event_type = event.get("type")
     obj = (event.get("data") or {}).get("object") or {}
 
+    # Event types that should update Order state in the DB
+    HANDLED_TYPES = {
+        # Payment Element / PI lifecycle
+        "payment_intent.succeeded",
+        "payment_intent.canceled",
+        "payment_intent.payment_failed",
+        "payment_intent.processing",
+
+        # Hosted checkout lifecycle
+        "checkout.session.completed",
+        "checkout.session.async_payment_succeeded",
+        "checkout.session.async_payment_failed",
+        "checkout.session.expired",
+    }
+
     try:
-        # 2) Handle success events
-        if event_type == "payment_intent.succeeded":
-            # Inline checkout path
-            logger.info("[WEBHOOK] payment_intent.succeeded | pi=%s", obj.get("id"))
-            update_order_from_stripe_session(obj)  # expects PaymentIntent-like dict
-
-        elif event_type == "checkout.session.completed":
-            # Hosted checkout path
-            logger.info("[WEBHOOK] checkout.session.completed | session_id=%s", obj.get("id"))
-            update_order_from_stripe_session(obj)  # expects Session-like dict
-
-        # 3) Optional: log other notable events
-        elif event_type == "payment_intent.payment_failed":
-            logger.warning("[WEBHOOK] payment_intent.payment_failed | pi=%s reason=%s",
-                           obj.get("id"), (obj.get("last_payment_error") or {}).get("message"))
+        if event_type in HANDLED_TYPES:
+            order = update_order_from_stripe_session(obj)
+            if order:
+                logger.info(
+                    "[WEBHOOK] %s -> Order #%s payment_status=%s",
+                    event_type, order.id, order.payment_status
+                )
+            else:
+                logger.warning(
+                    "[WEBHOOK] %s did not match any Order", event_type
+                )
 
         else:
-            logger.debug("[WEBHOOK] Unhandled event type: %s", event_type)
+            # Ignore duplicative events like charge.* or payment_intent.created
+            logger.debug("[WEBHOOK] Ignoring event type: %s", event_type)
 
     except Exception as e:
         # Return 500 so Stripe retries
