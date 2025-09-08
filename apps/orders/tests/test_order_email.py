@@ -59,6 +59,7 @@ def _session_for(order, **overrides):
         "object": "checkout.session",
         "id": order.stripe_session_id,
         "payment_intent": "pi_test_123",
+        "payment_status": "paid",
         "customer_details": {"email": "guest@example.com"},
         "metadata": {"order_id": str(order.id)},
     }

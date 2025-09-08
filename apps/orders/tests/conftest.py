@@ -1,8 +1,7 @@
 # apps/orders/tests/conftest.py
 
-import types
-from decimal import Decimal
 import pytest
+from decimal import Decimal
 from django.test import Client, RequestFactory
 from django.contrib.sessions.backends.db import SessionStore
 
@@ -61,7 +60,9 @@ def set_session_cart(client):
 
 
 @pytest.fixture(autouse=True)
-def no_real_emails(monkeypatch):
-    """Prevent real emails during tests."""
+def no_real_emails(monkeypatch, request):
+    # If a test or module sets @pytest.mark.allow_emails, don't patch
+    if request.node.get_closest_marker("allow_emails"):
+        return
     from apps.orders.utils import email as email_utils
     monkeypatch.setattr(email_utils, "send_order_confirmation_email", lambda *a, **k: None)

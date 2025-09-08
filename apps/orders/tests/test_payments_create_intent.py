@@ -88,7 +88,7 @@ def test_create_intent_guest_success(client, bundle, product, set_session_cart, 
     assert cap["metadata"]["order_id"] == str(order.id)
     assert cap["receipt_email"] == "guest@example.com"
     assert cap["payment_method_types"] == ["card"]
-    assert cap["idempotency_key"].startswith("pi_")
+    assert cap["idempotency_key"].startswith(f"order-{order.id}-")
     assert "automatic_payment_methods" not in cap
 
 

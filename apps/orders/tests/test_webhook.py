@@ -51,7 +51,13 @@ def fake_verify(monkeypatch):
 def test_webhook_marks_paid_on_payment_intent_succeeded(client, order_pending, fake_verify):
     event = {
         "type": "payment_intent.succeeded",
-        "data": {"object": {"object": "payment_intent", "id": "pi_42", "metadata": {"order_id": str(order_pending.id)}, "receipt_email": "guest@example.com"}},
+        "data": {"object": {
+            "object": "payment_intent",
+            "id": "pi_42",
+            "status": "succeeded",  # <-- required for your util to mark paid
+            "metadata": {"order_id": str(order_pending.id)},
+            "receipt_email": "guest@example.com",
+        }},
     }
     fake_verify(event)
     resp = client.post(reverse("orders:webhook"), data=b"{}", content_type="application/json")
@@ -59,28 +65,46 @@ def test_webhook_marks_paid_on_payment_intent_succeeded(client, order_pending, f
 
     order_pending.refresh_from_db()
     assert order_pending.is_paid is True
+    assert order_pending.payment_status == "succeeded"
 
 
 @pytest.mark.django_db
 def test_webhook_idempotent_on_replay(client, order_pending, fake_verify):
     event = {
         "type": "payment_intent.succeeded",
-        "data": {"object": {"object": "payment_intent", "id": "pi_42", "metadata": {"order_id": str(order_pending.id)}}},
+        "data": {"object": {
+            "object": "payment_intent",
+            "id": "pi_42",
+            "status": "succeeded",  # <-- add
+            "metadata": {"order_id": str(order_pending.id)},
+        }},
     }
     fake_verify(event)
     for _ in range(2):
         client.post(reverse("orders:webhook"), data=b"{}", content_type="application/json")
 
     order_pending.refresh_from_db()
-    assert order_pending.is_paid is True  # no error on duplicate
+    assert order_pending.is_paid is True
+    assert order_pending.payment_status == "succeeded"  # still succeeded; no dup work
 
 
 @pytest.mark.django_db
 def test_webhook_handles_checkout_session_completed(client, order_pending, fake_verify):
     event = {
         "type": "checkout.session.completed",
-        "data": {"object": {"object": "checkout.session", "id": "cs_42", "payment_intent": "pi_42", "metadata": {"order_id": str(order_pending.id)}, "customer_details": {"email": "g@e.com"}}},
+        "data": {"object": {
+            "object": "checkout.session",
+            "id": "cs_42",
+            "payment_intent": "pi_42",
+            "payment_status": "paid",  # <-- add for clarity/back-compat path
+            "metadata": {"order_id": str(order_pending.id)},
+            "customer_details": {"email": "g@e.com"},
+        }},
     }
     fake_verify(event)
     resp = client.post(reverse("orders:webhook"), data=b"{}", content_type="application/json")
     assert resp.status_code == 200
+
+    order_pending.refresh_from_db()
+    assert order_pending.is_paid is True
+    assert order_pending.payment_status == "succeeded"
