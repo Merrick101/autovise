@@ -138,6 +138,9 @@ def checkout_success_view(request):
         "settings": settings,
     }
 
+    request.session.pop("pending_order_id", None)
+    request.session.modified = True
+
     return render(request, "orders/checkout_success.html", context)
 
 

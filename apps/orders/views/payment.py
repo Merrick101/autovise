@@ -30,31 +30,35 @@ def _to_pence(amount_gbp: Decimal) -> int:
 @require_POST
 def create_payment_intent(request):
     """
-    Create a Stripe PaymentIntent and persist a pending Order.
-    Returns: { client_secret, payment_intent_id, order_id }
+    Create (or reuse) a Stripe PaymentIntent and a single pending Order
+    per browser session. Returns { client_secret, payment_intent_id, order_id }.
     """
     try:
-        # Read JSON body first; fall back to POST.
-        payload = {}
+        # Ensure session key is set for storing the pending order id
+        if not request.session.session_key:
+            request.session.save()
+
+        # ---- parse body (JSON preferred) ----
         if (request.META.get("CONTENT_TYPE") or "").startswith("application/json"):
             try:
-                payload = json.loads((request.body or b"").decode() or "{}")
+                source = json.loads((request.body or b"").decode() or "{}")
             except json.JSONDecodeError:
-                payload = {}
-        source = payload if payload else request.POST
+                source = {}
+        else:
+            source = request.POST
 
-        # Guest email (for receipt)
+        # guest receipt email (only when not authenticated)
         guest_email = None
         if not request.user.is_authenticated:
             guest_email = (source.get("guest_email") or "").strip() or None
 
-        # Build cart summary
+        # ---- cart summary ----
         cart_data, cart_type = get_active_cart(request)
         summary = calculate_cart_summary(request, cart_data, cart_type)
         if not summary["cart_items"]:
             return HttpResponseBadRequest("Cart empty")
 
-        # Shipping fields from form/JSON
+        # ---- shipping fields ----
         shipping_fields = {
             k: (source.get(k) or "").strip()
             for k in [
@@ -67,29 +71,70 @@ def create_payment_intent(request):
                 "shipping_phone",
             ]
         }
-        # Normalize country code
         if shipping_fields["shipping_country"]:
             shipping_fields["shipping_country"] = shipping_fields["shipping_country"].upper()
 
-        # Save default address for logged-in users
         save_shipping = str(source.get("save_shipping", "")).lower() in {"1", "true", "on", "yes"}
 
+        amount_pence = _to_pence(summary["grand_total"])
+
         with transaction.atomic():
-            # 1) Create Order (pending)
-            order = Order.objects.create(
-                user=request.user if request.user.is_authenticated else None,
-                total_amount=summary["total_before_discount"],
-                discount_total=summary["bundle_discount"] + summary["cart_discount"],
-                delivery_fee=summary["delivery_fee"],
-                total_price=summary["grand_total"],
-                contact_email=(
+            # ---- reuse one pending order per session ----
+            order = None
+            pending_id = request.session.get("pending_order_id")
+            if pending_id:
+                # lock it to avoid parallel creation
+                order = (
+                    Order.objects.select_for_update()
+                    .filter(id=pending_id, is_paid=False)
+                    .first()
+                )
+
+            if order:
+                # refresh core fields
+                order.user = request.user if request.user.is_authenticated else None
+                order.total_amount = summary["total_before_discount"]
+                order.discount_total = summary["bundle_discount"] + summary["cart_discount"]
+                order.delivery_fee = summary["delivery_fee"]
+                order.total_price = summary["grand_total"]
+                order.contact_email = (
                     request.user.email if request.user.is_authenticated else (guest_email or "")
-                ),
-                **shipping_fields,
-                is_paid=False,
+                )
+                for f, v in shipping_fields.items():
+                    setattr(order, f, v)
+                order.save()
+                # refresh items
+                order.items.all().delete()
+            else:
+                order = Order.objects.create(
+                    user=request.user if request.user.is_authenticated else None,
+                    total_amount=summary["total_before_discount"],
+                    discount_total=summary["bundle_discount"] + summary["cart_discount"],
+                    delivery_fee=summary["delivery_fee"],
+                    total_price=summary["grand_total"],
+                    contact_email=(
+                        request.user.email if request.user.is_authenticated else (guest_email or "")
+                    ),
+                    **shipping_fields,
+                    is_paid=False,
+                )
+                request.session["pending_order_id"] = order.id
+                request.session.modified = True
+
+            OrderItem.objects.bulk_create(
+                [
+                    OrderItem(
+                        order=order,
+                        product=item["product"],
+                        bundle=item["bundle"],
+                        quantity=item["quantity"],
+                        unit_price=item["discounted_price"],
+                    )
+                    for item in summary["cart_items"]
+                ]
             )
 
-            # 2) Optionally persist/update default ShippingAddress (logged-in only)
+            # ---- optionally store default shipping address ----
             if request.user.is_authenticated and save_shipping and shipping_fields.get("shipping_line1"):
                 try:
                     data = {
@@ -112,38 +157,63 @@ def create_payment_intent(request):
                 except Exception as e:
                     logger.warning("[CHECKOUT] Could not save default shipping address: %s", e)
 
-            # 3) Persist items (discounted unit prices)
-            OrderItem.objects.bulk_create(
-                [
-                    OrderItem(
-                        order=order,
-                        product=item["product"],
-                        bundle=item["bundle"],
-                        quantity=item["quantity"],
-                        unit_price=item["discounted_price"],
+            # ---- reuse or create payment intent ----
+            intent = None
+            email_for_receipt = (
+                request.user.email if request.user.is_authenticated else guest_email
+            )
+
+            if order.stripe_payment_intent:
+                # Fetch & modify if still active
+                si = stripe.PaymentIntent.retrieve(order.stripe_payment_intent)
+                status = si.get("status")
+                if status in ("requires_payment_method", "requires_confirmation", "requires_action", "processing"):
+                    intent = stripe.PaymentIntent.modify(
+                        order.stripe_payment_intent,
+                        amount=amount_pence,
+                        shipping=order.shipping_for_stripe(),
+                        receipt_email=email_for_receipt,
+                        metadata={
+                            "order_id": str(order.id),
+                            "user_id": str(getattr(request.user, "id", "guest")),
+                        },
                     )
-                    for item in summary["cart_items"]
-                ]
-            )
-
-            # 4) Create PaymentIntent (card-only)
-            amount_pence = _to_pence(summary["grand_total"])
-            idemp = f"pi_{order.id}_{getattr(request.user, 'id', 'guest')}"
-            intent = stripe.PaymentIntent.create(
-                amount=amount_pence,
-                currency="gbp",
-                payment_method_types=["card"],  # restrict to card-only
-                metadata={
-                    "order_id": str(order.id),
-                    "user_id": str(getattr(request.user, "id", "guest")),
-                },
-                receipt_email=(request.user.email if request.user.is_authenticated else guest_email),
-                shipping=order.shipping_for_stripe(),
-                idempotency_key=idemp,
-            )
-
-            order.stripe_payment_intent = intent.id
-            order.save(update_fields=["stripe_payment_intent"])
+                elif status in ("canceled", "succeeded"):
+                    # start a fresh PI (should be rare for a still-pending order)
+                    intent = stripe.PaymentIntent.create(
+                        amount=amount_pence,
+                        currency="gbp",
+                        payment_method_types=["card"],
+                        shipping=order.shipping_for_stripe(),
+                        receipt_email=email_for_receipt,
+                        metadata={
+                            "order_id": str(order.id),
+                            "user_id": str(getattr(request.user, "id", "guest")),
+                        },
+                        # stable idempotency per order
+                        idempotency_key=f"order-{order.id}-create-v1",
+                    )
+                    if order.stripe_payment_intent != intent.id:
+                        order.stripe_payment_intent = intent.id
+                        order.save(update_fields=["stripe_payment_intent"])
+                else:
+                    # default to returning the current intent
+                    intent = si
+            else:
+                intent = stripe.PaymentIntent.create(
+                    amount=amount_pence,
+                    currency="gbp",
+                    payment_method_types=["card"],
+                    shipping=order.shipping_for_stripe(),
+                    receipt_email=email_for_receipt,
+                    metadata={
+                        "order_id": str(order.id),
+                        "user_id": str(getattr(request.user, "id", "guest")),
+                    },
+                    idempotency_key=f"order-{order.id}-create-v1",
+                )
+                order.stripe_payment_intent = intent.id
+                order.save(update_fields=["stripe_payment_intent"])
 
         return JsonResponse(
             {

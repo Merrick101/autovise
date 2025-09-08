@@ -58,6 +58,8 @@ async function initInlineCheckout() {
 
   const stripe = Stripe(pk);
 
+  let creatingPI = false;
+
   // Submit gating & state
   const submitBtn = form.querySelector("#submit");
   const spinner = document.getElementById("spinner");
@@ -107,9 +109,14 @@ async function initInlineCheckout() {
 
   // Create PI + mount Stripe Element once address is valid
   async function maybeCreateAndMount() {
-    if (mounted) return;
-    if (!form.checkValidity()) { updateSubmitState(); return; }
+    if (mounted || creatingPI) return;
 
+    if (!form.checkValidity()) { 
+      updateSubmitState(); 
+      return; 
+    }
+
+    creatingPI = true;                 // <— lock
     try {
       const resp = await fetch(createUrl, {
         method: "POST",
@@ -133,24 +140,15 @@ async function initInlineCheckout() {
       paymentIntentId = data.payment_intent_id || data.paymentIntentId || null;
       if (!clientSecret) { fail("Missing client secret"); return; }
 
-      // Hide Link and the extra billing fields
-      const latestEmail =
-        (guestEmailInput?.value || "").trim() || undefined;
+      const latestEmail = (guestEmailInput?.value || "").trim() || undefined;
 
       elements = stripe.elements({
         clientSecret,
         wallets: { link: "never" },
         fields: {
-          billingDetails: {
-            address: "never",
-            name: "never",
-            email: "never",
-            phone: "never",
-          },
+          billingDetails: { address: "never", name: "never", email: "never", phone: "never" },
         },
-        defaultValues: {
-          billingDetails: { email: latestEmail },
-        },
+        defaultValues: { billingDetails: { email: latestEmail } },
       });
 
       const paymentElement = elements.create("payment");
@@ -160,13 +158,22 @@ async function initInlineCheckout() {
       mounted = true;
       updateSubmitState();
 
+      form.removeEventListener("input", maybeCreateAndMount);
+      form.removeEventListener("change", maybeCreateAndMount);
+
+      // Prevent double confirmation with a tiny lock
+      let confirming = false;
+
       // Submit handler (added only once, after mount)
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
+        if (confirming) return;       // <— guard
+        confirming = true;
 
         if (!form.checkValidity()) {
           form.reportValidity();
           updateSubmitState();
+          confirming = false;
           return;
         }
 
@@ -175,8 +182,6 @@ async function initInlineCheckout() {
 
         try {
           const latestEmailNow = guestEmailInput && guestEmailInput.value.trim();
-
-          // Update PI with latest email before confirmation
           if (updateUrl && paymentIntentId && latestEmailNow) {
             await fetch(updateUrl, {
               method: "POST",
@@ -196,15 +201,13 @@ async function initInlineCheckout() {
           console.warn("[Checkout] update-intent failed:", e);
         }
 
-        const result = await stripe.confirmPayment({
-          elements,
-          redirect: "if_required",
-        });
+        const result = await stripe.confirmPayment({ elements, redirect: "if_required" });
 
         if (result.error) {
           fail(result.error.message || "Payment failed");
           if (submitBtn) submitBtn.disabled = false;
           if (spinner) spinner.classList.add("d-none");
+          confirming = false;          // allow retry
           return;
         }
 
@@ -215,9 +218,12 @@ async function initInlineCheckout() {
         }
 
         fail("Payment is processing. You’ll be redirected once it completes.");
+        confirming = false;
       });
     } catch (err) {
       fail(err?.message || "Unexpected error");
+    } finally {
+      creatingPI = false;              // <— release lock
     }
   }
 
