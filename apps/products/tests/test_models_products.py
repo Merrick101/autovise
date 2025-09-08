@@ -3,10 +3,12 @@ Tests for Product and Bundle models.
 Located at apps/products/tests/test_models_products.py
 """
 
-import pytest
 from decimal import Decimal
-from apps.products.models import Product, Bundle, Category, ProductType, Review
+import pytest
 from django.contrib.auth.models import User
+from apps.products.models import (
+    Bundle, Product, Category, ProductType, ProductBundle, Review
+)
 
 
 @pytest.fixture
@@ -46,15 +48,25 @@ def test_average_and_count_product(base):
 
 
 @pytest.mark.django_db
-def test_bundle_calculated_price_default_and_custom():
+def test_bundle_calculated_price_default_and_custom_with_products():
+    cat = Category.objects.create(name="Accessories", slug="accessories")
+    ptype = ProductType.objects.create(name="Mount")
+
+    # Default discount is 10.00
     b = Bundle.objects.create(
         name="Calc", description="", bundle_type="Standard",
-        discount_percentage=Decimal(""), price=0, subtotal_price=0,
-        sku="B2", bundle_code="bundle-calc",
+        price=0, subtotal_price=0, sku="B2", bundle_code="bundle-calc",
     )
-    # With no products, calculated_price() should just apply default 10% to 0
-    assert b.calculated_price() == 0
 
-    # If products were attached, compare math: total * (1 - discount/100)
+    p = Product.objects.create(
+        name="Phone Mount", variant="V", description="x", type=ptype, tier="Standard",
+        category=cat, price=Decimal("100.00"), stock=5, sku="S100", product_code="C100",
+    )
+    ProductBundle.objects.create(product=p, bundle=b)
+
+    # total=100 → with 10% -> 90.00
+    assert b.calculated_price() == Decimal("90.00")
+
+    # Change to 25% → 75.00
     b.discount_percentage = Decimal("25.00")
-    assert b.calculated_price() == 0
+    assert b.calculated_price() == Decimal("75.00")

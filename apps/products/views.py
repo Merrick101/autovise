@@ -26,7 +26,6 @@ def product_list_view(request):
 
     # 3) Search filter
     if search_q:
-        qs = qs.filter(name__icontains=search_q)
         qs = qs.filter(
             Q(name__icontains=search_q) |
             Q(variant__icontains=search_q) |
@@ -46,6 +45,8 @@ def product_list_view(request):
         qs = qs.order_by("price")
     elif sort_param == "price_desc":
         qs = qs.order_by("-price")
+    else:
+        qs = qs.order_by("id")
 
     # 7) Paginate (20 per page)
     paginator = Paginator(qs, 20)

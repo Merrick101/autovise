@@ -69,8 +69,9 @@ def test_list_search_matches_name_and_type(client, products):
 def test_list_sort_price_asc_desc(client, products):
     asc = client.get(reverse("products:product_list") + "?sort=price_asc")
     desc = client.get(reverse("products:product_list") + "?sort=price_desc")
-    assert [p.price for p in asc.context["products"]] == sorted([9.99, 14.50, 19.99])
-    assert [p.price for p in desc.context["products"]] == sorted([9.99, 14.50, 19.99], reverse=True)
+
+    assert [float(p.price) for p in asc.context["products"]] == sorted([9.99, 14.50, 19.99])
+    assert [float(p.price) for p in desc.context["products"]] == sorted([9.99, 14.50, 19.99], reverse=True)
 
 
 @pytest.mark.django_db
