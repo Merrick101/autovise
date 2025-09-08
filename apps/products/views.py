@@ -1,11 +1,16 @@
-# apps/products/views.py
+"""
+Views for handling product and bundle listings, details, reviews,
+and filtering in the e-commerce application.
+Located at apps/products/views.py
+"""
 
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
 from .models import Product, Bundle, Category, Review
-from apps.products.forms import ReviewForm
+from .forms import ReviewForm
 
 
 def product_list_view(request):
@@ -82,7 +87,7 @@ def product_detail_view(request, pk):
                     new_review.user = request.user
                     new_review.save()
                     messages.success(request, "Your review has been submitted.")
-                    return redirect('products:product_detail', product_id=product.id)
+                    return redirect('products:product_detail', pk=product.id)
             else:
                 review_form = ReviewForm()
 
@@ -158,3 +163,35 @@ def bundle_detail_view(request, bundle_id):
         'review_form': review_form,
     }
     return render(request, 'products/bundle_detail.html', context)
+
+
+@staff_member_required
+def review_update_view(request, review_id):
+    review = get_object_or_404(Review, pk=review_id)
+    if request.method == "POST":
+        form = ReviewForm(request.POST, instance=review)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Review updated.")
+            # redirect back to the relevant detail with anchor
+            if review.product_id:
+                return redirect('products:product_detail', pk=review.product_id)
+            return redirect('products:bundle_detail', bundle_id=review.bundle_id)
+    else:
+        form = ReviewForm(instance=review)
+    ctx = {"form": form, "review": review}
+    return render(request, "products/review_form.html", ctx)
+
+
+@staff_member_required
+def review_delete_view(request, review_id):
+    review = get_object_or_404(Review, pk=review_id)
+    if request.method == "POST":
+        pid, bid = review.product_id, review.bundle_id
+        review.delete()
+        messages.success(request, "Review deleted.")
+        if pid:
+            return redirect('products:product_detail', pk=pid)
+        return redirect('products:bundle_detail', bundle_id=bid)
+    # simple confirm page (optional)
+    return render(request, "products/review_confirm_delete.html", {"review": review})

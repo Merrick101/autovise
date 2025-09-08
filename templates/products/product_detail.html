@@ -1,3 +1,5 @@
+<!-- templates/products/product_detail.html -->
+
 {% extends "base.html" %}
 {% load static %}
 {% load widget_tweaks %}
@@ -33,50 +35,79 @@
       </form>
     </div>
   </div>
-  <!-- Reviews Section -->
-<section class="mt-5">
-  <h4 class="mb-4"><i class="fas fa-star text-warning"></i> Customer Reviews</h4>
+  
+    <!-- Reviews Section -->
+    <section class="mt-5" id="reviews">
+      <h4 class="mb-4"><i class="fas fa-star text-warning"></i> Customer Reviews</h4>
 
-  <!-- Existing Reviews -->
-  {% if reviews %}
-    <ul class="list-group mb-4">
-      {% for review in reviews %}
-        <li class="list-group-item">
-          <strong>{{ review.user.get_full_name|default:review.user.username }}</strong>
-          <span class="text-muted small"> – {{ review.created_at|date:"F j, Y" }}</span>
-          <p class="mb-0 mt-2">{{ review.content }}</p>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p class="text-muted">No reviews yet. Be the first to leave one!</p>
-  {% endif %}
+      {# Existing Reviews #}
+      {% if reviews %}
+        <ul class="list-group mb-4">
+          {% for review in reviews %}
+            <li class="list-group-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <strong>{{ review.user.get_full_name|default:review.user.username }}</strong>
+                  <span class="text-muted small"> – {{ review.created_at|date:"F j, Y" }}</span>
+                  <div class="small text-muted mt-1">Rating: {{ review.rating }}/5</div>
+                  <p class="mb-0 mt-2">{{ review.comment }}</p>
+                </div>
 
-    <!-- Add Review Form -->
-    {% if user.is_authenticated %}
-      {% if user_review %}
-        <div class="alert alert-info">
-          You have already submitted a review.
-        </div>
+                {% if request.user.is_staff %}
+                  <div class="ms-3">
+                    <a class="btn btn-sm btn-secondary mb-1"
+                      href="{% url 'products:review_update' review.id %}">Edit</a>
+                    <form method="post" action="{% url 'products:review_delete' review.id %}"
+                          class="d-inline"
+                          onsubmit="return confirm('Delete this review?');">
+                      {% csrf_token %}
+                      <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                    </form>
+                  </div>
+                {% endif %}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
       {% else %}
-        <h5>Leave a Review</h5>
-        <form method="post" class="mb-4">
-          {% csrf_token %}
-          <div class="mb-3">
-            {{ review_form.content.label_tag }}
-            {{ review_form.content|add_class:"form-control" }}
-            {% if review_form.content.errors %}
-              <div class="text-danger small">{{ review_form.content.errors.0 }}</div>
-            {% endif %}
-          </div>
-          <button type="submit" class="btn btn-primary">Submit Review</button>
-        </form>
+        <p class="text-muted">No reviews yet. Be the first to leave one!</p>
       {% endif %}
-    {% else %}
-      <p>
-        <a href="{% url 'account_login' %}?next={{ request.path }}">Log in</a> to leave a review.
-      </p>
-    {% endif %}
-  </section>
+
+      {# Add Review Form #}
+      {% if user.is_authenticated %}
+        {% if user_review %}
+          <div class="alert alert-info">
+            You have already submitted a review.
+          </div>
+        {% else %}
+          <h5>Leave a Review</h5>
+          <form method="post" class="mb-4">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              {{ review_form.rating.label_tag }}
+              {{ review_form.rating }}
+              {% if review_form.rating.errors %}
+                <div class="text-danger small">{{ review_form.rating.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              {{ review_form.comment.label_tag }}
+              {{ review_form.comment|add_class:"form-control" }}
+              {% if review_form.comment.errors %}
+                <div class="text-danger small">{{ review_form.comment.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit Review</button>
+          </form>
+        {% endif %}
+      {% else %}
+        <p>
+          <a href="{% url 'account_login' %}?next={{ request.path }}">Log in</a> to leave a review.
+        </p>
+      {% endif %}
+    </section>
 </div>
 {% endblock %}

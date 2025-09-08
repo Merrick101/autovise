@@ -1,4 +1,8 @@
-# apps/products/forms.py
+"""
+Forms for managing products, bundles, and reviews
+in the e-commerce application.
+Located at apps/products/forms.py
+"""
 
 from django import forms
 from decimal import Decimal

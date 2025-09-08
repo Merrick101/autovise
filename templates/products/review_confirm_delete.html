@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-4">
+  <h3>Delete Review</h3>
+  <p>Are you sure you want to permanently delete this review?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit">Delete</button>
+    <a class="btn btn-light" href="javascript:history.back()">Cancel</a>
+  </form>
+</div>
+{% endblock %}

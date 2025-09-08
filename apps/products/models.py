@@ -1,4 +1,8 @@
-# apps/products/models.py
+"""
+Models for managing products, bundles, categories,
+and reviews in the e-commerce application.
+Located at apps/products/models.py
+"""
 
 from django.db import models
 from django.contrib.auth.models import User
