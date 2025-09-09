@@ -1,21 +1,23 @@
 <!-- templates/include/navbar.html -->
 
 {% load static %}
-<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top" role="navigation" aria-label="Main navigation">
   <div class="container-fluid">
 
     <!-- Logo -->
     <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'home' %}">
       <!-- Inline SVG gear icon... -->
-      <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" fill="#4682B4" class="bi bi-gear-wide-connected" viewBox="0 0 16 16">
-        <path d="M7.068.727c.243-.97 1.62-.97 1.864 0l.071.286a.96.96 0 0 0 1.622.434l.205-.211c.695-.719 1.888-.03 1.613.931l-.08.284a.96.96 0 0 0 1.187 1.187l.283-.081c.96-.275 1.65.918.931 1.613l-.211.205a.96.96 0 0 0 .434 1.622l.286.071c.97.243.97 1.62 0 1.864l-.286.071a.96.96 0 0 0-.434 1.622l.211.205c.719.695.03 1.888-.931 1.613l-.284-.08a.96.96 0 0 0-1.187 1.187l.081.283c.275.96-.918 1.65-1.613.931l-.205-.211a.96.96 0 0 0-1.622.434l-.071.286c-.243.97-1.62.97-1.864 0l-.071-.286a.96.96 0 0 0-1.622-.434l-.205.211c-.695.719-1.888.03-1.613-.931l.08-.284a.96.96 0 0 0-1.186-1.187l-.284.081c-.96.275-1.65-.918-.931-1.613l.211-.205a.96.96 0 0 0-.434-1.622l-.286-.071c-.97-.243-.97-1.62 0-1.864l.286-.071a.96.96 0 0 0 .434-1.622l-.211-.205c-.719-.695-.03-1.888.931-1.613l.284.08a.96.96 0 0 0 1.187-1.186l-.081-.284c-.275-.96.918-1.65 1.613-.931l.205.211a.96.96 0 0 0 1.622-.434zM12.973 8.5H8.25l-2.834 3.779A4.998 4.998 0 0 0 12.973 8.5m0-1a4.998 4.998 0 0 0-7.557-3.779l2.834 3.78zM5.048 3.967l-.087.065zm-.431.355A4.98 4.98 0 0 0 3.002 8c0 1.455.622 2.765 1.615 3.678L7.375 8zm.344 7.646.087.065z"/>
+      <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" fill="#4682B4" class="bi bi-gear-wide-connected"
+        viewBox="0 0 16 16">
+        <path
+          d="M7.068.727c.243-.97 1.62-.97 1.864 0l.071.286a.96.96 0 0 0 1.622.434l.205-.211c.695-.719 1.888-.03 1.613.931l-.08.284a.96.96 0 0 0 1.187 1.187l.283-.081c.96-.275 1.65.918.931 1.613l-.211.205a.96.96 0 0 0 .434 1.622l.286.071c.97.243.97 1.62 0 1.864l-.286.071a.96.96 0 0 0-.434 1.622l.211.205c.719.695.03 1.888-.931 1.613l-.284-.08a.96.96 0 0 0-1.187 1.187l.081.283c.275.96-.918 1.65-1.613.931l-.205-.211a.96.96 0 0 0-1.622.434l-.071.286c-.243.97-1.62.97-1.864 0l-.071-.286a.96.96 0 0 0-1.622-.434l-.205.211c-.695.719-1.888.03-1.613-.931l.08-.284a.96.96 0 0 0-1.186-1.187l-.284.081c-.96.275-1.65-.918-.931-1.613l.211-.205a.96.96 0 0 0-.434-1.622l-.286-.071c-.97-.243-.97-1.62 0-1.864l.286-.071a.96.96 0 0 0 .434-1.622l-.211-.205c-.719-.695-.03-1.888.931-1.613l.284.08a.96.96 0 0 0 1.187-1.186l-.081-.284c-.275-.96.918-1.65 1.613-.931l.205.211a.96.96 0 0 0 1.622-.434zM12.973 8.5H8.25l-2.834 3.779A4.998 4.998 0 0 0 12.973 8.5m0-1a4.998 4.998 0 0 0-7.557-3.779l2.834 3.78zM5.048 3.967l-.087.065zm-.431.355A4.98 4.98 0 0 0 3.002 8c0 1.455.622 2.765 1.615 3.678L7.375 8zm.344 7.646.087.065z" />
       </svg>
       <span class="fw-bold fs-3 logo-text">AUTOVISE</span>
     </a>
 
     <!-- Hamburger Toggle -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
-            aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+      aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -24,48 +26,47 @@
       <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center
                   justify-content-lg-between w-100 gap-2 mt-3 mt-lg-0">
 
-        {# GLOBAL SEARCH FORM: switches between product_list & bundle_list based on current view #}
-        <form class="d-flex w-100 w-lg-50 mb-2 mb-lg-0 me-lg-3"
-              method="get"
-              action="{% if request.resolver_match.url_name == 'bundle_list' and request.resolver_match.namespace == 'products' %}
-                        {% url 'products:bundle_list' %}
-                      {% else %}
-                        {% url 'products:product_list' %}
-                      {% endif %}">
-          <input
-            type="search"
-            name="q"
-            class="form-control"
+        <form class="d-flex w-100 w-lg-50 mb-2 mb-lg-0 me-lg-3" method="get" role="search" aria-label="Site search"
+          action="{% if request.resolver_match.url_name == 'bundle_list' and request.resolver_match.namespace == 'products' %}
+                    {% url 'products:bundle_list' %}
+                  {% else %}
+                    {% url 'products:product_list' %}
+                  {% endif %}">
+          <label for="nav-search" class="visually-hidden">Search</label>
+          <input id="nav-search" type="search" name="q" class="form-control"
             placeholder="{% if request.resolver_match.url_name == 'bundle_list' %}Search bundles…{% else %}Search products…{% endif %}"
-            aria-label="Search"
             value="{% if request.resolver_match.url_name != 'bundle_list' %}{{ request.GET.q|default_if_none:'' }}{% endif %}">
-          
-          {# Preserve filters for bundles or products #}
+
           {% if request.resolver_match.url_name == 'bundle_list' %}
-            <input type="hidden" name="type" value="{{ request.GET.type }}">
-            <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+          <input type="hidden" name="type" value="{{ request.GET.type }}">
+          <input type="hidden" name="sort" value="{{ request.GET.sort }}">
           {% else %}
-            <input type="hidden" name="category" value="{{ request.GET.category }}">
-            <input type="hidden" name="tier" value="{{ request.GET.tier }}">
-            <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+          <input type="hidden" name="category" value="{{ request.GET.category }}">
+          <input type="hidden" name="tier" value="{{ request.GET.tier }}">
+          <input type="hidden" name="sort" value="{{ request.GET.sort }}">
           {% endif %}
         </form>
 
         <!-- Nav Items -->
         <div class="d-flex flex-row gap-3 align-items-center justify-content-center justify-content-lg-end w-100">
+          
           <!-- Products Dropdown -->
           <div class="dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="productsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <button class="nav-link dropdown-toggle btn btn-link p-0"
+                    id="productsDropdown"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-haspopup="true">
               <i class="fa-solid fa-car"></i> Products
-            </a>
+            </button>
             <ul class="dropdown-menu" aria-labelledby="productsDropdown">
               <li><a class="dropdown-item" href="{% url 'products:product_list' %}">All Products</a></li>
               <li><a class="dropdown-item" href="{% url 'products:bundle_list' %}">Bundles</a></li>
               <li><hr class="dropdown-divider"></li>
               {% for cat in categories %}
                 <li>
-                  <a class="dropdown-item"
-                     href="{% url 'products:product_list' %}?category={{ cat.slug }}">
+                  <a class="dropdown-item" href="{% url 'products:product_list' %}?category={{ cat.slug }}">
                     {{ cat.name }}
                   </a>
                 </li>
@@ -75,75 +76,77 @@
 
           <!-- Cart Dropdown -->
           <div class="dropdown">
-            <a class="nav-link dropdown-toggle position-relative"
-              href="#"
-              id="cartDropdown"
-              data-bs-toggle="dropdown"
-              aria-expanded="false">
-              <i class="fas fa-shopping-cart"></i>
-              Cart
+            <button class="nav-link dropdown-toggle btn btn-link p-0 position-relative"
+                    id="cartDropdown"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-haspopup="true">
+              <i class="fas fa-shopping-cart"></i> Cart
               {% if cart_item_count %}
                 <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
                   {{ cart_item_count }}
                 </span>
               {% endif %}
-            </a>
+            </button>
 
-            <ul class="dropdown-menu dropdown-menu-end p-3" aria-labelledby="cartDropdown"
-                style="min-width: 280px;">
+            <ul class="dropdown-menu dropdown-menu-end p-3" aria-labelledby="cartDropdown" style="min-width: 280px;">
               {% if cart_items %}
                 {% for item in cart_items|slice:":3" %}
-                  <div class="d-flex align-items-center mb-2">
-
-                    {% if item.bundle %}
-                      {# Bundle line (session cart) #}
-                      {% with obj=item.bundle %}
-                        {% if obj.image %}
-                          <img src="{{ obj.image.url }}" alt="{{ obj.name }}"
-                              style="width:40px;height:40px;object-fit:cover;" class="me-2 rounded">
-                        {% endif %}
-                        <div class="flex-grow-1">
-                          <div class="small"><strong>{{ obj.name }}</strong></div>
-                          <div class="small text-muted">
-                            ×{{ item.quantity }} —
-                            {% if item.get_total_price %}
-                              £{{ item.get_total_price|floatformat:2 }}
-                            {% else %}
-                              £{{ item.subtotal|floatformat:2 }}
-                            {% endif %}
+                  <li>
+                    <div class="d-flex align-items-center mb-2 dropdown-item-text">
+                      {% if item.bundle %}
+                        {% with obj=item.bundle %}
+                          {% if obj.image %}
+                            <img src="{{ obj.image.url }}" alt="{{ obj.name }}"
+                                style="width:40px;height:40px;object-fit:cover;" class="me-2 rounded">
+                          {% endif %}
+                          <div class="flex-grow-1">
+                            <div class="small"><strong>{{ obj.name }}</strong></div>
+                            <div class="small text-muted">
+                              ×{{ item.quantity }} —
+                              {% if item.get_total_price %}
+                                £{{ item.get_total_price|floatformat:2 }}
+                              {% else %}
+                                £{{ item.subtotal|floatformat:2 }}
+                              {% endif %}
+                            </div>
                           </div>
-                        </div>
-                      {% endwith %}
-                    {% else %}
-                      {# Product line (session or DB cart) #}
-                      {% with obj=item.product %}
-                        {% if obj and obj.image %}
-                          <img src="{{ obj.image.url }}" alt="{{ obj.name }}"
-                              style="width:40px;height:40px;object-fit:cover;" class="me-2 rounded">
-                        {% endif %}
-                        <div class="flex-grow-1">
-                          <div class="small"><strong>{{ obj.name }}</strong></div>
-                          <div class="small text-muted">
-                            ×{{ item.quantity }} —
-                            {% if item.get_total_price %}
-                              £{{ item.get_total_price|floatformat:2 }}
-                            {% else %}
-                              £{{ item.subtotal|floatformat:2 }}
-                            {% endif %}
+                        {% endwith %}
+                      {% else %}
+                        {% with obj=item.product %}
+                          {% if obj and obj.image %}
+                            <img src="{{ obj.image.url }}" alt="{{ obj.name }}"
+                                style="width:40px;height:40px;object-fit:cover;" class="me-2 rounded">
+                          {% endif %}
+                          <div class="flex-grow-1">
+                            <div class="small"><strong>{{ obj.name }}</strong></div>
+                            <div class="small text-muted">
+                              ×{{ item.quantity }} —
+                              {% if item.get_total_price %}
+                                £{{ item.get_total_price|floatformat:2 }}
+                              {% else %}
+                                £{{ item.subtotal|floatformat:2 }}
+                              {% endif %}
+                            </div>
                           </div>
-                        </div>
-                      {% endwith %}
-                    {% endif %}
-
-                  </div>
+                        {% endwith %}
+                      {% endif %}
+                    </div>
+                  </li>
                 {% endfor %}
 
-                <div class="dropdown-divider"></div>
+                <li><hr class="dropdown-divider"></li>
+
+                <li class="px-2">
                   <a href="{% url 'orders:cart' %}" class="btn btn-sm btn-primary w-100">
                     View Cart ({{ cart_item_count }})
                   </a>
+                </li>
 
-                  <div class="dropdown-divider"></div>
+                <li><hr class="dropdown-divider"></li>
+
+                <li class="px-2">
                   <form action="{% url 'orders:clear_cart' %}" method="post" class="mt-2">
                     {% csrf_token %}
                     <input type="hidden" name="next" value="{{ request.get_full_path }}">
@@ -152,18 +155,23 @@
                       Clear Cart
                     </button>
                   </form>
+                </li>
               {% else %}
-                <p class="dropdown-item text-center mb-0">Your cart is empty</p>
+                <li><span class="dropdown-item-text text-center d-block">Your cart is empty</span></li>
               {% endif %}
             </ul>
           </div>
 
           <!-- Profile Dropdown -->
           <div class="dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button"
-               data-bs-toggle="dropdown" aria-expanded="false">
+            <button class="nav-link dropdown-toggle btn btn-link p-0"
+                    id="profileDropdown"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-haspopup="true">
               <i class="fa-solid fa-user"></i> Profile
-            </a>
+            </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
               {% if user.is_authenticated %}
                 <li><a class="dropdown-item" href="{% url 'users:dashboard' %}">My Account</a></li>
@@ -185,12 +193,11 @@
 
 {# Promo banner (unchanged) #}
 {% if promo_banner %}
-  <div class="promo-banner position-relative text-center">
-    <span class="promo-text">{{ promo_banner }}</span>
-    <button type="button" class="btn-close btn-close-white position-absolute end-0
-                           top-50 translate-middle-y me-3"
-            aria-label="Close"
-            onclick="this.parentElement.style.display='none';">
-    </button>
-  </div>
+<div class="promo-banner position-relative text-center">
+  <span class="promo-text">{{ promo_banner }}</span>
+  <button type="button" class="btn-close btn-close-white position-absolute end-0
+                           top-50 translate-middle-y me-3" aria-label="Close"
+    onclick="this.parentElement.style.display='none';">
+  </button>
+</div>
 {% endif %}
