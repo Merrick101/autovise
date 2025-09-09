@@ -7,7 +7,7 @@ from apps.products.models import Product, Bundle
 from django.views.decorators.http import require_POST
 from django.core.mail import send_mail
 from django.utils.html import strip_tags
-from .models import NewsletterSubscriber
+from .models import NewsletterSubscriber, ContactMessage
 from .forms import NewsletterForm, ContactForm
 
 
@@ -44,11 +44,32 @@ def terms_and_conditions(request):
     return render(request, 'pages/terms.html')
 
 
+def _client_ip(request):
+    xff = request.META.get("HTTP_X_FORWARDED_FOR")
+    if xff:
+        # typical format: "client, proxy1, proxy2"
+        return xff.split(",")[0].strip()
+    return request.META.get("REMOTE_ADDR")
+
+
 def contact(request):
     if request.method == "POST":
         form = ContactForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
+
+            # 1) Save submission
+            ContactMessage.objects.create(
+                name=cd["name"],
+                email=cd["email"],
+                subject=cd["subject"],
+                message=cd["message"],
+                user=request.user if request.user.is_authenticated else None,
+                ip_address=_client_ip(request),
+                user_agent=(request.META.get("HTTP_USER_AGENT") or "")[:500],
+            )
+
+            # 2) Send notification email
             subj = f"[Autovise Contact] {cd['subject']}"
             body = (
                 f"From: {cd['name']} <{cd['email']}>\n"
