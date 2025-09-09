@@ -1,31 +1,32 @@
-# apps/users/views.py
+"""
+Views for user profile management, dashboard, account deletion,
+and saving products/bundles for later.
+Located at /apps/users/views.py
+"""
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect, get_object_or_404
 from apps.products.models import Product, Bundle
 from .models import UserProfile
-from .forms import UserForm, UserProfileForm
+from .forms import UserForm
 
 
 @login_required
 def profile_view(request):
     user_form = UserForm(instance=request.user)
-    profile_form = UserProfileForm(instance=request.user.profile)
 
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance=request.user)
-        profile_form = UserProfileForm(request.POST, instance=request.user.profile)
-        if user_form.is_valid() and profile_form.is_valid():
+        if user_form.is_valid():
             user_form.save()
-            profile_form.save()
-            return redirect('profile')
+            return redirect('users:profile')
 
     context = {
         'user_form': user_form,
-        'profile_form': profile_form,
         'first_time_discount': request.user.profile.is_first_time_buyer
     }
     return render(request, 'users/profile.html', context)
@@ -33,13 +34,13 @@ def profile_view(request):
 
 @login_required
 def dashboard(request):
-    profile = request.user.profile
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
     saved_products = profile.saved_products.all()
     saved_bundles = profile.saved_bundles.all()
-    order_count = request.user.orders.count() if hasattr(request.user, "orders") else 0
+    order_count = request.user.order_set.count()
 
     context = {
-        'user': request.user,
         'profile': profile,
         'saved_products': saved_products,
         'saved_bundles': saved_bundles,
@@ -61,25 +62,33 @@ def delete_account(request):
 @login_required
 def save_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
-    if product in profile.saved_products.all():
+    if profile.saved_products.filter(id=product.id).exists():
         profile.saved_products.remove(product)
+        messages.info(request, "Removed product from saved.")
     else:
         profile.saved_products.add(product)
+        messages.success(request, "Saved product for later.")
 
-    # Redirect back to the same page or product detail
-    return redirect(request.META.get('HTTP_REFERER', 'products:product_list'))
+    next_url = request.POST.get("next") or request.META.get("HTTP_REFERER") \
+        or reverse("products:product_list")
+    return redirect(next_url)
 
 
+@require_POST
 @login_required
 def save_bundle(request, bundle_id):
     bundle = get_object_or_404(Bundle, id=bundle_id)
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
-    if bundle in profile.saved_bundles.all():
+    if profile.saved_bundles.filter(id=bundle.id).exists():
         profile.saved_bundles.remove(bundle)
+        messages.info(request, "Removed bundle from saved.")
     else:
         profile.saved_bundles.add(bundle)
+        messages.success(request, "Saved bundle for later.")
 
-    return redirect(request.META.get('HTTP_REFERER', 'products:bundle_list'))
+    next_url = request.POST.get("next") or request.META.get("HTTP_REFERER") \
+        or reverse("products:bundle_list")
+    return redirect(next_url)

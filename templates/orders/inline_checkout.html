@@ -67,10 +67,18 @@
             
             <div class="col-md-3">
               <label for="shipping_country" class="form-label">Country</label>
-              <select id="shipping_country" name="shipping_country" required class="form-select">
-                <option value="GB" {% if saved_address and saved_address.country == "GB" %}selected{% endif %}>United Kingdom</option>
-                <option value="IE" {% if saved_address and saved_address.country == "IE" %}selected{% endif %}>Ireland</option>
-                <!-- Optional: add others as needed -->
+              <select id="shipping_country" name="shipping_country" class="form-select" required>
+                <option value=""
+                        {% if not saved_address or not saved_address.country %}selected{% endif %}
+                        disabled>
+                  Select a country
+                </option>
+                <option value="GB" {% if saved_address and saved_address.country == "GB" %}selected{% endif %}>
+                  United Kingdom
+                </option>
+                <option value="IE" {% if saved_address and saved_address.country == "IE" %}selected{% endif %}>
+                  Ireland
+                </option>
               </select>
             </div>
           </div>

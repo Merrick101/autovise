@@ -5,9 +5,11 @@
 <div class="container mt-5">
   <h2>🧾 Your Order History</h2>
 
-  {% if request.user.is_authenticated and request.user.order_set.exists %}
+  {# Use queryset truthiness; this evaluates to .exists() under the hood #}
+  {% if request.user.is_authenticated and request.user.order_set.all %}
+    {# Prefer DB ordering in the view; if not, keep dictsortreversed fallback #}
     {% for order in request.user.order_set.all|dictsortreversed:"created_at" %}
-      <div class="card mb-4 mt-3">
+      <div class="card mb-4 mt-3" id="order-{{ order.id }}">
         <div class="card-header">
           <strong>Order #{{ order.id }}</strong> — {{ order.created_at|date:"F j, Y" }}
         </div>

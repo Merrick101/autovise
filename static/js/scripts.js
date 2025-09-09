@@ -280,3 +280,31 @@ function updateFilterParam(key, value) {
   params.delete('page');
   window.location.search = params;
 }
+
+// Clear all saved items (products + bundles) in the dashboard
+document.addEventListener("click", async (e) => {
+  if (e.target && e.target.id === "clear-saved-btn") {
+    if (!confirm("Remove all saved items?")) return;
+
+    const forms = Array.from(document.querySelectorAll(".saved-remove-form"));
+    if (!forms.length) return;
+
+    try {
+      await Promise.all(
+        forms.map((form) => {
+          const formData = new FormData(form);
+          return fetch(form.action, {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "X-CSRFToken": getCookie("csrftoken") || "" },
+            body: formData,
+          });
+        })
+      );
+      window.location.reload();
+    } catch (err) {
+      console.error("Clear saved failed:", err);
+      alert("Sorry, something went wrong clearing your saved items.");
+    }
+  }
+});

@@ -1,0 +1,1100 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Autovise is your go-to brand for premium car accessories and care bundles. Shop smarter with quality, performance, and trust.">
+  <meta name="keywords" content="car accessories, car care, premium car products, Autovise, automotive accessories, car maintenance">
+  <meta name="author" content="Autovise Team">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autovise</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/static/images/favicon.ico">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <!-- Optional: Your main CSS -->
+  <link rel="stylesheet" href="/static/css/styles.css">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Orbitron:wght@400..900&family=Racing+Sans+One&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/a60794e3bd.js" crossorigin="anonymous"></script>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- templates/include/navbar.html -->
+
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top" role="navigation" aria-label="Main navigation">
+  <div class="container-fluid">
+
+    <!-- Logo -->
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <!-- Inline SVG gear icon... -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" fill="#4682B4" class="bi bi-gear-wide-connected"
+        viewBox="0 0 16 16">
+        <path
+          d="M7.068.727c.243-.97 1.62-.97 1.864 0l.071.286a.96.96 0 0 0 1.622.434l.205-.211c.695-.719 1.888-.03 1.613.931l-.08.284a.96.96 0 0 0 1.187 1.187l.283-.081c.96-.275 1.65.918.931 1.613l-.211.205a.96.96 0 0 0 .434 1.622l.286.071c.97.243.97 1.62 0 1.864l-.286.071a.96.96 0 0 0-.434 1.622l.211.205c.719.695.03 1.888-.931 1.613l-.284-.08a.96.96 0 0 0-1.187 1.187l.081.283c.275.96-.918 1.65-1.613.931l-.205-.211a.96.96 0 0 0-1.622.434l-.071.286c-.243.97-1.62.97-1.864 0l-.071-.286a.96.96 0 0 0-1.622-.434l-.205.211c-.695.719-1.888.03-1.613-.931l.08-.284a.96.96 0 0 0-1.186-1.187l-.284.081c-.96.275-1.65-.918-.931-1.613l.211-.205a.96.96 0 0 0-.434-1.622l-.286-.071c-.97-.243-.97-1.62 0-1.864l.286-.071a.96.96 0 0 0 .434-1.622l-.211-.205c-.719-.695-.03-1.888.931-1.613l.284.08a.96.96 0 0 0 1.187-1.186l-.081-.284c-.275-.96.918-1.65 1.613-.931l.205.211a.96.96 0 0 0 1.622-.434zM12.973 8.5H8.25l-2.834 3.779A4.998 4.998 0 0 0 12.973 8.5m0-1a4.998 4.998 0 0 0-7.557-3.779l2.834 3.78zM5.048 3.967l-.087.065zm-.431.355A4.98 4.98 0 0 0 3.002 8c0 1.455.622 2.765 1.615 3.678L7.375 8zm.344 7.646.087.065z" />
+      </svg>
+      <span class="fw-bold fs-3 logo-text">AUTOVISE</span>
+    </a>
+
+    <!-- Hamburger Toggle -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+      aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Collapsible Content -->
+    <div class="collapse navbar-collapse" id="mainNavbar">
+      <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center
+                  justify-content-lg-between w-100 gap-2 mt-3 mt-lg-0">
+
+        <form class="d-flex w-100 w-lg-50 mb-2 mb-lg-0 me-lg-3" method="get" role="search" aria-label="Site search"
+          action="
+                    /products/
+                  ">
+          <label for="nav-search" class="visually-hidden">Search</label>
+          <input id="nav-search" type="search" name="q" class="form-control"
+            placeholder="Search products…"
+            value="">
+
+          
+          <input type="hidden" name="category" value="">
+          <input type="hidden" name="tier" value="">
+          <input type="hidden" name="sort" value="">
+          
+        </form>
+
+        <!-- Nav Items -->
+        <div class="d-flex flex-row gap-3 align-items-center justify-content-center justify-content-lg-end w-100">
+          
+          <!-- Products Dropdown -->
+          <div class="dropdown">
+            <button class="nav-link dropdown-toggle btn btn-link p-0"
+                    id="productsDropdown"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-haspopup="true">
+              <i class="fa-solid fa-car"></i> Products
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="productsDropdown">
+              <li><a class="dropdown-item" href="/products/">All Products</a></li>
+              <li><a class="dropdown-item" href="/products/bundles/">Bundles</a></li>
+              <li><hr class="dropdown-divider"></li>
+              
+                <li>
+                  <a class="dropdown-item" href="/products/?category=accessories">
+                    Accessories
+                  </a>
+                </li>
+              
+                <li>
+                  <a class="dropdown-item" href="/products/?category=cleaning-care">
+                    Cleaning &amp; Care
+                  </a>
+                </li>
+              
+                <li>
+                  <a class="dropdown-item" href="/products/?category=electronics">
+                    Electronics
+                  </a>
+                </li>
+              
+                <li>
+                  <a class="dropdown-item" href="/products/?category=performance">
+                    Performance
+                  </a>
+                </li>
+              
+                <li>
+                  <a class="dropdown-item" href="/products/?category=safety-emergency">
+                    Safety &amp; Emergency
+                  </a>
+                </li>
+              
+            </ul>
+          </div>
+
+          <!-- Cart Dropdown -->
+          <div class="dropdown">
+            <button class="nav-link dropdown-toggle btn btn-link p-0 position-relative"
+                    id="cartDropdown"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-haspopup="true">
+              <i class="fas fa-shopping-cart"></i> Cart
+              
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-end p-3" aria-labelledby="cartDropdown" style="min-width: 280px;">
+              
+                <li><span class="dropdown-item-text text-center d-block">Your cart is empty</span></li>
+              
+            </ul>
+          </div>
+
+          <!-- Profile Dropdown -->
+          <div class="dropdown">
+            <button class="nav-link dropdown-toggle btn btn-link p-0"
+                    id="profileDropdown"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-haspopup="true">
+              <i class="fa-solid fa-user"></i> Profile
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+              
+                <li><a class="dropdown-item" href="/accounts/login/">Login</a></li>
+                <li><a class="dropdown-item" href="/accounts/signup/">Register</a></li>
+              
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</nav>
+
+
+
+
+  <main class="container my-4 flex-grow-1">
+    
+
+    
+<h2 class="mb-4">Autovise Product Catalog</h2>
+
+<!-- MOBILE: stacked selects -->
+<div class="d-block d-sm-none mb-4">
+  
+  <label for="mobile-category" class="visually-hidden">Category</label>
+  <select id="mobile-category" class="form-select mb-2"
+          onchange="updateFilterParam('category', this.value)">
+    <option value="" selected>All Categories</option>
+    
+      <option value="accessories" >
+        Accessories
+      </option>
+    
+      <option value="cleaning-care" >
+        Cleaning &amp; Care
+      </option>
+    
+      <option value="electronics" >
+        Electronics
+      </option>
+    
+      <option value="performance" >
+        Performance
+      </option>
+    
+      <option value="safety-emergency" >
+        Safety &amp; Emergency
+      </option>
+    
+  </select>
+
+  
+  <label for="mobile-sort" class="visually-hidden">Sort</label>
+  <select id="mobile-sort" class="form-select mb-2"
+          onchange="updateFilterParam('sort', this.value)">
+    <option value="" selected>Default Sort</option>
+    <option value="price_asc"  >Price: Low → High</option>
+    <option value="price_desc" >Price: High → Low</option>
+  </select>
+
+  
+  <label for="mobile-tier" class="visually-hidden">Tier</label>
+  <select id="mobile-tier" class="form-select"
+          onchange="updateFilterParam('tier', this.value)">
+    <option value="" selected>All Tiers</option>
+    <option value="Standard" >Standard</option>
+    <option value="Pro"      >Pro</option>
+  </select>
+</div>
+
+<!-- DESKTOP: pills + inline selects -->
+<div class="d-none d-sm-block mb-4">
+  
+  <ul class="nav nav-pills mb-2 flex-row flex-wrap">
+    <li class="nav-item">
+      <a class="nav-link active"
+         href="?">
+        All Categories
+      </a>
+    </li>
+    
+      <li class="nav-item">
+        <a class="nav-link "
+           href="?category=accessories&">
+          Accessories
+        </a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-link "
+           href="?category=cleaning-care&">
+          Cleaning &amp; Care
+        </a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-link "
+           href="?category=electronics&">
+          Electronics
+        </a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-link "
+           href="?category=performance&">
+          Performance
+        </a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-link "
+           href="?category=safety-emergency&">
+          Safety &amp; Emergency
+        </a>
+      </li>
+    
+  </ul>
+
+  
+  <div class="d-flex gap-2">
+    <select class="form-select w-auto form-select-sm"
+            onchange="updateFilterParam('sort', this.value)">
+      <option value="" selected>Sort</option>
+      <option value="price_asc"  >Low → High</option>
+      <option value="price_desc" >High → Low</option>
+    </select>
+
+    <select class="form-select w-auto form-select-sm"
+            onchange="updateFilterParam('tier', this.value)">
+      <option value="" selected>Tier</option>
+      <option value="Standard" >Standard</option>
+      <option value="Pro"      >Pro</option>
+    </select>
+  </div>
+</div>
+
+<!-- Product Grid -->
+  
+    <div class="row">
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A1__gel-pod-air-freshener__dashboard.png" class="card-img-top img-fluid product-list-image" alt="Gel Pod Air Freshener – Dashboard">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Gel Pod Air Freshener – Dashboard</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£4.49</p>
+                <p class="card-text small text-muted">A spill-free scent solution that sticks securely to your dashboard or console. …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/8/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/8/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/8/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A1__vent-clip-air-freshener__vanilla-breeze.png" class="card-img-top img-fluid product-list-image" alt="Vent Clip Air Freshener – Vanilla Breeze">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Vent Clip Air Freshener – Vanilla Breeze</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£3.49</p>
+                <p class="card-text small text-muted">Enhance your daily drive with the warm, comforting aroma of vanilla. This …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/9/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/9/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/9/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+              <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Pro</span>
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A1__essential-oil-diffuser__usb-powered-v2.png" class="card-img-top img-fluid product-list-image" alt="Essential Oil Diffuser – USB Powered">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Essential Oil Diffuser – USB Powered</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£9.99</p>
+                <p class="card-text small text-muted">Description: Bring spa-level freshness to your car with this refillable electric diffuser. …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/10/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/10/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/10/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+              <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Pro</span>
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A1__essential-oil-set__signature-scents.png" class="card-img-top img-fluid product-list-image" alt="Essential Oil Set – Signature Scents (3-Pack)">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Essential Oil Set – Signature Scents (3-Pack)</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£14.99</p>
+                <p class="card-text small text-muted">A curated trio of premium-grade essential oils designed for in-car aromatherapy. Created …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/11/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/11/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/11/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A2__blind-spot-mirror__oval-stick-on.png" class="card-img-top img-fluid product-list-image" alt="Blind Spot Mirror – Oval Stick-On">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Blind Spot Mirror – Oval Stick-On</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£3.99</p>
+                <p class="card-text small text-muted">Slim and discreet, this oval stick-on mirror expands your side view for …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/12/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/12/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/12/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A2__blind-spot-mirror__rectangular-hd-glass.png" class="card-img-top img-fluid product-list-image" alt="Blind Spot Mirror – Rectangular HD Glass">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Blind Spot Mirror – Rectangular HD Glass</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£4.29</p>
+                <p class="card-text small text-muted">See more of what matters. This rectangular blind spot mirror is crafted …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/13/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/13/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/13/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+              <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Pro</span>
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A2__blind-spot-mirror__auto-dimming-glass.png" class="card-img-top img-fluid product-list-image" alt="Blind Spot Mirror – Auto-Dimming Glass">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Blind Spot Mirror – Auto-Dimming Glass</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£6.99</p>
+                <p class="card-text small text-muted">A premium blind spot mirror that adjusts to lighting conditions. Reduces glare …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/14/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/14/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/14/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A3__crystal-sun-catcher__crescent-moon.png" class="card-img-top img-fluid product-list-image" alt="Crystal Sun Catcher – Crescent Moon">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Crystal Sun Catcher – Crescent Moon</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£5.49</p>
+                <p class="card-text small text-muted">A dreamy boho/celestial-inspired sun catcher with a delicate crescent moon shape. Casts …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/15/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/15/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/15/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A3__crystal-sun-catcher__lotus-prism.png" class="card-img-top img-fluid product-list-image" alt="Crystal Sun Catcher – Lotus Prism">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Crystal Sun Catcher – Lotus Prism</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£5.49</p>
+                <p class="card-text small text-muted">A radiant lotus-cut glass prism that reflects sunlight into soft rainbow patterns. …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/16/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/16/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/16/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+              <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Pro</span>
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A3__crystal-sun-catcher__gold-frame-cluster.png" class="card-img-top img-fluid product-list-image" alt="Crystal Sun Catcher – Gold Frame Cluster">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Crystal Sun Catcher – Gold Frame Cluster</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£7.99</p>
+                <p class="card-text small text-muted">Luxury meets light play in this gold-framed multi-prism cluster. Adds a premium …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/17/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/17/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/17/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A4__cup-holder-coaster__glow-in-the-dark.png" class="card-img-top img-fluid product-list-image" alt="Cup Holder Coaster – Glow-in-the-Dark">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Cup Holder Coaster – Glow-in-the-Dark</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£3.99</p>
+                <p class="card-text small text-muted">Add nighttime visibility to your cabin with these silicone coasters that glow …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/18/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/18/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/18/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A4__cup-holder-coaster__wood-finish.png" class="card-img-top img-fluid product-list-image" alt="Cup Holder Coaster – Wood Finish">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Cup Holder Coaster – Wood Finish</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      <i class="fas fa-star text-warning me-1"></i>5.0 (1)
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£4.49</p>
+                <p class="card-text small text-muted">Bring warmth and elegance to your interior with this faux-wood coaster set. …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/19/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/19/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/19/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+              <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Pro</span>
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A4__cup-holder-coaster__aluminium-finish.png" class="card-img-top img-fluid product-list-image" alt="Cup Holder Coaster – Aluminium Finish">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Cup Holder Coaster – Aluminium Finish</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£6.49</p>
+                <p class="card-text small text-muted">A sleek, metallic upgrade for modern interiors. These brushed alloy coasters offer …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/20/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/20/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/20/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A5__dashboard-grip-mat__silicone-edge.png" class="card-img-top img-fluid product-list-image" alt="Dashboard Grip Mat – Silicone Edge">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Dashboard Grip Mat – Silicone Edge</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£3.79</p>
+                <p class="card-text small text-muted">Keep your essentials from sliding mid-drive with this raised-edge grip mat. Great …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/21/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/21/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/21/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A5__dashboard-grip-mat__transparent.png" class="card-img-top img-fluid product-list-image" alt="Dashboard Grip Mat – Transparent">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Dashboard Grip Mat – Transparent</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£2.99</p>
+                <p class="card-text small text-muted">Discreet and functional. This clear dashboard mat keeps your items in place …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/22/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/22/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/22/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+              <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Pro</span>
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A5__dashboard-grip-mat__modular-slot-design.png" class="card-img-top img-fluid product-list-image" alt="Dashboard Organizer Mat – Modular Slot Design">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Dashboard Organizer Mat – Modular Slot Design</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£12.99</p>
+                <p class="card-text small text-muted">A high-end dashboard mat with built-in compartments to organize your most-used items. …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/23/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/23/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/23/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A6__dip-clip__foldable.png" class="card-img-top img-fluid product-list-image" alt="Dip Clip – Foldable">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Dip Clip – Foldable</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£3.99</p>
+                <p class="card-text small text-muted">A compact and clever solution for on-the-go snacking. This foldable dip clip …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/24/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/24/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/24/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+              <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Pro</span>
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A6__dip-clip__heated-sauce-edition.png" class="card-img-top img-fluid product-list-image" alt="Dip Clip – Heated Sauce Edition">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Dip Clip – Heated Sauce Edition</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£7.99</p>
+                <p class="card-text small text-muted">Take your drive-thru game to the next level. This premium clip gently …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/25/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/25/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/25/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A7__floor-mat__all-weather-universal.png" class="card-img-top img-fluid product-list-image" alt="Floor Mat Set – All-Weather – Universal">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Floor Mat Set – All-Weather – Universal</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£13.99</p>
+                <p class="card-text small text-muted">Durable rubber mats designed for year-round protection. Built to trap water, mud, …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/26/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/26/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/26/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            
+            
+              <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A7__floor-mat__carpeted-universal.png" class="card-img-top img-fluid product-list-image" alt="Floor Mat Set – Carpeted – Universal">
+            
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title product-title">Floor Mat Set – Carpeted – Universal</h5>
+                <!-- Review Summary -->
+                
+                  <div class="small text-muted mb-1">
+                    
+                      No reviews yet
+                    
+                  </div>
+                
+                <p class="card-text fw-semibold">£11.99</p>
+                <p class="card-text small text-muted">Soft carpeted floor mats ideal for everyday city driving. Adds a layer …</p>
+              </div>
+              <div class="mt-auto d-grid gap-2">
+                <a href="/products/27/" class="btn btn-outline-secondary btn-sm">View</a>
+                <form action="/orders/add-to-cart/27/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <input type="hidden" name="quantity" value="1">
+                  <button class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                </form>
+                <form action="/users/save/27/" method="post"><input type="hidden" name="csrfmiddlewaretoken" value="YNSpzqXSaihdX1qvrQydfsCOPZi8cIORju0yIMOOJQbUWmRuxeD7LDriaucoxYQz">
+                  <button class="btn btn-outline-primary btn-sm w-100">Save</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+    </div>
+  
+
+<!-- Pagination controls -->
+<nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">
+    
+      <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+    
+
+    
+      <li class="page-item active">
+        <a class="page-link"
+           href="?page=1">
+          1
+        </a>
+      </li>
+    
+      <li class="page-item ">
+        <a class="page-link"
+           href="?page=2">
+          2
+        </a>
+      </li>
+    
+      <li class="page-item ">
+        <a class="page-link"
+           href="?page=3">
+          3
+        </a>
+      </li>
+    
+      <li class="page-item ">
+        <a class="page-link"
+           href="?page=4">
+          4
+        </a>
+      </li>
+    
+      <li class="page-item ">
+        <a class="page-link"
+           href="?page=5">
+          5
+        </a>
+      </li>
+    
+      <li class="page-item ">
+        <a class="page-link"
+           href="?page=6">
+          6
+        </a>
+      </li>
+    
+      <li class="page-item ">
+        <a class="page-link"
+           href="?page=7">
+          7
+        </a>
+      </li>
+    
+      <li class="page-item ">
+        <a class="page-link"
+           href="?page=8">
+          8
+        </a>
+      </li>
+    
+
+    
+      <li class="page-item">
+        <a class="page-link"
+           href="?page=2"
+           aria-label="Next">&raquo;</a>
+      </li>
+    
+  </ul>
+</nav>
+
+  </main>
+
+  <!-- templates/include/footer.html -->
+
+<footer class="bg-dark text-white text-center py-4 mt-auto">
+  <div class="container">
+    <p class="mb-1">© 2025 Autovise. All rights reserved.</p>
+    <div class="d-flex justify-content-center gap-3 mt-2 small">
+      <a href="/pages/privacy/" class="text-white text-decoration-none">Privacy Policy</a>
+      <a href="/pages/terms/" class="text-white text-decoration-none">Terms & Conditions</a>
+      <a href="/pages/contact/" class="text-white text-decoration-none">Contact Us</a>
+    </div>
+  </div>
+</footer>
+
+
+  <!-- Bootstrap JS Bundle (with Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script src="/static/js/scripts.js" defer></script>
+  
+  
+
+</body>
+</html>

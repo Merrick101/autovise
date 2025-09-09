@@ -1,0 +1,1398 @@
+<!-- templates/products/bundle_list.html -->
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Autovise is your go-to brand for premium car accessories and care bundles. Shop smarter with quality, performance, and trust.">
+  <meta name="keywords" content="car accessories, car care, premium car products, Autovise, automotive accessories, car maintenance">
+  <meta name="author" content="Autovise Team">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autovise</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/static/images/favicon.ico">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <!-- Optional: Your main CSS -->
+  <link rel="stylesheet" href="/static/css/styles.css">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Orbitron:wght@400..900&family=Racing+Sans+One&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/a60794e3bd.js" crossorigin="anonymous"></script>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- templates/include/navbar.html -->
+
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top" role="navigation" aria-label="Main navigation">
+  <div class="container-fluid">
+
+    <!-- Logo -->
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <!-- Inline SVG gear icon... -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" fill="#4682B4" class="bi bi-gear-wide-connected"
+        viewBox="0 0 16 16">
+        <path
+          d="M7.068.727c.243-.97 1.62-.97 1.864 0l.071.286a.96.96 0 0 0 1.622.434l.205-.211c.695-.719 1.888-.03 1.613.931l-.08.284a.96.96 0 0 0 1.187 1.187l.283-.081c.96-.275 1.65.918.931 1.613l-.211.205a.96.96 0 0 0 .434 1.622l.286.071c.97.243.97 1.62 0 1.864l-.286.071a.96.96 0 0 0-.434 1.622l.211.205c.719.695.03 1.888-.931 1.613l-.284-.08a.96.96 0 0 0-1.187 1.187l.081.283c.275.96-.918 1.65-1.613.931l-.205-.211a.96.96 0 0 0-1.622.434l-.071.286c-.243.97-1.62.97-1.864 0l-.071-.286a.96.96 0 0 0-1.622-.434l-.205.211c-.695.719-1.888.03-1.613-.931l.08-.284a.96.96 0 0 0-1.186-1.187l-.284.081c-.96.275-1.65-.918-.931-1.613l.211-.205a.96.96 0 0 0-.434-1.622l-.286-.071c-.97-.243-.97-1.62 0-1.864l.286-.071a.96.96 0 0 0 .434-1.622l-.211-.205c-.719-.695-.03-1.888.931-1.613l.284.08a.96.96 0 0 0 1.187-1.186l-.081-.284c-.275-.96.918-1.65 1.613-.931l.205.211a.96.96 0 0 0 1.622-.434zM12.973 8.5H8.25l-2.834 3.779A4.998 4.998 0 0 0 12.973 8.5m0-1a4.998 4.998 0 0 0-7.557-3.779l2.834 3.78zM5.048 3.967l-.087.065zm-.431.355A4.98 4.98 0 0 0 3.002 8c0 1.455.622 2.765 1.615 3.678L7.375 8zm.344 7.646.087.065z" />
+      </svg>
+      <span class="fw-bold fs-3 logo-text">AUTOVISE</span>
+    </a>
+
+    <!-- Hamburger Toggle -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+      aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Collapsible Content -->
+    <div class="collapse navbar-collapse" id="mainNavbar">
+      <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center
+                  justify-content-lg-between w-100 gap-2 mt-3 mt-lg-0">
+
+        <form class="d-flex w-100 w-lg-50 mb-2 mb-lg-0 me-lg-3" method="get" role="search" aria-label="Site search"
+          action="
+                    /products/bundles/
+                  ">
+          <label for="nav-search" class="visually-hidden">Search</label>
+          <input id="nav-search" type="search" name="q" class="form-control"
+            placeholder="Search bundles…"
+            value="">
+
+          
+          <input type="hidden" name="type" value="">
+          <input type="hidden" name="sort" value="">
+          
+        </form>
+
+        <!-- Nav Items -->
+        <div class="d-flex flex-row gap-3 align-items-center justify-content-center justify-content-lg-end w-100">
+          
+          <!-- Products Dropdown -->
+          <div class="dropdown">
+            <button class="nav-link dropdown-toggle btn btn-link p-0"
+                    id="productsDropdown"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-haspopup="true">
+              <i class="fa-solid fa-car"></i> Products
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="productsDropdown">
+              <li><a class="dropdown-item" href="/products/">All Products</a></li>
+              <li><a class="dropdown-item" href="/products/bundles/">Bundles</a></li>
+              <li><hr class="dropdown-divider"></li>
+              
+                <li>
+                  <a class="dropdown-item" href="/products/?category=accessories">
+                    Accessories
+                  </a>
+                </li>
+              
+                <li>
+                  <a class="dropdown-item" href="/products/?category=cleaning-care">
+                    Cleaning &amp; Care
+                  </a>
+                </li>
+              
+                <li>
+                  <a class="dropdown-item" href="/products/?category=electronics">
+                    Electronics
+                  </a>
+                </li>
+              
+                <li>
+                  <a class="dropdown-item" href="/products/?category=performance">
+                    Performance
+                  </a>
+                </li>
+              
+                <li>
+                  <a class="dropdown-item" href="/products/?category=safety-emergency">
+                    Safety &amp; Emergency
+                  </a>
+                </li>
+              
+            </ul>
+          </div>
+
+          <!-- Cart Dropdown -->
+          <div class="dropdown">
+            <button class="nav-link dropdown-toggle btn btn-link p-0 position-relative"
+                    id="cartDropdown"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-haspopup="true">
+              <i class="fas fa-shopping-cart"></i> Cart
+              
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-end p-3" aria-labelledby="cartDropdown" style="min-width: 280px;">
+              
+                <li><span class="dropdown-item-text text-center d-block">Your cart is empty</span></li>
+              
+            </ul>
+          </div>
+
+          <!-- Profile Dropdown -->
+          <div class="dropdown">
+            <button class="nav-link dropdown-toggle btn btn-link p-0"
+                    id="profileDropdown"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-haspopup="true">
+              <i class="fa-solid fa-user"></i> Profile
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+              
+                <li><a class="dropdown-item" href="/accounts/login/">Login</a></li>
+                <li><a class="dropdown-item" href="/accounts/signup/">Register</a></li>
+              
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</nav>
+
+
+
+<div class="promo-banner position-relative text-center">
+  <span class="promo-text">💡 10% Off All Bundles — Discount Applied Automatically</span>
+  <button type="button" class="btn-close btn-close-white position-absolute end-0
+                           top-50 translate-middle-y me-3" aria-label="Close"
+    onclick="this.parentElement.style.display='none';">
+  </button>
+</div>
+
+
+  <main class="container my-4 flex-grow-1">
+    
+
+    
+
+<h2 class="mb-4">Autovise Bundles</h2>
+
+
+<div class="mb-4 d-flex flex-wrap align-items-center justify-content-between gap-2">
+  
+  <div class="btn-group" role="group">
+    <a href="/products/bundles/"
+       class="btn btn-outline-secondary active">
+      All
+    </a>
+    <a href="?type=Standard"
+       class="btn btn-outline-secondary ">
+      Standard
+    </a>
+    <a href="?type=Pro"
+       class="btn btn-outline-secondary ">
+      Pro
+    </a>
+    <a href="?type=Special"
+       class="btn btn-outline-secondary ">
+      Special
+    </a>
+  </div>
+
+  
+  <form id="bundle-filter-form" method="get" class="d-flex align-items-center">
+    
+    <input type="hidden" name="type" value="None">
+    <label for="sort" class="me-2 mb-0">Sort:</label>
+    <select name="sort"
+            id="sort"
+            class="form-select form-select-sm"
+            onchange="this.form.submit()">
+      <option value="" selected>—</option>
+      <option value="price_asc"
+        >
+        Price: Low → High
+      </option>
+      <option value="price_desc"
+        >
+        Price: High → Low
+      </option>
+    </select>
+  </form>
+</div>
+
+<div class="row">
+  
+    <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+
+        
+          <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Pro</span>
+        
+
+        
+          <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/special_bundles/BND__road-warrior-survival-kit.png" class="card-img-top img-fluid bundle-image" alt="Road Warrior Survival Kit">
+        
+
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="card-title product-title">Road Warrior Survival Kit</h5>
+            <!-- Review Summary -->
+            
+              <div class="small text-muted mb-1">
+                
+                  No reviews yet
+                
+              </div>
+            
+            <p class="card-text fw-semibold text-success">
+              £46.32
+              
+                <small class="text-muted text-decoration-line-through">
+                  £51.47
+                </small>
+              
+            </p>
+            <p class="card-text small text-muted">
+              A fully equipped, high-resilience emergency kit built for long-distance travellers, rural drivers, …
+            </p>
+            <div class="d-flex gap-1 my-2">
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/safety_emergency/S4__winter-emergency-box__arctic-grade.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Winter Emergency Box – Arctic Grade"
+                       alt="Winter Emergency Box – Arctic Grade"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/safety_emergency/S1__car-escape-tool__led-handle.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Car Escape Tool – LED Handle"
+                       alt="Car Escape Tool – LED Handle"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/safety_emergency/S5__first-aid-kit__hard-shell.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="First Aid Kit – Hard Shell"
+                       alt="First Aid Kit – Hard Shell"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+            </div>
+          </div>
+
+          <div class="mt-auto d-grid gap-2">
+            <a href="/products/bundles/12/"
+               class="btn btn-outline-secondary btn-sm">
+              View Bundle
+            </a>
+
+            <form action="/orders/cart/add_bundle/12/"
+                  method="post"
+                  class="mb-2 prevent-multi-submit">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+            </form>
+
+            <form action="/users/save-bundle/12/"
+                  method="post">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                Save for Later
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  
+    <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+
+        
+
+        
+          <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/special_bundles/BND__quick-fix-kit.png" class="card-img-top img-fluid bundle-image" alt="Quick Fix Kit">
+        
+
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="card-title product-title">Quick Fix Kit</h5>
+            <!-- Review Summary -->
+            
+              <div class="small text-muted mb-1">
+                
+                  No reviews yet
+                
+              </div>
+            
+            <p class="card-text fw-semibold text-success">
+              £19.32
+              
+                <small class="text-muted text-decoration-line-through">
+                  £21.47
+                </small>
+              
+            </p>
+            <p class="card-text small text-muted">
+              A compact all-rounder kit to keep your engine running smooth and your …
+            </p>
+            <div class="d-flex gap-1 my-2">
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/performance/P8__digital-tire-inflator__lcd-digital.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Digital Tire Inflator – LCD Digital"
+                       alt="Digital Tire Inflator – LCD Digital"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/performance/P6__throttle-body-cleaning-spray__500ml-aerosol.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Throttle Body Cleaner Spray – 500ml Aerosol"
+                       alt="Throttle Body Cleaner Spray – 500ml Aerosol"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/performance/P4__fuel-additive__octane-booster.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Fuel Additive – Octane Booster"
+                       alt="Fuel Additive – Octane Booster"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+            </div>
+          </div>
+
+          <div class="mt-auto d-grid gap-2">
+            <a href="/products/bundles/9/"
+               class="btn btn-outline-secondary btn-sm">
+              View Bundle
+            </a>
+
+            <form action="/orders/cart/add_bundle/9/"
+                  method="post"
+                  class="mb-2 prevent-multi-submit">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+            </form>
+
+            <form action="/users/save-bundle/9/"
+                  method="post">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                Save for Later
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  
+    <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+
+        
+
+        
+          <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/special_bundles/BND__drivers-basic-kit.png" class="card-img-top img-fluid bundle-image" alt="Drivers Basic Kit">
+        
+
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="card-title product-title">Drivers Basic Kit</h5>
+            <!-- Review Summary -->
+            
+              <div class="small text-muted mb-1">
+                
+                  No reviews yet
+                
+              </div>
+            
+            <p class="card-text fw-semibold text-success">
+              £22.47
+              
+                <small class="text-muted text-decoration-line-through">
+                  £24.97
+                </small>
+              
+            </p>
+            <p class="card-text small text-muted">
+              A reliable everyday bundle to keep drivers connected, powered, and hands-free. Perfect …
+            </p>
+            <div class="d-flex gap-1 my-2">
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/electronics/E1__bluetooth-adapter__aux-plug.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Bluetooth Adapter – AUX Plug"
+                       alt="Bluetooth Adapter – AUX Plug"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/electronics/E3__usb-charger__dual-port.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="USB Charger – Dual Port"
+                       alt="USB Charger – Dual Port"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/electronics/E7__phone-mount__dashboard-suction.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Phone Mount – Dashboard Suction"
+                       alt="Phone Mount – Dashboard Suction"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+            </div>
+          </div>
+
+          <div class="mt-auto d-grid gap-2">
+            <a href="/products/bundles/7/"
+               class="btn btn-outline-secondary btn-sm">
+              View Bundle
+            </a>
+
+            <form action="/orders/cart/add_bundle/7/"
+                  method="post"
+                  class="mb-2 prevent-multi-submit">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+            </form>
+
+            <form action="/users/save-bundle/7/"
+                  method="post">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                Save for Later
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  
+    <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+
+        
+          <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Pro</span>
+        
+
+        
+          <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/special_bundles/BND__pro-driving-companion-kit.png" class="card-img-top img-fluid bundle-image" alt="Pro Driving Companion Kit">
+        
+
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="card-title product-title">Pro Driving Companion Kit</h5>
+            <!-- Review Summary -->
+            
+              <div class="small text-muted mb-1">
+                
+                  No reviews yet
+                
+              </div>
+            
+            <p class="card-text fw-semibold text-success">
+              £40.92
+              
+                <small class="text-muted text-decoration-line-through">
+                  £45.47
+                </small>
+              
+            </p>
+            <p class="card-text small text-muted">
+              Upgrade your drive with essential smart tools for safety, speed, and connectivity. …
+            </p>
+            <div class="d-flex gap-1 my-2">
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/electronics/E1__bluetooth-adapter__fm-transmitter.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Bluetooth Adapter – FM Transmitter"
+                       alt="Bluetooth Adapter – FM Transmitter"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/electronics/E3__usb-charger__usb-c-fast-charge.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="USB Charger – USB-C Fast Charge"
+                       alt="USB Charger – USB-C Fast Charge"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/electronics/E6__heads-up-display__compact-obd-ii.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Heads-Up Display – Compact OBD II"
+                       alt="Heads-Up Display – Compact OBD II"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+            </div>
+          </div>
+
+          <div class="mt-auto d-grid gap-2">
+            <a href="/products/bundles/8/"
+               class="btn btn-outline-secondary btn-sm">
+              View Bundle
+            </a>
+
+            <form action="/orders/cart/add_bundle/8/"
+                  method="post"
+                  class="mb-2 prevent-multi-submit">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+            </form>
+
+            <form action="/users/save-bundle/8/"
+                  method="post">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                Save for Later
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  
+    <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+
+        
+          <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Pro</span>
+        
+
+        
+          <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/special_bundles/BND__interior-essentials-kit-v1.png" class="card-img-top img-fluid bundle-image" alt="Premium Interior Essentials Kit">
+        
+
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="card-title product-title">Premium Interior Essentials Kit</h5>
+            <!-- Review Summary -->
+            
+              <div class="small text-muted mb-1">
+                
+                  No reviews yet
+                
+              </div>
+            
+            <p class="card-text fw-semibold text-success">
+              £51.71
+              
+                <small class="text-muted text-decoration-line-through">
+                  £57.46
+                </small>
+              
+            </p>
+            <p class="card-text small text-muted">
+              Transform your cabin with this Pro-level bundle tailored for comfort, scent, and …
+            </p>
+            <div class="d-flex gap-1 my-2">
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A10__seat-cushion__cooling-gel-memory-foam.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Seat Cushion – Cooling Gel Memory Foam"
+                       alt="Seat Cushion – Cooling Gel Memory Foam"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A15__trunk-organizer__strap-lock-base.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Trunk Organizer – Strap-Lock Base"
+                       alt="Trunk Organizer – Strap-Lock Base"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A1__essential-oil-diffuser__usb-powered-v2.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Essential Oil Diffuser – USB Powered"
+                       alt="Essential Oil Diffuser – USB Powered"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+            </div>
+          </div>
+
+          <div class="mt-auto d-grid gap-2">
+            <a href="/products/bundles/4/"
+               class="btn btn-outline-secondary btn-sm">
+              View Bundle
+            </a>
+
+            <form action="/orders/cart/add_bundle/4/"
+                  method="post"
+                  class="mb-2 prevent-multi-submit">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+            </form>
+
+            <form action="/users/save-bundle/4/"
+                  method="post">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                Save for Later
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  
+    <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+
+        
+          <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Pro</span>
+        
+
+        
+          <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/special_bundles/BND__power-performance-pack-pro.png" class="card-img-top img-fluid bundle-image" alt="Pro Power Performance Pack">
+        
+
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="card-title product-title">Pro Power Performance Pack</h5>
+            <!-- Review Summary -->
+            
+              <div class="small text-muted mb-1">
+                
+                  No reviews yet
+                
+              </div>
+            
+            <p class="card-text fw-semibold text-success">
+              £101.67
+              
+                <small class="text-muted text-decoration-line-through">
+                  £112.97
+                </small>
+              
+            </p>
+            <p class="card-text small text-muted">
+              Built for demanding drivers and off-road enthusiasts. This powerhouse trio boosts tire …
+            </p>
+            <div class="d-flex gap-1 my-2">
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/performance/P1__air-compressor__twin-cylinder.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Portable Air Compressor – Twin Cylinder"
+                       alt="Portable Air Compressor – Twin Cylinder"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/performance/P2__battery-booster__1000a-emergency-kit.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Battery Booster – 1000A Emergency Kit"
+                       alt="Battery Booster – 1000A Emergency Kit"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/performance/P4__fuel-additive__octane-booster-track-blend.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Fuel Additive – Octane Booster – Track Blend"
+                       alt="Fuel Additive – Octane Booster – Track Blend"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+            </div>
+          </div>
+
+          <div class="mt-auto d-grid gap-2">
+            <a href="/products/bundles/10/"
+               class="btn btn-outline-secondary btn-sm">
+              View Bundle
+            </a>
+
+            <form action="/orders/cart/add_bundle/10/"
+                  method="post"
+                  class="mb-2 prevent-multi-submit">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+            </form>
+
+            <form action="/users/save-bundle/10/"
+                  method="post">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                Save for Later
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  
+    <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+
+        
+
+        
+          <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/special_bundles/BND__driver-comfort-pack.png" class="card-img-top img-fluid bundle-image" alt="Driver Comfort Pack">
+        
+
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="card-title product-title">Driver Comfort Pack</h5>
+            <!-- Review Summary -->
+            
+              <div class="small text-muted mb-1">
+                
+                  No reviews yet
+                
+              </div>
+            
+            <p class="card-text fw-semibold text-success">
+              £16.44
+              
+                <small class="text-muted text-decoration-line-through">
+                  £18.27
+                </small>
+              
+            </p>
+            <p class="card-text small text-muted">
+              Make your daily drive more enjoyable with this curated trio of comfort-first …
+            </p>
+            <div class="d-flex gap-1 my-2">
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A10__seat-cushion__wedge_support.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Seat Cushion – Wedge Support"
+                       alt="Seat Cushion – Wedge Support"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A5__dashboard-grip-mat__silicone-edge.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Dashboard Grip Mat – Silicone Edge"
+                       alt="Dashboard Grip Mat – Silicone Edge"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A14__trash-can__push-lid-black.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Compact Trash Can – Push Lid – Black"
+                       alt="Compact Trash Can – Push Lid – Black"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+            </div>
+          </div>
+
+          <div class="mt-auto d-grid gap-2">
+            <a href="/products/bundles/2/"
+               class="btn btn-outline-secondary btn-sm">
+              View Bundle
+            </a>
+
+            <form action="/orders/cart/add_bundle/2/"
+                  method="post"
+                  class="mb-2 prevent-multi-submit">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+            </form>
+
+            <form action="/users/save-bundle/2/"
+                  method="post">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                Save for Later
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  
+    <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+
+        
+
+        
+          <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/special_bundles/BND__safety-essentials-pack.png" class="card-img-top img-fluid bundle-image" alt="Safety Essentials Pack">
+        
+
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="card-title product-title">Safety Essentials Pack</h5>
+            <!-- Review Summary -->
+            
+              <div class="small text-muted mb-1">
+                
+                  No reviews yet
+                
+              </div>
+            
+            <p class="card-text fw-semibold text-success">
+              £14.37
+              
+                <small class="text-muted text-decoration-line-through">
+                  £15.97
+                </small>
+              
+            </p>
+            <p class="card-text small text-muted">
+              A compact, glovebox-friendly bundle designed for quick response during common roadside incidents. …
+            </p>
+            <div class="d-flex gap-1 my-2">
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/safety_emergency/S1__car-escape-tool__spring-loaded-punch.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Car Escape Tool – Spring-Loaded Punch"
+                       alt="Car Escape Tool – Spring-Loaded Punch"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/safety_emergency/S2__emergency-blanket__compact-roll.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Emergency Blanket – Compact Roll"
+                       alt="Emergency Blanket – Compact Roll"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/safety_emergency/S3__emergency-light__flash-beacon.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Emergency Light – Flash Beacon"
+                       alt="Emergency Light – Flash Beacon"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+            </div>
+          </div>
+
+          <div class="mt-auto d-grid gap-2">
+            <a href="/products/bundles/11/"
+               class="btn btn-outline-secondary btn-sm">
+              View Bundle
+            </a>
+
+            <form action="/orders/cart/add_bundle/11/"
+                  method="post"
+                  class="mb-2 prevent-multi-submit">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+            </form>
+
+            <form action="/users/save-bundle/11/"
+                  method="post">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                Save for Later
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  
+    <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+
+        
+          <span class="badge bg-info text-dark position-absolute top-0 end-0 m-2">Special</span>
+        
+
+        
+          <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/special_bundles/SP1__road-trip-pro-pack.png" class="card-img-top img-fluid bundle-image" alt="Essential Road Trip Pack">
+        
+
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="card-title product-title">Essential Road Trip Pack</h5>
+            <!-- Review Summary -->
+            
+              <div class="small text-muted mb-1">
+                
+                  No reviews yet
+                
+              </div>
+            
+            <p class="card-text fw-semibold text-success">
+              £70.60
+              
+                <small class="text-muted text-decoration-line-through">
+                  £78.45
+                </small>
+              
+            </p>
+            <p class="card-text small text-muted">
+              Optimized for longer journeys, this deluxe travel companion bundle ensures you&amp;#39;re equipped …
+            </p>
+            <div class="d-flex gap-1 my-2">
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/electronics/E2__dash-cam__1080-p.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Dash Cam – 1080p"
+                       alt="Dash Cam – 1080p"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/electronics/E3__usb-charger__volt-meter-display.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="USB Charger – Volt Meter Display"
+                       alt="USB Charger – Volt Meter Display"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A15__trunk-organizer__collapsible.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Trunk Organizer – Collapsible"
+                       alt="Trunk Organizer – Collapsible"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+            </div>
+          </div>
+
+          <div class="mt-auto d-grid gap-2">
+            <a href="/products/bundles/13/"
+               class="btn btn-outline-secondary btn-sm">
+              View Bundle
+            </a>
+
+            <form action="/orders/cart/add_bundle/13/"
+                  method="post"
+                  class="mb-2 prevent-multi-submit">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+            </form>
+
+            <form action="/users/save-bundle/13/"
+                  method="post">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                Save for Later
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  
+    <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+
+        
+          <span class="badge bg-info text-dark position-absolute top-0 end-0 m-2">Special</span>
+        
+
+        
+          <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/special_bundles/SP1__winter-command-pack.png" class="card-img-top img-fluid bundle-image" alt="Premium Winter Command Kit">
+        
+
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="card-title product-title">Premium Winter Command Kit</h5>
+            <!-- Review Summary -->
+            
+              <div class="small text-muted mb-1">
+                
+                  No reviews yet
+                
+              </div>
+            
+            <p class="card-text fw-semibold text-success">
+              £67.90
+              
+                <small class="text-muted text-decoration-line-through">
+                  £75.45
+                </small>
+              
+            </p>
+            <p class="card-text small text-muted">
+              Conquer winter roads with this Pro-grade emergency bundle engineered for cold-weather resilience. …
+            </p>
+            <div class="d-flex gap-1 my-2">
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/accessories/A10__seat-cushion__heated-cushion-set.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Seat Cushion – Heated Cushion Set"
+                       alt="Seat Cushion – Heated Cushion Set"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/safety_emergency/S7__emergency-light__rechargeable-flare-set.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Emergency Light – Rechargeable Flare Set"
+                       alt="Emergency Light – Rechargeable Flare Set"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/safety_emergency/S5__first-aid-kit__hard-shell.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="First Aid Kit – Hard Shell"
+                       alt="First Aid Kit – Hard Shell"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+            </div>
+          </div>
+
+          <div class="mt-auto d-grid gap-2">
+            <a href="/products/bundles/14/"
+               class="btn btn-outline-secondary btn-sm">
+              View Bundle
+            </a>
+
+            <form action="/orders/cart/add_bundle/14/"
+                  method="post"
+                  class="mb-2 prevent-multi-submit">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+            </form>
+
+            <form action="/users/save-bundle/14/"
+                  method="post">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                Save for Later
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  
+    <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+
+        
+          <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Pro</span>
+        
+
+        
+          <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/special_bundles/BND__interior-detailing-kit-pro.png" class="card-img-top img-fluid bundle-image" alt="Pro Interior Detailing Kit">
+        
+
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="card-title product-title">Pro Interior Detailing Kit</h5>
+            <!-- Review Summary -->
+            
+              <div class="small text-muted mb-1">
+                
+                  No reviews yet
+                
+              </div>
+            
+            <p class="card-text fw-semibold text-success">
+              £38.66
+              
+                <small class="text-muted text-decoration-line-through">
+                  £42.96
+                </small>
+              
+            </p>
+            <p class="card-text small text-muted">
+              A premium-grade detailing kit designed to help you deep clean, polish, and …
+            </p>
+            <div class="d-flex gap-1 my-2">
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/cleaning_care/C1__all-purpose-cleaner__ceramic-infused.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="All-Purpose Cleaner – Ceramic-Infused"
+                       alt="All-Purpose Cleaner – Ceramic-Infused"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/cleaning_care/C6__lint-free-duster__extendable-handle.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Lint-Free Duster – Extendable Handle"
+                       alt="Lint-Free Duster – Extendable Handle"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/cleaning_care/C8__microfiber-cloth__standard-weave.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Microfiber Cloth – Standard Weave"
+                       alt="Microfiber Cloth – Standard Weave"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+            </div>
+          </div>
+
+          <div class="mt-auto d-grid gap-2">
+            <a href="/products/bundles/6/"
+               class="btn btn-outline-secondary btn-sm">
+              View Bundle
+            </a>
+
+            <form action="/orders/cart/add_bundle/6/"
+                  method="post"
+                  class="mb-2 prevent-multi-submit">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+            </form>
+
+            <form action="/users/save-bundle/6/"
+                  method="post">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                Save for Later
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  
+    <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+
+        
+
+        
+          <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/special_bundles/BND__tire-shine-starter-kit.png" class="card-img-top img-fluid bundle-image" alt="Tire Shine Starter Pack">
+        
+
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="card-title product-title">Tire Shine Starter Pack</h5>
+            <!-- Review Summary -->
+            
+              <div class="small text-muted mb-1">
+                
+                  No reviews yet
+                
+              </div>
+            
+            <p class="card-text fw-semibold text-success">
+              £17.06
+              
+                <small class="text-muted text-decoration-line-through">
+                  £18.96
+                </small>
+              
+            </p>
+            <p class="card-text small text-muted">
+              Everything you need to get your tires looking clean, deep, and professionally …
+            </p>
+            <div class="d-flex gap-1 my-2">
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/cleaning_care/C11__tire-gel__high-gloss.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Tire Gel – High Gloss"
+                       alt="Tire Gel – High Gloss"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/cleaning_care/C4__tire-shining-kit__wipes.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Tire Shining Kit - Wipes"
+                       alt="Tire Shining Kit - Wipes"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+                
+                  <img src="https://autovise-media.s3.eu-west-2.amazonaws.com/products/cleaning_care/C7__foam-applicator-sponge__round.png"
+                       class="img-thumbnail"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Foam Applicator Sponge – Round"
+                       alt="Foam Applicator Sponge – Round"
+                       style="width: 45px; height: 45px; object-fit: cover;">
+                
+              
+            </div>
+          </div>
+
+          <div class="mt-auto d-grid gap-2">
+            <a href="/products/bundles/5/"
+               class="btn btn-outline-secondary btn-sm">
+              View Bundle
+            </a>
+
+            <form action="/orders/cart/add_bundle/5/"
+                  method="post"
+                  class="mb-2 prevent-multi-submit">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+            </form>
+
+            <form action="/users/save-bundle/5/"
+                  method="post">
+              <input type="hidden" name="csrfmiddlewaretoken" value="CUNbCziL3y5HwyvR1hYlWoQwnrrjkKGvXBVkLV9HC6ZovTWQ7F3fszF0IWlzF0Id">
+              <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                Save for Later
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  
+</div>
+
+
+  </main>
+
+  <!-- templates/include/footer.html -->
+
+<footer class="bg-dark text-white text-center py-4 mt-auto">
+  <div class="container">
+    <p class="mb-1">© 2025 Autovise. All rights reserved.</p>
+    <div class="d-flex justify-content-center gap-3 mt-2 small">
+      <a href="/pages/privacy/" class="text-white text-decoration-none">Privacy Policy</a>
+      <a href="/pages/terms/" class="text-white text-decoration-none">Terms & Conditions</a>
+      <a href="/pages/contact/" class="text-white text-decoration-none">Contact Us</a>
+    </div>
+  </div>
+</footer>
+
+
+  <!-- Bootstrap JS Bundle (with Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script src="/static/js/scripts.js" defer></script>
+  
+  
+
+</body>
+</html>

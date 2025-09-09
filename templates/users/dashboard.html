@@ -17,54 +17,117 @@
     </div>
   </div>
 
-  <!-- Order Summary -->
+  <!-- Orders: simple overview -->
   <div class="card mb-4 shadow-sm">
     <div class="card-body">
       <h5 class="card-title"><i class="fas fa-receipt"></i> Your Orders</h5>
-      {% with user.orders.all|slice:":2" as recent_orders %}
-        {% if recent_orders %}
-          <ul class="list-unstyled mb-2">
-            {% for order in recent_orders %}
-              <li>
-                • #{{ order.id }}: {{ order.get_status_display }} 
-                <a href="{% url 'orders:order_detail' order.id %}" class="ms-2" title="View">
-                  <i class="fas fa-search"></i>
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p>You haven't placed any orders yet.</p>
-        {% endif %}
-      {% endwith %}
+      {% if order_count %}
+        <p class="mb-2">You have <strong>{{ order_count }}</strong> order{{ order_count|pluralize }}.</p>
+      {% else %}
+        <p class="mb-2">You haven't placed any orders yet.</p>
+      {% endif %}
       <a href="{% url 'orders:order_history' %}" class="btn btn-outline-secondary btn-sm mt-2">View All Orders</a>
     </div>
   </div>
 
-  <!-- Saved Products -->
-  <div class="card mb-4 shadow-sm">
+  <!-- Saved Items (products + bundles) -->
+  <div class="card mb-4 shadow-sm" id="saved">
     <div class="card-body">
-      <h5 class="card-title"><i class="fas fa-heart text-danger"></i> Saved Products</h5>
+      <h5 class="card-title"><i class="fas fa-heart text-danger"></i> Saved Items</h5>
 
-      {% if saved_products %}
-        <div class="row row-cols-1 row-cols-sm-2 g-3">
-          {% for product in saved_products|slice:":2" %}
-            <div class="col">
-              {% include "include/product_card.html" with product=product %}
+      {% with pcount=saved_products|length bcount=saved_bundles|length %}
+        {% with total=pcount|add:bcount %}
+          {% if total %}
+            <button class="btn btn-outline-secondary btn-sm"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#savedCollapse"
+                    aria-expanded="false"
+                    aria-controls="savedCollapse">
+              Show Saved Items ({{ total }})
+            </button>
+
+            <div class="collapse mt-3" id="savedCollapse">
+              {% if pcount %}
+                <h6 class="text-muted mb-2">Products ({{ pcount }})</h6>
+                <ul class="list-unstyled mb-3">
+                  {% for product in saved_products %}
+                    <li class="d-flex align-items-center gap-3 py-2 border-bottom">
+                      <a href="{% url 'products:product_detail' pk=product.id %}"
+                        class="d-flex align-items-center text-decoration-none flex-grow-1">
+                        {% if product.image %}
+                          <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                              class="rounded" style="width:96px;height:96px;object-fit:cover;">
+                        {% else %}
+                          <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                              style="width:96px;height:96px;"><i class="bi bi-image text-muted"></i></div>
+                        {% endif %}
+                        <div class="ms-2">
+                          <div class="fw-semibold">{{ product.name }}</div>
+                          <div class="text-muted small">£{{ product.price }}</div>
+                        </div>
+                      </a>
+                      <form method="post"
+                            action="{% url 'users:save_product' product.id %}"
+                            class="saved-remove-form ms-auto">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{% url 'users:dashboard' %}#saved">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                      </form>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+
+              {% if bcount %}
+                <h6 class="text-muted mb-2">Bundles ({{ bcount }})</h6>
+                <ul class="list-unstyled mb-3">
+                  {% for bundle in saved_bundles %}
+                    <li class="d-flex align-items-center gap-3 py-2 border-bottom">
+                      <a href="{% url 'products:bundle_detail' bundle_id=bundle.id %}"
+                        class="d-flex align-items-center text-decoration-none flex-grow-1">
+                        {% if bundle.image %}
+                          <img src="{{ bundle.image.url }}" alt="{{ bundle.name }}"
+                              class="rounded" style="width:96px;height:96px;object-fit:cover;">
+                        {% else %}
+                          <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                              style="width:96px;height:96px;"><i class="bi bi-image text-muted"></i></div>
+                        {% endif %}
+                        <div class="ms-2">
+                          <div class="fw-semibold">{{ bundle.name }}</div>
+                          <div class="text-muted small">£{{ bundle.price }}</div>
+                        </div>
+                      </a>
+                      <form method="post"
+                            action="{% url 'users:save_bundle' bundle.id %}"
+                            class="saved-remove-form ms-auto">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{% url 'users:dashboard' %}#saved">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                      </form>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+
+              <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-sm btn-outline-danger" id="clear-saved-btn">
+                  Clear All
+                </button>
+              </div>
             </div>
-          {% endfor %}
-        </div>
-        <a href="{% url 'users:profile' %}#saved" class="btn btn-outline-secondary btn-sm mt-3">View All Saved Items</a>
-      {% else %}
-        <p class="text-muted mb-0">You haven’t saved any products yet.</p>
-      {% endif %}
+          {% else %}
+            <p class="text-muted mb-0">You haven’t saved any items yet.</p>
+          {% endif %}
+        {% endwith %}
+      {% endwith %}
     </div>
   </div>
 
   <!-- Logout -->
   <form method="post" action="{% url 'account_logout' %}">
     {% csrf_token %}
-    <button type="submit" class="btn btn-danger w-100">Logout</button>
+    <button type="submit" class="btn btn-danger w-35">Logout</button>
   </form>
 </section>
 {% endblock %}

@@ -27,9 +27,9 @@ urlpatterns = [
     # Allauth URLs
     path('accounts/', include('allauth.urls')),
     # Placeholder routes for each core app
-    path('products/', include('apps.products.urls')),
+    path('products/', include('apps.products.urls', namespace='products')),
     path('orders/', include('apps.orders.urls', namespace='orders')),
-    path('users/', include('apps.users.urls')),
+    path('users/', include('apps.users.urls', namespace='users')),
     path('pages/', include('apps.pages.urls', namespace='pages')),
     path("orders/webhook/", stripe_webhook_view, name="stripe_webhook"),
     #  Sitemap

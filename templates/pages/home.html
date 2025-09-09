@@ -9,7 +9,7 @@
 {% block content %}
 
 <!-- Hero Section -->
-<section class="hero-banner position-relative text-white text-center">
+<div class="hero-banner position-relative text-white text-center">
   <img src="{% static 'images/hero/hero-banner-03.png' %}" alt="Hero Banner" class="img-fluid w-100">
 
   <!-- Overlay -->
@@ -24,14 +24,14 @@
       <a href="{% url 'products:bundle_list' %}" class="btn btn-warning btn-lg">Explore Bundles</a>
     </div>
   </div>
-</section>
+</div>
 
 <!-- Bundle Promo Banner -->
-<section class="bg-warning text-dark text-center py-2 fw-semibold">
+<div class="bg-warning text-dark text-center py-2 fw-semibold">
   <div class="container">
     🔥 Bundle More, Save More – 10% Off All Kits!
   </div>
-</section>
+</div>
 
 <!-- Featured Products Section -->
 {% if featured_products %}
@@ -39,7 +39,7 @@
 {% endif %}
 
 <!-- Callouts -->
-<section class="py-4 bg-light">
+<div class="py-4 bg-light">
   <div class="container text-center">
     <div class="row g-4">
       <div class="col-md-4">🚗 Quality You Can Trust</div>
@@ -47,7 +47,7 @@
       <div class="col-md-4">🔄 Easy Returns</div>
     </div>
   </div>
-</section>
+</div>
 
 <!-- Featured Bundles Section -->
 {% if featured_bundles %}
@@ -55,7 +55,7 @@
 {% endif %}
 
 <!-- Testimonials -->
-<section class="bg-dark text-white py-5">
+<div class="bg-dark text-white py-5">
   <div class="container text-center">
     <h3 class="mb-4 text-white">What Our Customers Say</h3>
     <blockquote class="blockquote">
@@ -65,10 +65,10 @@
       <p>"Fast shipping." – Verified Buyer</p>
     </blockquote>
   </div>
-</section>
+</div>
 
 <!-- Newsletter Signup -->
-<section class="bg-light py-5">
+<div class="bg-light py-5">
   <div class="container text-center">
     <h4>Stay Updated with Autovise!</h4>
     <form method="post" action="{% url 'pages:newsletter_subscribe' %}" class="mt-3">
@@ -81,6 +81,6 @@
       </div>
     </form>
   </div>
-</section>
+</div>
 
 {% endblock %}

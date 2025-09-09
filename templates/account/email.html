@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Manage Email Addresses | Autovise{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h1 class="mb-4 text-center">Manage Email Addresses</h1>
+
+    {# Add a new email #}
+    <div class="card mb-4 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Add a new email</h5>
+        <form method="post" action="{% url 'account_email' %}" class="row gy-2 gx-2 align-items-end" novalidate>
+          {% csrf_token %}
+          <div class="col-md-8">
+            <label for="id_email_add" class="form-label">Email address</label>
+            <input id="id_email_add" name="email" type="email" class="form-control" required>
+          </div>
+          <div class="col-md-4 d-grid">
+            <button class="btn btn-primary" type="submit" name="action_add">Add Email</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {# Existing emails #}
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Your email addresses</h5>
+
+        {% with email_list=user.emailaddress_set.all %}
+          {% if email_list %}
+            <ul class="list-group">
+              {% for e in email_list %}
+                <li class="list-group-item d-flex flex-wrap align-items-center gap-2">
+                  <div class="me-auto">
+                    <div class="fw-semibold">{{ e.email }}</div>
+                    <div class="small text-muted">
+                      {% if e.verified %}Verified{% else %}Not verified{% endif %}
+                      &middot;
+                      {% if e.primary %}<span class="badge bg-success">Primary</span>{% else %}Secondary{% endif %}
+                    </div>
+                  </div>
+
+                  {# Make primary #}
+                  {% if not e.primary %}
+                    <form method="post" action="{% url 'account_email' %}" class="d-inline">
+                      {% csrf_token %}
+                      <input type="hidden" name="email" value="{{ e.email }}">
+                      <button class="btn btn-outline-secondary btn-sm" type="submit" name="action_primary">
+                        Make primary
+                      </button>
+                    </form>
+                  {% endif %}
+
+                  {# Resend verification #}
+                  {% if not e.verified %}
+                    <form method="post" action="{% url 'account_email' %}" class="d-inline">
+                      {% csrf_token %}
+                      <input type="hidden" name="email" value="{{ e.email }}">
+                      <button class="btn btn-outline-warning btn-sm" type="submit" name="action_send">
+                        Resend verification
+                      </button>
+                    </form>
+                  {% endif %}
+
+                  {# Remove (don’t allow removing the only email if you rely on email login) #}
+                  <form method="post" action="{% url 'account_email' %}" class="d-inline"
+                        onsubmit="return confirm('Remove {{ e.email }}?');">
+                    {% csrf_token %}
+                    <input type="hidden" name="email" value="{{ e.email }}">
+                    <button class="btn btn-outline-danger btn-sm" type="submit" name="action_remove"
+                            {% if e.primary and email_list|length == 1 %}disabled title="You must have at least one email"{% endif %}>
+                      Remove
+                    </button>
+                  </form>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted mb-0">You don’t have any email addresses yet.</p>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+
+    <div class="mt-3 text-center">
+      <a class="text-decoration-none" href="{% url 'users:dashboard' %}">Back to Dashboard</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
