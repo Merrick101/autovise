@@ -7,6 +7,7 @@ Located at apps/products/models.py
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 from django.utils.text import slugify
 from django.utils import timezone
 from django.utils.timezone import now
@@ -104,6 +105,9 @@ class Product(models.Model):
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        return reverse("products:product_detail", kwargs={"pk": self.pk})
+
     def __str__(self):
         return f"{self.name} ({self.variant})"
 
@@ -189,6 +193,9 @@ class Bundle(models.Model):
         if self.image_path:
             self.image.name = self.image_path
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse("products:bundle_detail", kwargs={"bundle_id": self.pk})
 
     def __str__(self):
         return self.name

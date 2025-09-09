@@ -9,4 +9,4 @@ Disallow: /media/
 
 Allow: /
 
-Sitemap: https://autovise-99770207782d.herokuapp.com/sitemap.xml
+Sitemap: {{ request.scheme }}://{{ request.get_host }}{% url 'sitemap' %}

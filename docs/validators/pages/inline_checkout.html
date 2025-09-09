@@ -36,10 +36,8 @@
 
 <body class="d-flex flex-column min-vh-100">
 
-  <!-- templates/include/navbar.html -->
-
-
-<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top" role="navigation" aria-label="Main navigation">
+  
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top" aria-label="Main navigation">
   <div class="container-fluid">
 
     <!-- Logo -->
@@ -194,7 +192,7 @@
        data-success-url="https://testserver/orders/orders/success/">
 
     <form id="payment-form">
-      <input type="hidden" name="csrfmiddlewaretoken" value="5AxRHgDkl8i8JqOJvUTiPqDmA3PqBshDqhF0QCugUGcPILfIBiYclBsQVyJGWIjl">
+      <input type="hidden" name="csrfmiddlewaretoken" value="gLBHHsbMlQDsBQOMpnBZKsATgp5CxqK2ANqSYsqHYk57lzpZY37xp4fMHGcnQ44L">
       
         <div class="mb-3">
           <label for="guest_email" class="form-label">Email for receipt (optional)</label>
@@ -246,10 +244,18 @@
             
             <div class="col-md-3">
               <label for="shipping_country" class="form-label">Country</label>
-              <select id="shipping_country" name="shipping_country" required class="form-select">
-                <option value="GB" >United Kingdom</option>
-                <option value="IE" >Ireland</option>
-                <!-- Optional: add others as needed -->
+              <select id="shipping_country" name="shipping_country" class="form-select" required>
+                <option value=""
+                        selected
+                        disabled>
+                  Select a country
+                </option>
+                <option value="GB" >
+                  United Kingdom
+                </option>
+                <option value="IE" >
+                  Ireland
+                </option>
               </select>
             </div>
           </div>
@@ -276,7 +282,7 @@
 
   </main>
 
-  <!-- templates/include/footer.html -->
+  
 
 <footer class="bg-dark text-white text-center py-4 mt-auto">
   <div class="container">

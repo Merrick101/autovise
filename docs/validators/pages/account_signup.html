@@ -36,10 +36,8 @@
 
 <body class="d-flex flex-column min-vh-100">
 
-  <!-- templates/include/navbar.html -->
-
-
-<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top" role="navigation" aria-label="Main navigation">
+  
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top" aria-label="Main navigation">
   <div class="container-fluid">
 
     <!-- Logo -->
@@ -187,31 +185,47 @@
     <h1 class="mb-4 text-center">Create Account</h1>
 
     <form method="POST" novalidate>
-      <input type="hidden" name="csrfmiddlewaretoken" value="lhiY6DgQnV3jFzhoqWja9voyRxknjHyGGYq7fZ7MWtX0EUInwko4FGd2c2eDEXAo">
+      <input type="hidden" name="csrfmiddlewaretoken" value="5X2Sl228LF03Q9ICsl5M42jEALAKtfatpZR3C2h3o9sIASjP11BkJEYx12HvMTuc">
       
 
       
         <div class="mb-3">
           <label for="id_email" class="form-label">Email</label>
           <input type="email" name="email" placeholder="Email address" autocomplete="email" maxlength="320" class="form-control" required id="id_email">
+
+          
+
           
         </div>
       
         <div class="mb-3">
           <label for="id_username" class="form-label">Username</label>
           <input type="text" name="username" placeholder="Username" autocomplete="username" minlength="1" maxlength="150" class="form-control" required id="id_username">
+
+          
+
           
         </div>
       
         <div class="mb-3">
           <label for="id_password1" class="form-label">Password</label>
           <input type="password" name="password1" placeholder="Password" autocomplete="new-password" class="form-control" required aria-describedby="id_password1_helptext" id="id_password1">
+
+          
+            <div id="id_password1_helptext" class="form-text">
+              <ul><li>Your password can’t be too similar to your other personal information.</li><li>Your password must contain at least 8 characters.</li><li>Your password can’t be a commonly used password.</li><li>Your password can’t be entirely numeric.</li></ul>
+            </div>
+          
+
           
         </div>
       
         <div class="mb-3">
           <label for="id_password2" class="form-label">Password (again)</label>
           <input type="password" name="password2" placeholder="Password (again)" autocomplete="new-password" class="form-control" required id="id_password2">
+
+          
+
           
         </div>
       
@@ -238,7 +252,7 @@
 
   </main>
 
-  <!-- templates/include/footer.html -->
+  
 
 <footer class="bg-dark text-white text-center py-4 mt-auto">
   <div class="container">

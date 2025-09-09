@@ -1,5 +1,3 @@
-<!-- templates/pages/contact.html -->
-
 
 
 
@@ -36,10 +34,8 @@
 
 <body class="d-flex flex-column min-vh-100">
 
-  <!-- templates/include/navbar.html -->
-
-
-<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top" role="navigation" aria-label="Main navigation">
+  
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top" aria-label="Main navigation">
   <div class="container-fluid">
 
     <!-- Logo -->
@@ -183,13 +179,71 @@
 
     
 <div class="container py-5">
-  <h1>Contact Us</h1>
-  <p>If you need help, email us at <a href="mailto:hello.autovise@gmail.com">hello.autovise@gmail.com</a>.</p>
+  <h1 class="mb-3">Contact Us</h1>
+  <p class="text-muted">Questions, feedback, or issues—send us a message and we’ll get back to you.</p>
+
+  <div class="row">
+    <div class="col-lg-7">
+      <form method="post" novalidate class="needs-validation">
+        <input type="hidden" name="csrfmiddlewaretoken" value="e07vPGBivLjlk88gunqBzFoDvzkn8VNHy2WG6GQd8fL04RJt33W9eh3wWQr8rz7q">
+
+        
+
+        <div class="mb-3">
+          <label for="id_name" class="form-label">Your name</label>
+          <input type="text" name="name" maxlength="100" aria-describedby="id_name_help" class="form-control" required id="id_name">
+          <div id="id_name_help" class="form-text">So we know what to call you.</div>
+          
+        </div>
+
+        <div class="mb-3">
+          <label for="id_email" class="form-label">Email address</label>
+          <input type="email" name="email" maxlength="320" aria-describedby="id_email_help" class="form-control" required id="id_email">
+          <div id="id_email_help" class="form-text">We’ll reply to this address.</div>
+          
+        </div>
+
+        <div class="mb-3">
+          <label for="id_subject" class="form-label">Subject</label>
+          <input type="text" name="subject" maxlength="120" class="form-control" required id="id_subject">
+          
+        </div>
+
+        <div class="mb-3">
+          <label for="id_message" class="form-label">Message</label>
+          <textarea name="message" cols="40" rows="5" aria-describedby="id_msg_help" class="form-control" required id="id_message">
+</textarea>
+          <div id="id_msg_help" class="form-text">Share as much detail as helpful.</div>
+          
+        </div>
+
+        
+        <input type="hidden" name="website" id="id_website">
+
+        <button type="submit" class="btn btn-primary">Send Message</button>
+      </form>
+    </div>
+
+    <div class="col-lg-5 mt-4 mt-lg-0">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title mb-2">Prefer email?</h5>
+          <p class="mb-0">
+            <a href="mailto:hello.autovise@gmail.com">hello.autovise@gmail.com</a>
+          </p>
+          <hr>
+          <p class="small text-muted mb-0">
+            We usually reply within 1–2 business days.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
   </main>
 
-  <!-- templates/include/footer.html -->
+  
 
 <footer class="bg-dark text-white text-center py-4 mt-auto">
   <div class="container">
