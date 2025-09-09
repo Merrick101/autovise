@@ -41,7 +41,7 @@ def order_pending(db):
 def fake_verify(monkeypatch):
     """Monkeypatch verify_webhook_signature to return provided events."""
     def _set(event):
-        from apps.orders import utils as utils_pkg
+        from apps.orders import utils as utils_pkg  # NOQA: F401
         from apps.orders.utils import stripe_helpers
         monkeypatch.setattr(stripe_helpers, "verify_webhook_signature", lambda request: event)
     return _set

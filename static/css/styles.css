@@ -81,7 +81,6 @@ ul.nav-pills.overflow-auto::-webkit-scrollbar {
 }
 
 .btn.active {
-  border-color: #0d6efd;
   background-color: #0d6efd;
   color: #ffffff;
 }

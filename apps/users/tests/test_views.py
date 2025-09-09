@@ -9,7 +9,6 @@ from apps.products.models import Category, ProductType
 
 @pytest.mark.django_db
 def test_profile_view_get(client):
-    user = User.objects.create_user(username="testuser", password="pass")
     client.login(username="testuser", password="pass")
 
     url = reverse("users:profile")
@@ -21,7 +20,6 @@ def test_profile_view_get(client):
 
 @pytest.mark.django_db
 def test_dashboard_view(client):
-    user = User.objects.create_user(username="dashuser", password="pass")
     client.login(username="dashuser", password="pass")
 
     url = reverse("users:dashboard")
@@ -74,7 +72,6 @@ def test_save_bundle_toggle(client):
 
 @pytest.mark.django_db
 def test_delete_account(client):
-    user = User.objects.create_user(username="deleteuser", password="pass")
     client.login(username="deleteuser", password="pass")
 
     url = reverse("users:delete_account")

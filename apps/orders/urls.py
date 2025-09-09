@@ -5,14 +5,16 @@ payment processing, and order history.
 Located at apps/orders/urls.py
 """
 
-from django.urls import include, path
+from django.urls import path
 from apps.orders.views.cart_views import (
     add_to_cart_view, add_bundle_to_cart_view, cart_view, update_quantity, remove_item, clear_cart
 )
 from apps.orders.views.checkout import checkout_view
 from apps.orders.views import payment
 from apps.orders.views import webhook as webhook_views
-from apps.orders.views.general import checkout_success_view, order_history_view, checkout_cancel_view, inline_checkout_view
+from apps.orders.views.general import (
+    checkout_success_view, order_history_view, checkout_cancel_view, inline_checkout_view
+)
 
 app_name = 'orders'
 
@@ -24,7 +26,11 @@ urlpatterns = [
     path("remove/<str:item_key>/", remove_item, name="remove_item"),
     path('cart/clear/', clear_cart, name='clear_cart'),
     path("payments/create-intent/", payment.create_payment_intent, name="create_payment_intent"),
-    path("payments/update-intent/", payment.update_payment_intent, name="update_payment_intent"),
+    path(
+        "payments/update-intent/",
+        payment.update_payment_intent,
+        name="update_payment_intent"
+        ),
     path('checkout/', checkout_view, name='checkout'),
     path("checkout/inline/", inline_checkout_view, name="inline_checkout"),
     path('orders/success/', checkout_success_view, name='success'),

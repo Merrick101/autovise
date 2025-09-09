@@ -1,4 +1,8 @@
-# apps/orders/signals.py
+"""
+Signals for handling cart operations such as
+merging session carts into user carts upon login.
+Located at apps/orders/signals.py
+"""
 
 import logging
 from django.contrib.auth.signals import user_logged_in
@@ -55,4 +59,6 @@ def log_cart_saved(sender, instance, created, **kwargs):
 @receiver(post_save, sender=CartItem)
 def log_cart_item_saved(sender, instance, created, **kwargs):
     action = "added to" if created else "updated in"
-    logger.debug(f"[CartItem] Product {instance.product.name} {action} Cart {instance.cart.id} (Qty: {instance.quantity})")
+    logger.debug(
+        f"[CartItem] Product {instance.product.name} {action} Cart {instance.cart.id} (Qty: {instance.quantity})"
+    )

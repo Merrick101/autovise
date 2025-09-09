@@ -1,3 +1,7 @@
+/* jshint esversion: 11, browser: true, devel: true */
+/* globals bootstrap, Stripe */
+/* exported updateFilterParam */
+
 document.addEventListener('DOMContentLoaded', function () {
   // Bundle Card Tooltip
   const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -230,8 +234,8 @@ async function initInlineCheckout() {
               }),
             });
           }
-        } catch (e) {
-          console.warn("[Checkout] update-intent failed:", e);
+        } catch (evt) {
+          console.warn("[Checkout] update-intent failed:", evt);
         }
 
         const result = await stripe.confirmPayment({ elements, redirect: "if_required" });
@@ -280,6 +284,8 @@ function updateFilterParam(key, value) {
   params.delete('page');
   window.location.search = params;
 }
+
+window.updateFilterParam = updateFilterParam;
 
 // Clear all saved items (products + bundles) in the dashboard
 document.addEventListener("click", async (e) => {

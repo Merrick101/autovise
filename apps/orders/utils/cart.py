@@ -50,7 +50,9 @@ def get_or_create_cart(user):
 
 
 def get_active_cart(request):
-    return (get_or_create_cart(request.user), 'db') if request.user.is_authenticated else (request.session.get('cart', {}), 'session')
+    return (
+        get_or_create_cart(request.user), 'db'
+    ) if request.user.is_authenticated else (request.session.get('cart', {}), 'session')
 
 
 def save_cart(request, cart_data):

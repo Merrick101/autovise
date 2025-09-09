@@ -3,7 +3,6 @@ from django.utils.text import slugify
 from django.utils.timezone import now
 from apps.products.models import Product, Category, ProductType
 from decimal import Decimal, InvalidOperation
-import os
 
 FILE_PATH = "products_safety_emergency.txt"
 

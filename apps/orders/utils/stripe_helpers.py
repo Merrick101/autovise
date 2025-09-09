@@ -64,7 +64,9 @@ def create_payment_intent(
         pi = stripe.PaymentIntent.create(**params, idempotency_key=idempotency_key)
         logger.info(
             "[STRIPE] PaymentIntent created",
-            extra={"pi_id": pi.id, "amount": params["amount"], "currency": currency, "metadata": params.get("metadata")},
+            extra={
+                "pi_id": pi.id, "amount": params["amount"], "currency": currency, "metadata": params.get("metadata")
+            },
         )
         return pi
     except stripe.error.StripeError as e:
@@ -109,7 +111,9 @@ def create_checkout_session(
         )
 
         session = stripe.checkout.Session.create(**params, idempotency_key=idempotency_key)
-        logger.info("[STRIPE] Checkout Session created", extra={"cs_id": session.id, "metadata": params.get("metadata")})
+        logger.info(
+            "[STRIPE] Checkout Session created", extra={"cs_id": session.id, "metadata": params.get("metadata")}
+        )
         return session
 
     except stripe.error.StripeError as e:

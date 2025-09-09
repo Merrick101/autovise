@@ -2,7 +2,6 @@ from django.core.management.base import BaseCommand
 from django.utils.text import slugify
 from django.utils import timezone
 from apps.products.models import Product, Category, ProductType
-import os
 from decimal import Decimal, InvalidOperation
 
 FILE_PATH = "products_accessories.txt"

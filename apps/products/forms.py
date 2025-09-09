@@ -13,7 +13,8 @@ class ProductAdminForm(forms.ModelForm):
     image_path = forms.CharField(
         label="Image Path (S3 relative)",
         required=False,
-        help_text="Optional: Skip file upload and directly assign S3 image path (e.g. products/accessories/filename.png)"
+        help_text="Optional: Skip file upload and directly assign S3 image path"
+        "(e.g. products/accessories/filename.png)"
     )
 
     class Meta:

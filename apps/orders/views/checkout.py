@@ -1,10 +1,13 @@
-# apps/orders/views/checkout.py
+"""
+Views for checkout process.
+Located at apps/orders/views/checkout.py
+"""
 
 from decimal import Decimal
 import logging
 
 from django.contrib import messages
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.urls import reverse
 
 from apps.orders.models import Order, OrderItem
