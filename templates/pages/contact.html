@@ -1,10 +1,72 @@
-<!-- templates/pages/contact.html -->
-
 {% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+{% load widget_tweaks %}
+
 {% block title %}Contact Us | Autovise{% endblock %}
+
 {% block content %}
 <div class="container py-5">
-  <h1>Contact Us</h1>
-  <p>If you need help, email us at <a href="mailto:hello.autovise@gmail.com">hello.autovise@gmail.com</a>.</p>
+  <h1 class="mb-3">Contact Us</h1>
+  <p class="text-muted">Questions, feedback, or issues—send us a message and we’ll get back to you.</p>
+
+  <div class="row">
+    <div class="col-lg-7">
+      <form method="post" novalidate class="needs-validation">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="mb-3">
+          <label for="{{ form.name.id_for_label }}" class="form-label">Your name</label>
+          {{ form.name|add_class:"form-control"|attr:"aria-describedby:id_name_help" }}
+          <div id="id_name_help" class="form-text">So we know what to call you.</div>
+          {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label for="{{ form.email.id_for_label }}" class="form-label">Email address</label>
+          {{ form.email|add_class:"form-control"|attr:"aria-describedby:id_email_help" }}
+          <div id="id_email_help" class="form-text">We’ll reply to this address.</div>
+          {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label for="{{ form.subject.id_for_label }}" class="form-label">Subject</label>
+          {{ form.subject|add_class:"form-control" }}
+          {% if form.subject.errors %}<div class="text-danger small">{{ form.subject.errors }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label for="{{ form.message.id_for_label }}" class="form-label">Message</label>
+          {{ form.message|add_class:"form-control"|attr:"aria-describedby:id_msg_help" }}
+          <div id="id_msg_help" class="form-text">Share as much detail as helpful.</div>
+          {% if form.message.errors %}<div class="text-danger small">{{ form.message.errors }}</div>{% endif %}
+        </div>
+
+        {# Honeypot field (hidden) #}
+        {{ form.website }}
+
+        <button type="submit" class="btn btn-primary">Send Message</button>
+      </form>
+    </div>
+
+    <div class="col-lg-5 mt-4 mt-lg-0">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title mb-2">Prefer email?</h5>
+          <p class="mb-0">
+            <a href="mailto:{{ support_email }}">{{ support_email }}</a>
+          </p>
+          <hr>
+          <p class="small text-muted mb-0">
+            We usually reply within 1–2 business days.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

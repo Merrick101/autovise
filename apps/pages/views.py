@@ -1,12 +1,14 @@
 # apps/pages/views.py
 
-from django.shortcuts import render
+from django.conf import settings
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from apps.products.models import Product, Bundle
 from django.views.decorators.http import require_POST
-from django.shortcuts import redirect
+from django.core.mail import send_mail
+from django.utils.html import strip_tags
 from .models import NewsletterSubscriber
-from .forms import NewsletterForm
+from .forms import NewsletterForm, ContactForm
 
 
 def home(request):
@@ -43,7 +45,48 @@ def terms_and_conditions(request):
 
 
 def contact(request):
-    return render(request, 'pages/contact.html')
+    if request.method == "POST":
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            subj = f"[Autovise Contact] {cd['subject']}"
+            body = (
+                f"From: {cd['name']} <{cd['email']}>\n"
+                f"Path: {request.get_full_path()}\n"
+                f"User: {request.user if request.user.is_authenticated else 'Anonymous'}\n\n"
+                f"{strip_tags(cd['message'])}"
+            )
+
+            # Configure in settings
+            recipients = getattr(
+                settings, "CONTACT_RECIPIENTS",
+                [getattr(settings, "DEFAULT_FROM_EMAIL", "hello.autovise@gmail.com")]
+            )
+            from_email = getattr(settings, "DEFAULT_FROM_EMAIL", cd["email"])
+
+            try:
+                send_mail(
+                    subject=subj,
+                    message=body,
+                    from_email=from_email,
+                    recipient_list=recipients,
+                    fail_silently=False,
+                    reply_to=[cd["email"]],
+                )
+                messages.success(request, "Thanks! Your message has been sent.")
+                return redirect("pages:contact")
+            except Exception:
+                messages.error(
+                    request,
+                    "We couldn’t send your message right now. "
+                    "Please email us directly at hello.autovise@gmail.com."
+                )
+    else:
+        form = ContactForm()
+
+    return render(
+        request, "pages/contact.html", {"form": form, "support_email": "hello.autovise@gmail.com"}
+    )
 
 
 def custom_404(request, exception):
