@@ -106,48 +106,97 @@ MESSAGE_TAGS = {
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+# settings.py
 JAZZMIN_SETTINGS = {
+    # Branding
     "site_title": "Autovise Admin",
     "site_header": "Autovise Admin Panel",
     "site_brand": "Autovise",
-    "site_logo": None,
     "welcome_sign": "Welcome to the Autovise Admin Dashboard",
     "copyright": "Autovise Ltd",
+    # Clicking brand goes to storefront
+    "site_url": "/",
 
+    # Nav & layout
     "show_sidebar": True,
     "navigation_expanded": True,
-    "hide_apps": [],
-    "hide_models": [],
-
-    "order_with_respect_to": ["products", "orders", "users", "pages"],
-
-    "topmenu_links": [
-        {"name": "Dashboard", "url": "admin:index", "permissions": [
-            "auth.view_user"
-        ]},
-    ],
-
-    "icons": {
-        "products.Product": "fas fa-box-open",
-        "products.Bundle": "fas fa-cubes",
-        "products.Category": "fas fa-list",
-        "products.Subcategory": "fas fa-layer-group",
-        "products.ProductType": "fas fa-tags",
-        "products.Tag": "fas fa-tag",
-        "orders.Order": "fas fa-receipt",
-        "pages.NewsletterSubscriber": "fas fa-envelope",
-        "users.UserProfile": "fas fa-user-circle",
-    },
-
+    "show_bookmarks": True,
+    "related_modal_active": True,
     "changeform_format": "horizontal_tabs",
     "changeform_format_overrides": {
+        # Use "app_label.model_name" here
         "products.product": "horizontal_tabs",
         "products.bundle": "horizontal_tabs",
     },
 
-    "related_modal_active": True,
+    # App ordering in the sidebar
+    "order_with_respect_to": ["products", "orders", "users", "pages", "auth"],
+
+    # Quick access links in the top bar
+    "topmenu_links": [
+        {"name": "Dashboard", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"app": "products", "name": "Products"},
+        {"app": "orders", "name": "Orders"},
+    ],
+
+    # User menu links (top-right)
+    "usermenu_links": [
+        {"model": "auth.user"},  # “My account”
+        {"name": "Change password", "url": "admin:password_change"},
+        {"name": "View site", "url": "/", "new_window": True},
+    ],
+
+    # Sidebar icons
+    "icons": {
+        "products": "fas fa-store",
+        "products.product": "fas fa-box-open",
+        "products.bundle": "fas fa-cubes",
+        "products.category": "fas fa-list",
+        "products.subcategory": "fas fa-layer-group",
+        "products.producttype": "fas fa-tags",
+        "products.tag": "fas fa-tag",
+
+        "orders": "fas fa-cash-register",
+        "orders.order": "fas fa-receipt",
+        "orders.orderitem": "fas fa-list-ul",
+
+        "users": "fas fa-users-cog",
+        "users.userprofile": "fas fa-user-circle",
+
+        "pages": "fas fa-file-alt",
+        "pages.newslettersubscriber": "fas fa-envelope",
+        "pages.contactmessage": "fas fa-envelope-open-text",
+
+        "auth": "fas fa-users",
+        "auth.user": "fas fa-user",
+        "auth.group": "fas fa-user-shield",
+    },
+
+    "custom_links": {
+        "products": [
+            {"name": "Add Product", "url": "admin:products_product_add",
+             "icon": "fas fa-plus", "permissions": ["products.add_product"]},
+        ],
+        "orders": [
+            {"name": "Recent Orders", "url": "admin:orders_order_changelist",
+             "icon": "fas fa-clock", "permissions": ["orders.view_order"]},
+        ],
+    },
+
+    "search_model": ["products.Product", "orders.Order", "users.UserProfile"],
+
+    # Theme + extras
     "theme": "flatly",
-    "show_bookmarks": True,
+    "show_ui_builder": False,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar": "navbar-white navbar-light",
+    "navbar_fixed": True,
+    "sidebar": "sidebar-light-primary",
+    "sidebar_fixed": True,
+    "footer_fixed": False,
+    "actions_sticky_top": True,
 }
 
 # Stripe Credentials
