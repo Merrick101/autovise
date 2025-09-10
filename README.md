@@ -1,37 +1,36 @@
 # Autovise – E-Commerce Platform for Automotive Accessories
 
-**Autovise** is a premium Django-based e-commerce site offering automotive accessories, cleaning kits, electronic gear, and curated bundles. Designed for a seamless user experience, Autovise features tiered products, dynamic bundles, user accounts, and Stripe-powered checkout.
+**Autovise** is a Django-based e-commerce site offering automotive accessories, cleaning kits, electronic gear, and curated bundles. It features tiered products, dynamic bundles, user accounts, and Stripe-powered checkout with a focus on clean UX and production-ready practices.
 
 ## Table of Contents
 
-1. (Features)[#features]
-    
-2. Tech Stack
-    
-3. Architecture & Data Model
-    
-4. Project Structure
-    
-5. E-Commerce Business Model
-    
-6. Marketing Strategy
-    
-7. Getting Started (Local)
-    
-8. Environment Variables
-    
-9. Deployment (Heroku)
-    
-10. Sitemaps & Robots
-    
-11. Testing
-    
-12. Validation Results (HTML / CSS / JS / Python)
-    
-13. Accessibility & SEO Notes
-    
-14. Troubleshooting
-    
+1. [Features](#features)
+
+2. [E-Commerce Business Model](#e-commerce-business-model)
+
+3. [Marketing Strategy](#marketing-strategy)
+
+4. [Wireframes & Facebook Mockup](#wireframes--facebook-mockup)
+
+5. [Tech Stack](#tech-stack)
+
+6. [Architecture & Data Model](#architecture--data-model)
+
+7. [Project Structure](#project-structure) 
+
+8. [Deployment Guide](#deployment-guide)
+
+9. [Sitemaps & Robots](#sitemaps--robots)
+
+10. [Testing](#testing)
+
+11. [Validation Results](#validation-results-html--css--js--python)
+
+12. [Accessibility & SEO Notes](#accessibility--seo-notes)
+
+13. [Troubleshooting](#troubleshooting)
+
+
 
 ---
 
@@ -72,6 +71,49 @@
 
 ---
 
+## E-Commerce Business Model
+
+- **Revenue Streams:** single product sales, curated bundles (flat **10% off**), Pro tier up-sell
+    
+- **Delivery:** free for **first-time buyers** and for **orders ≥ £40**
+    
+- **Pricing:**
+    
+    - Standard: competitive
+        
+    - Pro: premium features/materials
+        
+    - Bundles: total of items minus fixed 10% discount
+        
+- **Audience:** car owners, detailing enthusiasts, everyday drivers
+    
+
+---
+
+## Marketing Strategy
+
+1. **Facebook Page:** brand presence, seasonal promos, bundle highlights
+    
+2. **Newsletter:** integrated signup; monthly offers, tips, new arrivals
+    
+3. **SEO:** descriptive titles/meta, `sitemap.xml` + `robots.txt`, image `alt` text
+    
+4. **UX:** clear categories, high-quality imagery, tiered presentation
+    
+---
+
+### Wireframes & Facebook Mockup
+
+![Homepage (Desktop)](/docs/wireframes/homepage_desktop.png)
+![Homepage (Mobile)](/docs/wireframes/homepage_mobile.png) 
+![Cart & Checkout (Mobile)](/docs/wireframes/cart_checkout_mobile.png)  
+![Product Detail (Mobile)](/docs/wireframes/product_detail_mobile.png)  
+![User Dashboard (Mobile)](/docs/wireframes/user_dashboard_mobile.png)  
+![Admin Panel (Desktop)](/docs/wireframes/admin_panel_desktop.png)  
+![Facebook Mockup](/docs/facebook_mockup/autovise_facebook_mockup.png)
+
+---
+
 ## Tech Stack
 
 - **Backend:** Django 5.x, Python 3.12
@@ -95,7 +137,11 @@
 
 ## Architecture & Data Model
 
-**Key Relationships (highlights):**
+### ERD Diagram
+
+![ERD Diagram](/docs/erd/autovise_erd.png)
+
+### Key Relationships (highlights):
 
 - `auth_user` ↔ `user_profile` (**1–1**), `auth_user` → `shipping_address` (**1–M**, one default enforced in app)
     
@@ -136,63 +182,120 @@ autovise/                # project root
 
 ---
 
-## E-Commerce Business Model
-
-- **Revenue Streams:** single product sales, curated bundles (flat **10% off**), Pro tier up-sell
-    
-- **Delivery:** free for **first-time buyers** and for **orders ≥ £40**
-    
-- **Pricing:**
-    
-    - Standard: competitive
-        
-    - Pro: premium features/materials
-        
-    - Bundles: total of items minus fixed 10% discount
-        
-- **Audience:** car owners, detailing enthusiasts, everyday drivers
-    
-
----
-
-## Marketing Strategy
-
-1. **Facebook Page:** brand presence, seasonal promos, bundle highlights
-    
-2. **Newsletter:** integrated signup; monthly offers, tips, new arrivals
-    
-3. **SEO:** descriptive titles/meta, `sitemap.xml` + `robots.txt`, image `alt` text
-    
-4. **UX:** clear categories, high-quality imagery, tiered presentation
-    
-
----
-
 ## Deployment Guide
 
 ### Getting Started (Local)
 
-`git clone https://github.com/your-username/autovise.git cd autovise  python -m venv .venv # macOS/Linux source .venv/bin/activate # Windows .venv\Scripts\activate  pip install -r requirements.txt cp .env.example .env  # or create .env manually (see below)  python manage.py migrate python manage.py createsuperuser python manage.py runserver`
+```bash
+git clone https://github.com/your-username/autovise.git
+cd autovise
+python -m venv .venv
+# macOS/Linux
+source .venv/bin/activate
+# Windows
+.venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env   # or create .env from the next section
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+```
 
 **Optional seed (shell):**
 
-`from apps.products.models import Category, ProductType, Product, Bundle from decimal import Decimal cat,_ = Category.objects.get_or_create(name="Accessories", slug="accessories") ptype,_ = ProductType.objects.get_or_create(name="Mount") Product.objects.get_or_create(     name="Sample Product", variant="V", description="desc",     type=ptype, tier="Standard", category=cat,     price=Decimal("9.99"), stock=5, sku="SKU-SP", product_code="PC-SP", is_draft=False) Bundle.objects.get_or_create(     name="Sample Bundle", description="bundle desc",     discount_percentage=Decimal("10.00"), price=Decimal("0.00"), subtotal_price=Decimal("0.00"),     bundle_type="Standard", sku="BNDL-001", bundle_code="bundle-sample")`
+```bash
+from decimal import Decimal
+from apps.products.models import Category, ProductType, Product, Bundle
+
+cat,_   = Category.objects.get_or_create(name="Accessories", slug="accessories")
+ptype,_ = ProductType.objects.get_or_create(name="Mount")
+Product.objects.get_or_create(
+    name="Sample Product", variant="V", description="desc",
+    type=ptype, tier="Standard", category=cat,
+    price=Decimal("9.99"), stock=5, sku="SKU-SP", product_code="PC-SP", is_draft=False
+)
+Bundle.objects.get_or_create(
+    name="Sample Bundle", description="bundle desc",
+    discount_percentage=Decimal("10.00"), price=Decimal("0.00"), subtotal_price=Decimal("0.00"),
+    bundle_type="Standard", sku="BNDL-001", bundle_code="bundle-sample"
+)
+```
 
 ### Environment Variables
 
 Create `.env` in the project root (never commit). **Minimum** for local dev:
 
-`# Django SECRET_KEY=change-me DEBUG=1 ALLOWED_HOSTS=127.0.0.1,localhost CSRF_TRUSTED_ORIGINS=http://127.0.0.1,http://localhost SITE_ID=1 SITEMAP_PROTOCOL=http  # Email (dev) EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend DEFAULT_FROM_EMAIL=hello.autovise@gmail.com CONTACT_RECIPIENTS=hello.autovise@gmail.com  # Stripe (test keys) STRIPE_PUBLIC_KEY=pk_test_xxx STRIPE_SECRET_KEY=sk_test_xxx STRIPE_WEBHOOK_SECRET=whsec_xxx`
+```bash
+# Django
+SECRET_KEY=change-me
+DEBUG=1
+ALLOWED_HOSTS=127.0.0.1,localhost
+CSRF_TRUSTED_ORIGINS=http://127.0.0.1:8000,http://localhost:8000
+SITE_ID=1
+SITEMAP_PROTOCOL=http
+
+# Email (dev)
+EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+DEFAULT_FROM_EMAIL=hello.autovise@gmail.com
+CONTACT_RECIPIENTS=hello.autovise@gmail.com
+
+# Stripe (test)
+STRIPE_PUBLISHABLE_KEY=pk_test_xxx
+STRIPE_SECRET_KEY=sk_test_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+```
 
 **Production (Heroku Config Vars):**
 
-`DEBUG=0 ALLOWED_HOSTS=autovise.herokuapp.com,yourdomain.com CSRF_TRUSTED_ORIGINS=https://autovise.herokuapp.com,https://yourdomain.com SITEMAP_PROTOCOL=https DEFAULT_FROM_EMAIL=hello.autovise@gmail.com CONTACT_RECIPIENTS=hello.autovise@gmail.com # Stripe live or test (be consistent): STRIPE_PUBLIC_KEY=pk_live_or_test STRIPE_SECRET_KEY=sk_live_or_test STRIPE_WEBHOOK_SECRET=whsec_from_dashboard # Optional S3 AWS_STORAGE_BUCKET_NAME=your-bucket AWS_S3_REGION_NAME=eu-west-1 AWS_S3_ACCESS_KEY_ID=... AWS_S3_SECRET_ACCESS_KEY=...`
+```
+DEBUG=0
+ALLOWED_HOSTS=autovise-<app>.herokuapp.com,yourdomain.com
+CSRF_TRUSTED_ORIGINS=https://autovise-<app>.herokuapp.com,https://yourdomain.com
+SITE_ID=1
+SITEMAP_PROTOCOL=https
+
+DEFAULT_FROM_EMAIL=hello.autovise@gmail.com
+CONTACT_RECIPIENTS=hello.autovise@gmail.com
+
+# Stripe (live or test—be consistent)
+STRIPE_PUBLISHABLE_KEY=pk_live_or_test
+STRIPE_SECRET_KEY=sk_live_or_test
+STRIPE_WEBHOOK_SECRET=whsec_from_dashboard_endpoint
+
+# Optional S3 media
+AWS_STORAGE_BUCKET_NAME=your-bucket
+AWS_S3_REGION_NAME=eu-west-1
+AWS_S3_ACCESS_KEY_ID=...
+AWS_S3_SECRET_ACCESS_KEY=...
+```
 
 ---
 
 ## Deployment (Heroku)
 
-`heroku login heroku apps:create autovise-prod heroku buildpacks:add heroku/python -a autovise-prod heroku addons:create heroku-postgresql:hobby-dev -a autovise-prod  # Config Vars (see .env above) heroku config:set SECRET_KEY=... DEBUG=0 SITE_ID=1 SITEMAP_PROTOCOL=https -a autovise-prod heroku config:set ALLOWED_HOSTS=autovise-prod.herokuapp.com -a autovise-prod heroku config:set CSRF_TRUSTED_ORIGINS=https://autovise-prod.herokuapp.com -a autovise-prod heroku config:set STRIPE_PUBLIC_KEY=... STRIPE_SECRET_KEY=... STRIPE_WEBHOOK_SECRET=... -a autovise-prod heroku config:set DEFAULT_FROM_EMAIL=hello.autovise@gmail.com CONTACT_RECIPIENTS=hello.autovise@gmail.com -a autovise-prod  # Procfile echo "web: gunicorn config.wsgi" > Procfile  git push heroku main heroku run python manage.py migrate -a autovise-prod heroku run python manage.py collectstatic --noinput -a autovise-prod heroku run python manage.py createsuperuser -a autovise-prod heroku open -a autovise-prod`
+```bash
+heroku login
+heroku apps:create autovise-prod
+heroku buildpacks:add heroku/python -a autovise-prod
+heroku addons:create heroku-postgresql:hobby-dev -a autovise-prod
+
+# Config Vars (see Environment Variables)
+heroku config:set SECRET_KEY=... DEBUG=0 SITE_ID=1 SITEMAP_PROTOCOL=https -a autovise-prod
+heroku config:set ALLOWED_HOSTS=autovise-prod.herokuapp.com -a autovise-prod
+heroku config:set CSRF_TRUSTED_ORIGINS=https://autovise-prod.herokuapp.com -a autovise-prod
+heroku config:set STRIPE_PUBLISHABLE_KEY=... STRIPE_SECRET_KEY=... STRIPE_WEBHOOK_SECRET=... -a autovise-prod
+heroku config:set DEFAULT_FROM_EMAIL=hello.autovise@gmail.com CONTACT_RECIPIENTS=hello.autovise@gmail.com -a autovise-prod
+
+# Procfile
+web: gunicorn config.wsgi:application --log-file -
+release: python manage.py migrate && python manage.py collectstatic --noinput
+
+git push heroku main
+heroku run python manage.py migrate -a autovise-prod
+heroku run python manage.py collectstatic --noinput -a autovise-prod
+heroku run python manage.py createsuperuser -a autovise-prod
+heroku open -a autovise-prod
+```
 
 ### Stripe Webhooks (prod)
 
@@ -204,7 +307,11 @@ Copy the signing secret into `STRIPE_WEBHOOK_SECRET`.
 
 ### Stripe Webhooks (local)
 
-`stripe login stripe listen --forward-to http://127.0.0.1:8000/orders/payments/webhook/ # Paste displayed Signing secret into .env as STRIPE_WEBHOOK_SECRET`
+```bash
+stripe login
+stripe listen --forward-to http://127.0.0.1:8000/orders/payments/webhook/
+# Paste the printed signing secret into STRIPE_WEBHOOK_SECRET in .env
+```
 
 ---
 
@@ -212,11 +319,40 @@ Copy the signing secret into `STRIPE_WEBHOOK_SECRET`.
 
 Sitemap index and section routes:
 
-`# config/urls.py from django.contrib.sitemaps.views import index as sitemap_index, sitemap as sitemap_section from apps.products.sitemaps import ProductSitemap, CategorySitemap, ProductTypeSitemap, BundleSitemap  sitemaps = {     "products": ProductSitemap,     "categories": CategorySitemap,     "product_types": ProductTypeSitemap,     "bundles": BundleSitemap, }  urlpatterns += [     path("sitemap.xml", sitemap_index, {"sitemaps": sitemaps, "sitemap_url_name": "sitemap_section"}, name="sitemap"),     path("sitemap-<section>.xml", sitemap_section, {"sitemaps": sitemaps}, name="sitemap_section"), ]`
+```python
+# config/urls.py
+from django.urls import path
+from django.contrib.sitemaps.views import index as sitemap_index, sitemap as sitemap_section
+from apps.products.sitemaps import ProductSitemap, CategorySitemap, ProductTypeSitemap, BundleSitemap
+
+sitemaps = {
+    "products": ProductSitemap,
+    "categories": CategorySitemap,
+    "product_types": ProductTypeSitemap,
+    "bundles": BundleSitemap,
+}
+
+urlpatterns += [
+    path("sitemap.xml", sitemap_index, {"sitemaps": sitemaps, "sitemap_url_name": "sitemap_section"}, name="sitemap"),
+    path("sitemap-<section>.xml", sitemap_section, {"sitemaps": sitemaps}, name="sitemap_section"),
+]
+```
 
 `robots.txt` (prod):
 
-`User-agent: * Disallow: /admin/ Disallow: /accounts/ Disallow: /checkout/ Disallow: /cart/ Disallow: /orders/ Disallow: /webhook/ Disallow: /media/ Allow: /  Sitemap: https://<your-domain>/sitemap.xml`
+```makefile
+User-agent: *
+Disallow: /admin/
+Disallow: /accounts/
+Disallow: /checkout/
+Disallow: /cart/
+Disallow: /orders/
+Disallow: /webhook/
+Disallow: /media/
+Allow: /
+
+Sitemap: https://<your-domain>/sitemap.xml
+```
 
 ---
 
@@ -228,43 +364,64 @@ Sitemap index and section routes:
 
 ### Automated Coverage (highlights)
 
-#### Orders App
+#### Orders app
 
-#### Pages App
+- Guest add-to-cart (product + bundle), inline checkout PaymentIntent creation
+- Success view handling (?pi= or ?session_id=)
+- Webhook marks orders paid; idempotent on replay
 
-#### Products App
+#### Products app
 
-#### Users App
+- Product & bundle list views: filters, search, sort, pagination
+- Reviews (frontend CRUD + permissions): create/read, inline validation, single-review guard, admin update/delete
+- Models & admin forms: slugging, rating aggregation, bundle price math, image path behavior
 
-- **Reviews (frontend CRUD + permissions):** create/read, validation, single-review guard, admin update/delete UI & perms
-    
-- **Product & Bundle Lists:** filters, search, sort, pagination
-    
-- **Models & Admin Forms:** slugging, ratings aggregation, bundle price math, form behaviors
-    
-- **Checkout / Payments:** create PaymentIntent; success view; webhook marking orders paid (idempotent)
-    
-- **Sitemaps:** index & sections valid; robots references sitemap
-    
+#### Sitemaps (SEO)
+
+- Index & section sitemaps present and valid; robots.txt points to /sitemap.xml
+
+#### Users app — Dashboard & Profile
+
+- Login required redirects for profile/dashboard
+- Dashboard context includes saved products/bundles and order count
+- Save Product/Bundle requires login; toggling works
+- Delete account removes the user and redirects to login
+
+#### Pages app — Contact & Home
+
+- Home view includes featured products/bundles + newsletter form
+- Contact POST creates ContactMessage, captures IP/UA, and sends admin email
+- Email failures are handled gracefully with a user-facing error message
+
+Test suite passes locally; a benign staticfiles warning may appear when STATIC_ROOT isn’t present in dev.
 
 ### Manual QA (critical paths)
 
 - Guest cart (add/update/remove/clear)
     
 - Inline checkout (address → Payment Element mounts → success)
+
+![Guest Cart](/docs/guest_checkout/guest_cart.png)
+
+![Inline Checkout 1](/docs/guest_checkout/inline_checkout_001.png)
+
+![Inline Checkout 2](/docs/guest_checkout/inline_checkout_002.png)
     
 - Webhook marks order paid; confirmation email (prod)
+
+![Checkout Success](/docs/guest_checkout/checkout_success_001.png)
+
+![Checkout Confirmation](/docs/guest_checkout/checkout_success_002.PNG)
     
 - Reviews UX: inline errors, success messages
     
 - Saved items: remove/clear all
     
-
-> Tests are isolated (no real Stripe calls). A benign `staticfiles` warning may appear locally.
-
 ---
 
 ## Validation Results (HTML / CSS / JS / Python)
+
+Full validation reports are accessible via (`docs/validators/reports`).
 
 ### HTML 
 
@@ -298,7 +455,6 @@ Evidence: before/after PDFs & text reports in `docs/validators/reports/`.
     
 - Sitemap + robots configured; descriptive titles/meta
     
-
 ---
 
 ## Troubleshooting
@@ -313,19 +469,13 @@ Evidence: before/after PDFs & text reports in `docs/validators/reports/`.
     
 - **Sitemap shows `example.com`:** configure **Sites** (Admin → Sites) and `SITEMAP_PROTOCOL`.
     
-
 ---
 
-### Wireframes & Facebook Mockup
-
-![Homepage (Desktop)](/docs/wireframes//homepage_desktop.png)
-![Homepage (Mobile)](/docs/wireframes/homepage_mobile.png) 
-![Cart & Checkout (Mobile)](/docs/wireframes/cart_checkout_mobile.png)  
-![Product Detail (Mobile)](/docs/wireframes/product_detail_mobile.png)  
-![User Dashboard (Mobile)](/docs/wireframes/user_dashboard_mobile.png)  
-![Admin Panel (Desktop)](/docs/wireframes/admin_panel_desktop.png)  
-![Facebook Mockup](/docs/facebook_mockup/autovise_facebook_mockup.png)
-
----
-
-**Project value:** Autovise demonstrates a complete, production-ready Django stack with clean separation of concerns, role-based CRUD, real payment integration, SEO & accessibility considerations, and a thorough test/validation story suitable for assessment and hand-off.
+## Credits
+- Developer: Merrick Minogue
+- PostgreSQL Database Provider: Code Institute
+- Payments: Stripe
+- Hosting: Heroku
+- Icons: Font Awesome
+- Admin UI: Jazzmin
+- Image Storage: AWS S3
