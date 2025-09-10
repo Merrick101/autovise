@@ -5,7 +5,7 @@ Located at config/settings.py
 
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.messages import constants as messages
-from decouple import config
+from decouple import config, Csv
 from pathlib import Path
 
 
@@ -16,7 +16,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
@@ -283,6 +283,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 SITE_ID = config("SITE_ID", default=3, cast=int)
 
+SITEMAP_PROTOCOL = config('SITEMAP_PROTOCOL', default=('https' if not DEBUG else 'http'))
+
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -295,8 +297,8 @@ EMAIL_PORT = config('EMAIL_PORT', cast=int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
-CONTACT_RECIPIENTS = config('CONTACT_RECIPIENTS', default=['hello.autovise@gmail.com'])
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='hello.autovise@gmail.com')
+CONTACT_RECIPIENTS = config('CONTACT_RECIPIENTS', cast=Csv(), default=DEFAULT_FROM_EMAIL)
 SUPPORT_EMAIL = config('SUPPORT_EMAIL', default='')
 ORDERS_NOTIFICATION_EMAIL = config('ORDERS_NOTIFICATION_EMAIL', default='')
 
